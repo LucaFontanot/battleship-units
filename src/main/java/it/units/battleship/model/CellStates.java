@@ -3,7 +3,8 @@ package it.units.battleship.model;
 public enum CellStates {
     EMPTY('0'),
     HIT('X'),
-    MISS('M');
+    MISS('M'),
+    SHIP('S');
 
     public final char representation;
 
