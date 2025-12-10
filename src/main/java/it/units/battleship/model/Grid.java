@@ -84,4 +84,27 @@ public class Grid {
 
         return grid[coordinate.row()][coordinate.col()];
     }
+
+    /**
+     * Serializes the current state of the grid into a string representation, where each cell
+     * is represented by a specific character based on its state:
+     * - '0' for CellStates.EMPTY
+     * - 'X' for CellStates.HIT
+     * - 'M' for CellStates.MISS
+     *
+     * @return a string representation of the grid's current state
+     */
+    public String gridSerialization(){
+        StringBuilder flattedGrid = new StringBuilder();
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < col; j++) {
+                switch (grid[i][j]) {
+                    case EMPTY -> flattedGrid.append("0");
+                    case HIT ->   flattedGrid.append("X");
+                    case MISS ->  flattedGrid.append("M");
+                }
+            }
+        }
+        return flattedGrid.toString();
+    }
 }
