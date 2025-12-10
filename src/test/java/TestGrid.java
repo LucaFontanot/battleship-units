@@ -1,7 +1,4 @@
-import it.units.battleship.model.Carrier;
-import it.units.battleship.model.CellStates;
-import it.units.battleship.model.Grid;
-import it.units.battleship.model.Ship;
+import it.units.battleship.model.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -17,14 +14,32 @@ public class TestGrid {
         List<Ship> navy = new ArrayList<>();
         navy.add(new Carrier());
         Grid grid = new Grid(5, 5, navy);
-        CellStates cell = CellStates.EMPTY;
+        CellStates emptyCell = CellStates.EMPTY;
         CellStates[][] expected = {
-                {cell,cell,cell,cell,cell},
-                {cell,cell,cell,cell,cell},
-                {cell,cell,cell,cell,cell},
-                {cell,cell,cell,cell,cell},
-                {cell,cell,cell,cell,cell}
+                {emptyCell, emptyCell, emptyCell, emptyCell, emptyCell},
+                {emptyCell, emptyCell, emptyCell, emptyCell, emptyCell},
+                {emptyCell, emptyCell, emptyCell, emptyCell, emptyCell},
+                {emptyCell, emptyCell, emptyCell, emptyCell, emptyCell},
+                {emptyCell, emptyCell, emptyCell, emptyCell, emptyCell}
         };
         assertTrue(Arrays.deepEquals(expected, grid.getGrid()), "The grid is not initialized correctly.");
+    }
+
+    @Test
+    public void testChangeGridCellState(){
+        List<Ship> navy = new ArrayList<>();
+        navy.add(new Carrier());
+        Grid grid = new Grid(5, 5, navy);
+        grid.changeState(new Coordinate(2,2), CellStates.HIT);
+        assertEquals(CellStates.HIT, grid.getGrid()[2][2], "The grid cell state is not updated correctly.");
+    }
+
+    @Test
+    public void testGetGridCellState(){
+        List<Ship> navy = new ArrayList<>();
+        navy.add(new Carrier());
+        Grid grid = new Grid(5, 5, navy);
+        grid.changeState(new Coordinate(2,1), CellStates.HIT);
+        assertEquals(CellStates.HIT, grid.getState(new Coordinate(2,1)), "The grid cell state is not extracted correctly.");
     }
 }
