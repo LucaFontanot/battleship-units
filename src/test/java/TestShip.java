@@ -27,8 +27,7 @@ public class TestShip {
 
     @Test
     void testAddHit_OutsideShip(){
-        testShip.addHit(new Coordinate(2,2));
-        assertEquals(false, true);
+        assertFalse(testShip.addHit(new Coordinate(2,2)));
     }
     
     @Test
@@ -43,5 +42,12 @@ public class TestShip {
     void testAddHit_OnShipTwice(){
         testShip.addHit(new Coordinate(0,0));
         assertFalse(testShip.addHit(new Coordinate(0,0)));
+    }
+
+    @Test
+    void testIsSunk(){
+        testShip.addHit(new Coordinate(0,0));
+        testShip.addHit(new Coordinate(1,1));
+        assertTrue(testShip.isSunk());
     }
 }

@@ -6,11 +6,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestGrid {
     private Grid grid;
+
+    @Test
+    public void testGridCreation(){
+        assertThrowsExactly(IllegalArgumentException.class, () -> new Grid(0, 5));
+    }
 
     @BeforeEach
     void setUp() {
@@ -27,7 +31,6 @@ public class TestGrid {
                 {emptyCell, emptyCell, emptyCell, emptyCell, emptyCell},
                 {emptyCell, emptyCell, emptyCell, emptyCell, emptyCell}
         };
-        System.out.println(Arrays.deepToString(grid.getGrid()));
         assertTrue(Arrays.deepEquals(expected, grid.getGrid()), "The grid is not initialized correctly.");
     }
 
@@ -35,6 +38,11 @@ public class TestGrid {
     public void testChangeGridCellState(){
         grid.changeState(new Coordinate(2,2), CellStates.HIT);
         assertEquals(CellStates.HIT, grid.getGrid()[2][2], "The grid cell state is not updated correctly.");
+    }
+
+    @Test
+    public void testChangeGridCellStateOutOfBounds(){
+        assertThrowsExactly(IndexOutOfBoundsException.class, () -> grid.changeState(new Coordinate(5,5), CellStates.HIT));
     }
 
     @Test

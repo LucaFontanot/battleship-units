@@ -25,7 +25,7 @@ public class Grid {
     private final CellStates[][] grid;
 
     public Grid(int row, int col){
-        if (row<=0 || col<=0){
+        if (row<=1 || col<=1){
             throw new IllegalArgumentException("Columns and rows value must be strictly positive");
         }
         this.row = row;
