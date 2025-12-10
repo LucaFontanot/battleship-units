@@ -1,4 +1,5 @@
 import it.units.battleship.model.*;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -9,11 +10,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestGrid {
-    @Test
-    public void testInitGrid(){
+    private Grid grid;
+
+    @BeforeEach
+    void setUp() {
         List<Ship> navy = new ArrayList<>();
         navy.add(new Carrier());
-        Grid grid = new Grid(5, 5, navy);
+        grid = new Grid(5, 5, navy);
+    }
+
+    @Test
+    public void testInitGrid(){
         CellStates emptyCell = CellStates.EMPTY;
         CellStates[][] expected = {
                 {emptyCell, emptyCell, emptyCell, emptyCell, emptyCell},
@@ -28,27 +35,18 @@ public class TestGrid {
 
     @Test
     public void testChangeGridCellState(){
-        List<Ship> navy = new ArrayList<>();
-        navy.add(new Carrier());
-        Grid grid = new Grid(5, 5, navy);
         grid.changeState(new Coordinate(2,2), CellStates.HIT);
         assertEquals(CellStates.HIT, grid.getGrid()[2][2], "The grid cell state is not updated correctly.");
     }
 
     @Test
     public void testGetGridCellState(){
-        List<Ship> navy = new ArrayList<>();
-        navy.add(new Carrier());
-        Grid grid = new Grid(5, 5, navy);
         grid.changeState(new Coordinate(2,1), CellStates.HIT);
         assertEquals(CellStates.HIT, grid.getState(new Coordinate(2,1)), "The grid cell state is not extracted correctly.");
     }
 
     @Test
     public void testGridSerialization(){
-        List<Ship> navy = new ArrayList<>();
-        navy.add(new Carrier());
-        Grid grid = new Grid(5, 5, navy);
 
         CellStates hitCell = CellStates.HIT;
         CellStates missCell = CellStates.MISS;

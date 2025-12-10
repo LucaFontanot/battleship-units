@@ -98,11 +98,7 @@ public class Grid {
         StringBuilder flattedGrid = new StringBuilder();
         for (int i = 0; i < row; i++) {
             for (int j = 0; j < col; j++) {
-                switch (grid[i][j]) {
-                    case EMPTY -> flattedGrid.append("0");
-                    case HIT ->   flattedGrid.append("X");
-                    case MISS ->  flattedGrid.append("M");
-                }
+                flattedGrid.append(grid[i][j].representation);
             }
         }
         return flattedGrid.toString();

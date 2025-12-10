@@ -1,7 +1,13 @@
 package it.units.battleship.model;
 
 public enum CellStates {
-    MISS,
-    EMPTY,
-    HIT
+    EMPTY('0'),
+    HIT('X'),
+    MISS('M');
+
+    public final char representation;
+
+    CellStates(char representation){
+        this.representation = representation;
+    }
 }
