@@ -54,4 +54,34 @@ public class Grid {
             }
         }
     }
+
+    /**
+     * Updates the state of the cell at the specified coordinate in the grid.
+     *
+     * @param coordinate the coordinate of the cell to update; must be non-null and within the grid's bounds
+     * @param newState the new state to assign to the specified cell; must be non-null
+     * @throws IndexOutOfBoundsException if the specified coordinate is outside the grid's dimensions
+     */
+    public void changeState(@NonNull Coordinate coordinate, @NonNull CellStates newState){
+        if (coordinate.row() < 0 || coordinate.row() >= row || coordinate.col() < 0 || coordinate.col() >= col) {
+            throw new IndexOutOfBoundsException("Coordinates must respect grid dimension");
+        }
+
+        grid[coordinate.row()][coordinate.col()] = newState;
+    }
+
+    /**
+     * Retrieves the state of the cell at the given coordinate in the grid.
+     *
+     * @param coordinate the coordinate of the cell to retrieve the state from; must be within the grid's bounds
+     * @return the state of the cell at the specified coordinate
+     * @throws IndexOutOfBoundsException if the specified coordinate is outside the grid's dimensions
+     */
+    public CellStates getState(@NonNull Coordinate coordinate){
+        if (coordinate.row() < 0 || coordinate.row() >= row || coordinate.col() < 0 || coordinate.col() >= col) {
+            throw new IndexOutOfBoundsException("Coordinates must respect grid dimension");
+        }
+
+        return grid[coordinate.row()][coordinate.col()];
+    }
 }
