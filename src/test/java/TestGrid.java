@@ -56,13 +56,12 @@ public class TestGrid {
 
         CellStates hitCell = CellStates.HIT;
         CellStates missCell = CellStates.MISS;
-        CellStates shipCell = CellStates.SHIP;
 
-        grid.changeState(new Coordinate(2,4), shipCell);
+        grid.changeState(new Coordinate(2,4), hitCell);
         grid.changeState(new Coordinate(3,1), missCell);
         grid.changeState(new Coordinate(4,4), hitCell);
 
-        String expected = "00000000000000S0M0000000X";
+        String expected = "00000000000000X0M0000000X";
 
         assertEquals(expected, grid.gridSerialization(), "The grid is not serialized correctly.");
     }
