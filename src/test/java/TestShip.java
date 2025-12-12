@@ -1,5 +1,6 @@
 import it.units.battleship.model.Coordinate;
 import it.units.battleship.model.Ship;
+import it.units.battleship.model.shipType.ShipType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -11,8 +12,8 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TestShip {
 
     private static class TestShipImpl extends Ship {
-        TestShipImpl(Set<Coordinate> coordinates) {
-            super(coordinates);
+        TestShipImpl(Set<Coordinate> coordinates, ShipType type) {
+            super(coordinates, type);
         }
     }
 
@@ -21,8 +22,9 @@ public class TestShip {
 
     @BeforeEach
     void setUp() {
-        testCoordinates = Set.of(new Coordinate(0,0), new Coordinate(1,1));
-        testShip = new TestShipImpl(testCoordinates);
+        testCoordinates = Set.of(new Coordinate(0,0), new Coordinate(0,1));
+        ShipType testType = ShipType.DESTROYER;
+        testShip = new TestShipImpl(testCoordinates, testType);
     }
 
     @Test
@@ -45,9 +47,21 @@ public class TestShip {
     }
 
     @Test
-    void testIsSunk(){
+    void testIsSunk_AllCoordinates(){
         testShip.addHit(new Coordinate(0,0));
-        testShip.addHit(new Coordinate(1,1));
+        testShip.addHit(new Coordinate(0,1));
         assertTrue(testShip.isSunk());
+    }
+
+    @Test
+    void testIsSunk_PartialHits() {
+        testShip.addHit(new Coordinate(0, 0));
+        assertFalse(testShip.isSunk(), "Expected ship to not be sunk when not all coordinates are hit.");
+    }
+
+    @Test
+    void testIsSunk_NoHits() {
+        // Assert ship is not sunk with no hits
+        assertFalse(testShip.isSunk(), "Expected ship to not be sunk when no coordinates are hit.");
     }
 }

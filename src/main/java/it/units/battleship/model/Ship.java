@@ -1,5 +1,6 @@
 package it.units.battleship.model;
 
+import it.units.battleship.model.shipType.ShipType;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -11,15 +12,17 @@ import java.util.*;
  */
 public abstract class Ship {
 
+    private final ShipType type;
     @Getter
     private final Set<Coordinate> coordinates;
     @Getter
     private final Set<Coordinate> hitCoordinates;
 
-    public Ship(@NonNull Set<Coordinate> coordinates){
+    public Ship(@NonNull Set<Coordinate> coordinates, @NonNull ShipType type){
         if (coordinates.size() <= 1){
             throw new IllegalArgumentException("Ship must have at least two cells");
         }
+        this.type = type;
         this.coordinates = Collections.unmodifiableSet(new HashSet<>(coordinates));
         this.hitCoordinates = new HashSet<>();
     }
@@ -48,7 +51,7 @@ public abstract class Ship {
      * Returns the size of the ship.
      */
     public int getSize(){
-        return coordinates.size();
+        return type.getSize();
     }
 
     /**
@@ -56,6 +59,14 @@ public abstract class Ship {
      */
     public int getHitsCount(){
         return hitCoordinates.size();
+    }
+
+    /**
+     * Returns the type of the ship.
+     * @return the name of the ship type, such as CARRIER, BATTLESHIP, etc.
+     */
+    public String getShipType(){
+        return type.getName();
     }
 
 }
