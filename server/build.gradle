@@ -1,5 +1,5 @@
 dependencies {
-    implementation project(':common')
+    implementation project(':battleship-common')
     implementation 'io.javalin:javalin:6.7.0'
 }
 
