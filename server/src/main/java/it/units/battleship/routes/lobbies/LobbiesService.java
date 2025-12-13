@@ -1,6 +1,5 @@
 package it.units.battleship.routes.lobbies;
 
-import io.javalin.websocket.WsConfig;
 import it.units.battleship.data.LobbyData;
 import it.units.battleship.models.Lobby;
 
@@ -15,6 +14,7 @@ public class LobbiesService {
 
     /**
      * Returns a list of all lobbies.
+     *
      * @return list of all lobbies
      */
     public List<Lobby> getAllLobbies() {
@@ -23,6 +23,7 @@ public class LobbiesService {
 
     /**
      * Returns a list of available lobbies (lobbies without a second player).
+     *
      * @return list of available lobbies
      */
     public List<Lobby> getAvailableLobbies() {
@@ -31,6 +32,7 @@ public class LobbiesService {
 
     /**
      * Returns a lobby by its ID.
+     *
      * @param lobbyID the ID of the lobby
      * @return the lobby with the specified ID, or null if not found
      */
@@ -40,6 +42,7 @@ public class LobbiesService {
 
     /**
      * Adds a new lobby.
+     *
      * @param lobby the lobby to add
      */
     public void addLobby(Lobby lobby) {
@@ -48,6 +51,7 @@ public class LobbiesService {
 
     /**
      * Adds a new lobby from LobbyData.
+     *
      * @param lobbyData the lobby data to create the lobby from
      */
     public void addLobby(LobbyData lobbyData) {
@@ -60,32 +64,84 @@ public class LobbiesService {
 
     /**
      * Removes a lobby by its ID.
+     *
      * @param lobbyID the ID of the lobby to remove
      */
     public void removeLobby(String lobbyID) {
         lobbies.remove(lobbyID);
     }
 
+    public enum PlayerType {
+        PLAYER_ONE,
+        PLAYER_TWO,
+        INVALID
+    }
+
+    /**
+     * Connects a player to a lobby.
+     *
+     * @param lobbyID    the ID of the lobby
+     * @param player     the WebSocket configuration of the player
+     * @param playerName the name of the player
+     * @return the type of player connected (PLAYER_ONE, PLAYER_TWO, or INVALID)
+     */
+    public PlayerType connectPlayer(String lobbyID, LobbySocketClient player, String playerName) {
+        Lobby lobby = lobbies.get(lobbyID);
+        if (lobby != null) {
+            if (lobby.getPlayerOneCtx() == null) {
+                lobby.setPlayerOneCtx(player);
+                lobby.setPlayerOne(playerName);
+                return PlayerType.PLAYER_ONE;
+            } else if (lobby.getPlayerTwoCtx() == null) {
+                lobby.setPlayerTwoCtx(player);
+                lobby.setPlayerTwo(playerName);
+                return PlayerType.PLAYER_TWO;
+            } else {
+                return PlayerType.INVALID;
+            }
+        } else {
+            return PlayerType.INVALID;
+        }
+    }
+
+    /**
+     * Connects player one to a lobby.
+     *
+     * @param lobbyID   the ID of the lobby
+     * @param playerOne the WebSocket configuration of player one
+     */
+    public void connectPlayerOne(String lobbyID, LobbySocketClient playerOne, String playerOneName) {
+        Lobby lobby = lobbies.get(lobbyID);
+        if (lobby != null) {
+            lobby.setPlayerOneCtx(playerOne);
+            lobby.setPlayerOne(playerOneName);
+        }
+    }
+
     /**
      * Connects player two to a lobby.
-     * @param lobbyID the ID of the lobby
+     *
+     * @param lobbyID   the ID of the lobby
      * @param playerTwo the WebSocket configuration of player two
      */
-    public void connectPlayerTwo(String lobbyID, WsConfig playerTwo) {
+    public void connectPlayerTwo(String lobbyID, LobbySocketClient playerTwo, String playerTwoName) {
         Lobby lobby = lobbies.get(lobbyID);
         if (lobby != null) {
             lobby.setPlayerTwoCtx(playerTwo);
+            lobby.setPlayerTwo(playerTwoName);
         }
     }
 
     /**
      * Disconnects player one from a lobby.
+     *
      * @param lobbyID the ID of the lobby
      */
     public void disconnectPlayerOne(String lobbyID) {
         Lobby lobby = lobbies.get(lobbyID);
         if (lobby != null) {
             lobby.setPlayerOne(null);
+            lobby.setPlayerOneCtx(null);
             if (lobby.getPlayerTwoCtx() == null) {
                 lobbies.remove(lobbyID);
             }
@@ -94,12 +150,14 @@ public class LobbiesService {
 
     /**
      * Disconnects player two from a lobby.
+     *
      * @param lobbyID the ID of the lobby
      */
     public void disconnectPlayerTwo(String lobbyID) {
         Lobby lobby = lobbies.get(lobbyID);
         if (lobby != null) {
             lobby.setPlayerTwo(null);
+            lobby.setPlayerTwoCtx(null);
             if (lobby.getPlayerOneCtx() == null) {
                 lobbies.remove(lobbyID);
             }

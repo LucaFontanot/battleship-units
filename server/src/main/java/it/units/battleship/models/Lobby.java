@@ -1,6 +1,6 @@
 package it.units.battleship.models;
 
-import io.javalin.websocket.WsConfig;
+import it.units.battleship.routes.lobbies.LobbySocketClient;
 import it.units.battleship.data.LobbyData;
 import lombok.*;
 
@@ -10,6 +10,6 @@ import lombok.*;
 @Getter
 @Setter
 public class Lobby extends LobbyData {
-    WsConfig playerOneCtx;
-    WsConfig playerTwoCtx;
+    LobbySocketClient playerOneCtx;
+    LobbySocketClient playerTwoCtx;
 }
