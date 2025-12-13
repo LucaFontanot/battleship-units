@@ -30,19 +30,18 @@ public class WebServerApp extends Thread {
             config.jetty.modifyWebSocketServletFactory(factory -> {
                 factory.setIdleTimeout(Duration.ofHours(1));
             });
+            config.router.mount( router -> {
+                router.before(ctx -> {
+                    Logger.log(String.format("[%s] %s %s", ctx.method(), ctx.path(), ctx.ip()));
+                });
+                for (AbstractRoute<?> route : routes) {
+                    router.get(route.getRoutePath(), route::handleGetRequest);
+                    router.post(route.getRoutePath(), route::handlePostRequest);
+                    router.put(route.getRoutePath(), route::handlePutRequest);
+                    router.delete(route.getRoutePath(), route::handleDeleteRequest);
+                }
+            });
         });
-    }
-
-    /**
-     * Registers all routes with the Javalin application.
-     */
-    void registerRoutes() {
-        for (AbstractRoute<?> route : routes) {
-            app.get(route.getRoutePath(), route::handleGetRequest);
-            app.post(route.getRoutePath(), route::handlePostRequest);
-            app.put(route.getRoutePath(), route::handlePutRequest);
-            app.delete(route.getRoutePath(), route::handleDeleteRequest);
-        }
     }
 
     /**
@@ -50,7 +49,6 @@ public class WebServerApp extends Thread {
      */
     @Override
     public void run() {
-        registerRoutes();
         app.start(port);
     }
 }
