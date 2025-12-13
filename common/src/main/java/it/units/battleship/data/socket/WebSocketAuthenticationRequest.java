@@ -1,4 +1,4 @@
-package it.units.battleship.data;
+package it.units.battleship.data.socket;
 
 import lombok.*;
 
@@ -7,7 +7,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class LobbyCreateRequestData {
+public class WebSocketAuthenticationRequest {
+    String id;
     String name;
-    String player;
 }
