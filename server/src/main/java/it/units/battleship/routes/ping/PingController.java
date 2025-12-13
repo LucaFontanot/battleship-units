@@ -44,6 +44,6 @@ public class PingController extends AbstractRoute<PingService> {
      */
     @Override
     public void handleGetRequest(Context ctx) {
-        ctx.status(200).result(getGson().toJson(getService().getPingResponse(), PingResponseData.class));
+        ctx.status(200).result(getApp().getGson().toJson(getService().getPingResponse(), PingResponseData.class));
     }
 }

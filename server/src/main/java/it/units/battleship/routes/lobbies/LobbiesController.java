@@ -1,12 +1,12 @@
 package it.units.battleship.routes.lobbies;
 
 import io.javalin.http.Context;
+import io.javalin.websocket.WsConfig;
 import it.units.battleship.WebServerApp;
 import it.units.battleship.data.LobbiesResponseData;
 import it.units.battleship.data.LobbyCreateRequestData;
 import it.units.battleship.data.LobbyData;
 import it.units.battleship.impl.AbstractRoute;
-import it.units.battleship.models.Lobby;
 
 import java.util.UUID;
 
@@ -37,18 +37,23 @@ public class LobbiesController extends AbstractRoute<LobbiesService> {
                 .count(getService().getAllLobbies().size())
                 .results(getService().getAvailableLobbies())
                 .build();
-        ctx.status(200).result(getGson().toJson(data, LobbiesResponseData.class));
+        ctx.status(200).result(getApp().getGson().toJson(data, LobbiesResponseData.class));
     }
 
     @Override
     public void handlePostRequest(Context ctx) {
-        LobbyCreateRequestData requestData = getGson().fromJson(ctx.body(), LobbyCreateRequestData.class);
+        LobbyCreateRequestData requestData = getApp().getGson().fromJson(ctx.body(), LobbyCreateRequestData.class);
         LobbyData newLobby = LobbyData.builder()
                 .lobbyID(UUID.randomUUID().toString())
                 .lobbyName(requestData.getName())
-                .playerOne(requestData.getPlayerOne())
+                .playerOne(requestData.getPlayer())
                 .build();
         getService().addLobby(newLobby);
-        ctx.status(201).result(getGson().toJson(newLobby, LobbyData.class));
+        ctx.status(201).result(getApp().getGson().toJson(newLobby, LobbyData.class));
+    }
+
+    @Override
+    public void handleWebsocketRequest(WsConfig config) {
+        new LobbySocketClient(getApp(), config);
     }
 }
