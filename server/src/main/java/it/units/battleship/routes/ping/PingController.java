@@ -1,6 +1,7 @@
 package it.units.battleship.routes.ping;
 
 import io.javalin.http.Context;
+import it.units.battleship.WebServerApp;
 import it.units.battleship.data.PingResponseData;
 import it.units.battleship.impl.AbstractRoute;
 
@@ -9,6 +10,15 @@ import it.units.battleship.impl.AbstractRoute;
  */
 public class PingController extends AbstractRoute<PingService> {
     final PingService service = new PingService();
+
+    /**
+     * Constructor for AbstractRoute.
+     *
+     * @param app the WebServerApp instance
+     */
+    public PingController(WebServerApp app) {
+        super(app);
+    }
 
     /**
      * Returns the PingService associated with the route.
@@ -34,6 +44,6 @@ public class PingController extends AbstractRoute<PingService> {
      */
     @Override
     public void handleGetRequest(Context ctx) {
-        ctx.status(200).result(getGson().toJsonString(getService().getPingResponse(), PingResponseData.class));
+        ctx.status(200).result(getGson().toJson(getService().getPingResponse(), PingResponseData.class));
     }
 }
