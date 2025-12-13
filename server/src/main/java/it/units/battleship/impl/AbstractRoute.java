@@ -1,12 +1,8 @@
 package it.units.battleship.impl;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import io.javalin.http.Context;
-import io.javalin.json.JavalinGson;
+import io.javalin.websocket.WsConfig;
 import it.units.battleship.WebServerApp;
-import it.units.battleship.models.Lobby;
-import it.units.battleship.models.LobbySerializer;
 import lombok.Getter;
 
 /**
@@ -14,11 +10,6 @@ import lombok.Getter;
  */
 public abstract class AbstractRoute <T> {
 
-    @Getter
-    final Gson gson = new GsonBuilder()
-            .registerTypeAdapter(Lobby.class, new LobbySerializer())
-            .setPrettyPrinting()
-            .create();
     @Getter
     final WebServerApp app;
 
@@ -86,5 +77,15 @@ public abstract class AbstractRoute <T> {
      */
     public void handlePatchRequest(Context ctx) {
         ctx.status(501).result("Not Implemented");
+    }
+
+    /**
+     * Handles WebSocket requests.
+     * @param config the WebSocket configuration
+     */
+    public void handleWebsocketRequest(WsConfig config) {
+        config.onConnect(ctx -> {
+            ctx.session.close();
+        });
     }
 }
