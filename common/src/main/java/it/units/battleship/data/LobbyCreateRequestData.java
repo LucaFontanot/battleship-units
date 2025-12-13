@@ -7,9 +7,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class LobbyData {
-    String lobbyID;
-    String lobbyName;
+public class LobbyCreateRequestData {
+    String name;
     String playerOne;
-    String playerTwo;
 }
