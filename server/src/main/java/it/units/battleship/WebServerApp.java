@@ -2,6 +2,8 @@ package it.units.battleship;
 
 import io.javalin.Javalin;
 import it.units.battleship.impl.AbstractRoute;
+import it.units.battleship.routes.lobbies.LobbiesController;
+import it.units.battleship.routes.lobbies.LobbiesService;
 import it.units.battleship.routes.ping.PingController;
 import lombok.Getter;
 
@@ -14,9 +16,12 @@ public class WebServerApp extends Thread {
     @Getter
     final Javalin app;
     final int port;
+    @Getter
+    final LobbiesService lobbiesService = new LobbiesService();
 
     final AbstractRoute<?>[] routes = new AbstractRoute<?>[]{
-            new PingController()
+            new PingController(this),
+            new LobbiesController(this),
     };
 
     /**

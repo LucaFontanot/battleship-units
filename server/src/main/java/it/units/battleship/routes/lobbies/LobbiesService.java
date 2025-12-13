@@ -1,4 +1,4 @@
-package it.units.battleship.services;
+package it.units.battleship.routes.lobbies;
 
 import io.javalin.websocket.WsConfig;
 import it.units.battleship.models.Lobby;
@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * LobbyService class that manages game lobbies.
  */
-public class LobbyService {
+public class LobbiesService {
     final HashMap<String, Lobby> lobbies = new HashMap<>();
 
     /**
@@ -25,7 +25,7 @@ public class LobbyService {
      * @return list of available lobbies
      */
     public List<Lobby> getAvailableLobbies() {
-        return lobbies.values().stream().filter(lobby -> lobby.getPlayerTwo() == null).toList();
+        return lobbies.values().stream().filter(lobby -> lobby.getPlayerTwoCtx() == null).toList();
     }
 
     /**
@@ -61,7 +61,7 @@ public class LobbyService {
     public void connectPlayerTwo(String lobbyID, WsConfig playerTwo) {
         Lobby lobby = lobbies.get(lobbyID);
         if (lobby != null) {
-            lobby.setPlayerTwo(playerTwo);
+            lobby.setPlayerTwoCtx(playerTwo);
         }
     }
 
@@ -73,7 +73,7 @@ public class LobbyService {
         Lobby lobby = lobbies.get(lobbyID);
         if (lobby != null) {
             lobby.setPlayerOne(null);
-            if (lobby.getPlayerTwo() == null) {
+            if (lobby.getPlayerTwoCtx() == null) {
                 lobbies.remove(lobbyID);
             }
         }
@@ -87,7 +87,7 @@ public class LobbyService {
         Lobby lobby = lobbies.get(lobbyID);
         if (lobby != null) {
             lobby.setPlayerTwo(null);
-            if (lobby.getPlayerOne() == null) {
+            if (lobby.getPlayerOneCtx() == null) {
                 lobbies.remove(lobbyID);
             }
         }
