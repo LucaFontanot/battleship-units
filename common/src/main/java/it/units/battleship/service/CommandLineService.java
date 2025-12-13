@@ -1,6 +1,9 @@
 package it.units.battleship.service;
 
 import org.apache.commons.cli.*;
+import org.apache.commons.cli.help.HelpFormatter;
+
+import java.io.IOException;
 
 /**
  * Service for parsing and handling command-line arguments.
@@ -59,5 +62,14 @@ public class CommandLineService {
         } else {
             return 443;
         }
+    }
+
+    /**
+     * Prints the help message.
+     * @throws IOException if an I/O error occurs
+     */
+    public void printHelp() throws IOException {
+        HelpFormatter formatter = HelpFormatter.builder().get();
+        formatter.printHelp("java -jar Battleship-server-jar", "", options, "", true);
     }
 }
