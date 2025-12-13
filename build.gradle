@@ -3,41 +3,33 @@ plugins {
     id("com.gradleup.shadow") version "9.2.2"
 }
 
-group = 'it.units'
-version = '0.1'
+allprojects {
+    apply plugin: 'java'
+    apply plugin: 'com.gradleup.shadow'
 
-repositories {
-    mavenCentral()
-    maven {
-        url = uri("https://jitpack.io")
+    group = 'it.units.battleship'
+    version = '0.1'
+
+    repositories {
+        mavenCentral()
+        maven {
+            url = uri("https://jitpack.io")
+        }
     }
-}
 
-dependencies {
-    compileOnly "org.projectlombok:lombok:1.18.42"
-    annotationProcessor "org.projectlombok:lombok:1.18.42"
-    implementation 'commons-cli:commons-cli:1.11.0'
-    implementation 'org.apache.logging.log4j:log4j-core:2.25.2'
-    implementation 'org.apache.logging.log4j:log4j-slf4j2-impl:2.25.2'
-    implementation 'io.javalin:javalin:6.7.0'
+    dependencies {
+        compileOnly "org.projectlombok:lombok:1.18.42"
+        annotationProcessor "org.projectlombok:lombok:1.18.42"
 
-    testImplementation platform('org.junit:junit-bom:5.10.0')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    testCompileOnly "org.projectlombok:lombok:1.18.42"
-    testAnnotationProcessor "org.projectlombok:lombok:1.18.42"
-}
-
-shadowJar {
-    archiveFileName.set('Battleship.jar')
-    mergeServiceFiles()
-    manifest {
-        attributes(
-                'Main-Class': 'it.units.battleship.Main'
-        )
+        testImplementation platform('org.junit:junit-bom:5.10.0')
+        testImplementation 'org.junit.jupiter:junit-jupiter'
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+        testCompileOnly "org.projectlombok:lombok:1.18.42"
+        testAnnotationProcessor "org.projectlombok:lombok:1.18.42"
     }
-}
 
-test {
-    useJUnitPlatform()
+    test {
+        useJUnitPlatform()
+    }
+
 }

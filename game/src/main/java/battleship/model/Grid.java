@@ -1,9 +1,7 @@
-package it.units.battleship.model;
+package battleship.model;
 
 import lombok.Getter;
 import lombok.NonNull;
-
-import java.util.List;
 
 /**
  * Represents a grid for the Battleship game, containing cells that can be in different states (EMPTY, HIT, or MISS).

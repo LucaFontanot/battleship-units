@@ -1,4 +1,4 @@
-package it.units.battleship.view;
+package battleship.view;
 
 /**
  * Represents the main window (frame) of the Battleship game's graphical user interface (GUI).

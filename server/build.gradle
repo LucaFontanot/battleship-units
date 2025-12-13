@@ -1,0 +1,14 @@
+dependencies {
+    implementation project(':common')
+    implementation 'io.javalin:javalin:6.7.0'
+}
+
+shadowJar {
+    archiveFileName.set('Battleship-Server.jar')
+    mergeServiceFiles()
+    manifest {
+        attributes(
+                'Main-Class': 'it.units.battleship.Main'
+        )
+    }
+}

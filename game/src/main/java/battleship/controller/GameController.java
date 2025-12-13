@@ -1,4 +1,4 @@
-package it.units.battleship.controller;
+package battleship.controller;
 
 /**
  * Manages the core game flow and logic of the Battleship game.
