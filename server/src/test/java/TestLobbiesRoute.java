@@ -1,6 +1,8 @@
 import com.google.gson.Gson;
 import it.units.battleship.WebServerApp;
 import it.units.battleship.data.LobbiesResponseData;
+import it.units.battleship.data.LobbyCreateRequestData;
+import it.units.battleship.data.LobbyData;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -30,6 +32,7 @@ public class TestLobbiesRoute {
 
     @Test
     public void testLobbiesRoute() {
+        testLobbyCreationRoute();
         Request request = new Request.Builder()
                 .url("http://localhost:7000/api/lobbies")
                 .get()
@@ -39,10 +42,37 @@ public class TestLobbiesRoute {
             assertNotNull(response.body());
             LobbiesResponseData lobbiesResponseData = gson.fromJson(response.body().string(), LobbiesResponseData.class);
             assertNotNull(lobbiesResponseData);
-            assertTrue(lobbiesResponseData.getCount() >= 0);
+            assertEquals(1, lobbiesResponseData.getCount());
             assertNotNull(lobbiesResponseData.getResults());
+            assertEquals(1, lobbiesResponseData.getResults().size());
+            LobbyData lobbyData = lobbiesResponseData.getResults().get(0);
+            assertEquals("Test Lobby", lobbyData.getLobbyName());
+            assertEquals("Player1", lobbyData.getPlayerOne());
+            assertNotNull(lobbyData.getLobbyID());
+            assertFalse(lobbyData.getLobbyID().isEmpty());
         } catch (Exception e) {
             fail("Exception during testLobbiesRoute: " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void testLobbyCreationRoute() {
+        Request request = new Request.Builder()
+                .url("http://localhost:7000/api/lobbies")
+                .post(okhttp3.RequestBody.create(
+                        gson.toJson(new LobbyCreateRequestData("Test Lobby", "Player1")),
+                        okhttp3.MediaType.parse("application/json")))
+                .build();
+        try (Response response = new OkHttpClient().newCall(request).execute()) {
+            assertEquals(201, response.code());
+            assertNotNull(response.body());
+            LobbyData lobbyData = gson.fromJson(response.body().string(), it.units.battleship.data.LobbyData.class);
+            assertNotNull(lobbyData);
+            assertEquals("Test Lobby", lobbyData.getLobbyName());
+            assertEquals("Player1", lobbyData.getPlayerOne());
+            System.out.println("Created Lobby ID: " + lobbyData.getLobbyID());
+        } catch (Exception e) {
+            fail("Exception during testLobbyCreationRoute: " + e.getMessage());
         }
     }
 }

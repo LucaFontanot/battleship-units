@@ -1,6 +1,7 @@
 package it.units.battleship.routes.lobbies;
 
 import io.javalin.websocket.WsConfig;
+import it.units.battleship.data.LobbyData;
 import it.units.battleship.models.Lobby;
 
 import java.util.HashMap;
@@ -42,6 +43,18 @@ public class LobbiesService {
      * @param lobby the lobby to add
      */
     public void addLobby(Lobby lobby) {
+        lobbies.put(lobby.getLobbyID(), lobby);
+    }
+
+    /**
+     * Adds a new lobby from LobbyData.
+     * @param lobbyData the lobby data to create the lobby from
+     */
+    public void addLobby(LobbyData lobbyData) {
+        Lobby lobby = new Lobby();
+        lobby.setLobbyID(lobbyData.getLobbyID());
+        lobby.setLobbyName(lobbyData.getLobbyName());
+        lobby.setPlayerOne(lobbyData.getPlayerOne());
         lobbies.put(lobby.getLobbyID(), lobby);
     }
 
