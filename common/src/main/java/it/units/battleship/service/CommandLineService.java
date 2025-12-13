@@ -25,7 +25,6 @@ public class CommandLineService {
      */
     void buildOptions() {
         options.addOption("h", "help", false, "Show help");
-        options.addOption("s", "server", false, "Start application as webserver");
         options.addOption("p", "port", true, "Webserver port number");
         options.addOption("v", "version", false, "Show version");
     }
@@ -44,14 +43,6 @@ public class CommandLineService {
      */
     public boolean isVersionRequested() {
         return cmd.hasOption("v");
-    }
-
-    /**
-     * Checks if the application should run in server mode.
-     * @return true if server mode is requested, false otherwise
-     */
-    public boolean isServerMode() {
-        return cmd.hasOption("s");
     }
 
     /**

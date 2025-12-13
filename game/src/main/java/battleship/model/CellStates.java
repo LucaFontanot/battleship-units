@@ -1,4 +1,4 @@
-package it.units.battleship.model;
+package battleship.model;
 
 public enum CellStates {
     EMPTY('0'),

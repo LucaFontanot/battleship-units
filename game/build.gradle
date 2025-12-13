@@ -1,0 +1,9 @@
+shadowJar {
+    archiveFileName.set('Battleship.jar')
+    mergeServiceFiles()
+    manifest {
+        attributes(
+                'Main-Class': 'it.units.battleship.Main'
+        )
+    }
+}

@@ -1,4 +1,4 @@
-package it.units.battleship.view;
+package battleship.view;
 
 /**
  * Defines the contract for a view in the Battleship game, decoupling the from the game logic.
