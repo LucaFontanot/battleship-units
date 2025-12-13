@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" name="ConversationsLogger">
+    <Appenders>
+        <RollingFile name="ConversationFile"
+                     fileName="${sys:programPath}/logs/system.log"
+                     filePattern="${sys:programPath}/logs/system-%d{MM-dd-yyyy}.log.gz"
+                     append="true">
+
+            <PatternLayout pattern="%d{MM-dd-yy HH:mm:ss.SSS} %m%n"/>
+
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+            </Policies>
+
+            <DefaultRolloverStrategy min="1" max="20" compressionLevel="1" fileIndex="min">
+                <Delete basePath="${sys:programPath}/logs" maxDepth="1">
+                    <IfFileName glob="system-*.log.gz"/>
+                    <IfLastModified age="P14D"/>
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{MM-dd-yy HH:mm:ss.SSS} %m%n"/>
+        </Console>
+    </Appenders>
+
+    <Loggers>
+        <Root level="info">
+            <AppenderRef ref="ConversationFile"/>
+            <AppenderRef ref="Console"/>
+        </Root>
+    </Loggers>
+</Configuration>
