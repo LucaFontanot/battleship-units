@@ -1,7 +1,11 @@
 package it.units.battleship;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import io.javalin.Javalin;
 import it.units.battleship.impl.AbstractRoute;
+import it.units.battleship.models.Lobby;
+import it.units.battleship.models.LobbySerializer;
 import it.units.battleship.routes.lobbies.LobbiesController;
 import it.units.battleship.routes.lobbies.LobbiesService;
 import it.units.battleship.routes.ping.PingController;
@@ -13,6 +17,11 @@ import java.time.Duration;
  * WebServerApp class that initializes and starts a Javalin web server.
  */
 public class WebServerApp extends Thread {
+    @Getter
+    final Gson gson = new GsonBuilder()
+            .registerTypeAdapter(Lobby.class, new LobbySerializer())
+            .setPrettyPrinting()
+            .create();
     @Getter
     final Javalin app;
     final int port;
@@ -44,6 +53,7 @@ public class WebServerApp extends Thread {
                     router.post(route.getRoutePath(), route::handlePostRequest);
                     router.put(route.getRoutePath(), route::handlePutRequest);
                     router.delete(route.getRoutePath(), route::handleDeleteRequest);
+                    router.ws(route.getRoutePath(), route::handleWebsocketRequest);
                 }
             });
         });
@@ -55,5 +65,12 @@ public class WebServerApp extends Thread {
     @Override
     public void run() {
         app.start(port);
+    }
+
+    /**
+     * Stops the Javalin web server.
+     */
+    public void close(){
+        app.stop();
     }
 }
