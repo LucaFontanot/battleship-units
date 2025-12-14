@@ -70,4 +70,24 @@ public class FleetManager {
         }
         return true;
     }
+
+    /**
+     * Removes a ship from the fleet. If the specified ship exists in the fleet, it is removed.
+     *
+     * @param ship the ship to be removed; must be non-null
+     * @return true if the ship was successfully removed from the fleet, false if the ship was not found
+     */
+    public boolean removeShip(@NonNull IShip ship){
+        return fleet.remove(ship);
+    }
+
+    /**
+     * Removes a ship from the fleet if it occupies the specified coordinate.
+     *
+     * @param coordinate the coordinate to check for ship removal; must be non-null
+     * @return true if a ship occupying the specified coordinate was successfully removed, false otherwise
+     */
+    public boolean removeShipFromCoordinate(@NonNull Coordinate coordinate){
+        return fleet.removeIf(ship -> ship.getCoordinates().contains(coordinate));
+    }
 }
