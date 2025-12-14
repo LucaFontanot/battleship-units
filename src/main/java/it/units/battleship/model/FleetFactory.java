@@ -1,6 +1,5 @@
 package it.units.battleship.model;
 
-import it.units.battleship.model.shipType.*;
 import lombok.NonNull;
 
 import java.util.ArrayList;
@@ -33,7 +32,7 @@ public class FleetFactory {
      * @throws IllegalArgumentException if the ship's coordinates exceed the boundaries of the grid or if the ship type is not supported
      * @return a new Ship instance of the specified type with the calculated coordinates
      */
-    public Ship createShip(@NonNull ShipType shipType,
+    public IShip createShip(@NonNull ShipType shipType,
                            @NonNull Orientation orientation,
                            @NonNull Coordinate init_coordinate) throws IllegalArgumentException {
         List<Coordinate> shipCoordinates = computeShipCoordinates(shipType, orientation, init_coordinate);
@@ -47,11 +46,12 @@ public class FleetFactory {
         Set<Coordinate> coordinatesSet = new HashSet<>(shipCoordinates);
 
         switch (shipType){
-            case CARRIER: return new Carrier(coordinatesSet, shipType);
-            case CRUISER: return new Cruiser(coordinatesSet, shipType);
-            case BATTLESHIP: return new Battleship(coordinatesSet, shipType);
-            case SUBMARINE: return new Submarine(coordinatesSet, shipType);
-            case DESTROYER: return new Destroyer(coordinatesSet, shipType);
+            case CARRIER:
+            case CRUISER:
+            case BATTLESHIP:
+            case FRIGATE:
+            case DESTROYER:
+                return new BaseShip(coordinatesSet, shipType);
             default:
                 throw new IllegalArgumentException("Ship type not supported: " + shipType);
         }

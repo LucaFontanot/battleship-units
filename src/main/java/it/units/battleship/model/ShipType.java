@@ -1,4 +1,4 @@
-package it.units.battleship.model.shipType;
+package it.units.battleship.model;
 
 import lombok.Getter;
 
@@ -10,7 +10,7 @@ public enum ShipType {
     CARRIER(7, "Carrier"),
     BATTLESHIP(6, "Battleship"),
     CRUISER(4, "Cruiser"),
-    SUBMARINE(3, "Submarine"),
+    FRIGATE(3, "Frigate"),
     DESTROYER(2, "Destroyer");
 
     @Getter

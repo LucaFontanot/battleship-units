@@ -1,6 +1,5 @@
 import it.units.battleship.model.*;
-import it.units.battleship.model.shipType.Carrier;
-import it.units.battleship.model.shipType.ShipType;
+import it.units.battleship.model.ShipType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -35,29 +34,29 @@ public class TestFleetFactory {
 
     @Test
     void testCreateShip_HorizontalRight_InBounds() {
-        Ship ship = factory.createShip(ShipType.DESTROYER, Orientation.HORIZONTAL_RIGHT, new Coordinate(0, 0));
+        BaseShip ship = (BaseShip) factory.createShip(ShipType.DESTROYER, Orientation.HORIZONTAL_RIGHT, new Coordinate(0, 0));
         Set<Coordinate> expected = Set.of(new Coordinate(0, 0), new Coordinate(0, 1));
         assertEquals(expected, ship.getCoordinates());
-        assertEquals(ShipType.DESTROYER.getName(), ship.getShipType());
+        assertEquals(ShipType.DESTROYER, ship.getShipType());
     }
 
     @Test
     void testCreateShip_HorizontalLeft_InBounds() {
-        Ship ship = factory.createShip(ShipType.DESTROYER, Orientation.HORIZONTAL_LEFT, new Coordinate(5, 5));
+        BaseShip ship = (BaseShip) factory.createShip(ShipType.DESTROYER, Orientation.HORIZONTAL_LEFT, new Coordinate(5, 5));
         Set<Coordinate> expected = Set.of(new Coordinate(5, 5), new Coordinate(5, 4));
         assertEquals(expected, ship.getCoordinates());
     }
 
     @Test
     void testCreateShip_VerticalDown_InBounds() {
-        Ship ship = factory.createShip(ShipType.DESTROYER, Orientation.VERTICAL_DOWN, new Coordinate(0, 0));
+        BaseShip ship = (BaseShip) factory.createShip(ShipType.DESTROYER, Orientation.VERTICAL_DOWN, new Coordinate(0, 0));
         Set<Coordinate> expected = Set.of(new Coordinate(0, 0), new Coordinate(1, 0));
         assertEquals(expected, ship.getCoordinates());
     }
 
     @Test
     void testCreateShip_VerticalUp_InBounds() {
-        Ship ship = factory.createShip(ShipType.DESTROYER, Orientation.VERTICAL_UP, new Coordinate(5, 5));
+        BaseShip ship = (BaseShip) factory.createShip(ShipType.DESTROYER, Orientation.VERTICAL_UP, new Coordinate(5, 5));
         Set<Coordinate> expected = Set.of(new Coordinate(5, 5), new Coordinate(4, 5));
         assertEquals(expected, ship.getCoordinates());
     }
@@ -94,8 +93,9 @@ public class TestFleetFactory {
 
     @Test
     void testCreateShip_CreatesCorrectShipType() {
-        Ship carrier = factory.createShip(ShipType.CARRIER, Orientation.HORIZONTAL_RIGHT, new Coordinate(0, 0));
-        assertTrue(carrier instanceof Carrier, "The factory did not create a Carrier ship.");
+        BaseShip ship = (BaseShip) factory.createShip(ShipType.CARRIER, Orientation.HORIZONTAL_RIGHT, new Coordinate(0, 0));
+        ShipType type = ship.getShipType();
+        assertEquals(ShipType.CARRIER, type, "The factory did not create a Carrier ship.");
     }
 
 }
