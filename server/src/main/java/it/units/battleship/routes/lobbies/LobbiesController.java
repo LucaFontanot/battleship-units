@@ -2,12 +2,14 @@ package it.units.battleship.routes.lobbies;
 
 import io.javalin.http.Context;
 import io.javalin.websocket.WsConfig;
+import io.javalin.websocket.WsContext;
 import it.units.battleship.WebServerApp;
 import it.units.battleship.data.LobbiesResponseData;
 import it.units.battleship.data.LobbyCreateRequestData;
 import it.units.battleship.data.LobbyData;
 import it.units.battleship.impl.AbstractRoute;
 
+import java.util.HashMap;
 import java.util.UUID;
 
 public class LobbiesController extends AbstractRoute<LobbiesService> {
@@ -52,8 +54,40 @@ public class LobbiesController extends AbstractRoute<LobbiesService> {
         ctx.status(201).result(getApp().getGson().toJson(newLobby, LobbyData.class));
     }
 
+
+    HashMap<WsContext, LobbySocketClient> websocketClients = new HashMap<>();
+
     @Override
     public void handleWebsocketRequest(WsConfig config) {
-        new LobbySocketClient(getApp(), config);
+        config.onConnect(ctx -> {
+            LobbySocketClient client = new LobbySocketClient(getApp(), ctx);
+            websocketClients.put(ctx, client);
+            client.onConnect(ctx);
+        });
+        config.onClose(ctx -> {
+            LobbySocketClient client = websocketClients.get(ctx);
+            if (client != null) {
+                client.onClose(ctx);
+            }
+        });
+        config.onBinaryMessage(ctx -> {
+            LobbySocketClient client = websocketClients.get(ctx);
+            if (client != null) {
+                client.onBinaryMessage(ctx);
+            }
+        });
+        config.onError(ctx -> {
+            LobbySocketClient client = websocketClients.get(ctx);
+            if (client != null) {
+                client.onError(ctx);
+            }
+        });
+        config.onMessage(ctx -> {
+            LobbySocketClient client = websocketClients.get(ctx);
+            if (client != null) {
+                client.onMessage(ctx);
+            }
+        });
+
     }
 }

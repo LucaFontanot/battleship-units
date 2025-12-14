@@ -15,6 +15,8 @@ public class LobbySerializer implements JsonSerializer<Lobby> {
         LobbyData lobbyData = LobbyData.builder()
                 .lobbyID(lobby.getLobbyID())
                 .lobbyName(lobby.getLobbyName())
+                .playerOne(lobby.getPlayerOne())
+                .playerTwo(lobby.getPlayerTwo())
                 .build();
         return new Gson().toJsonTree(lobbyData).getAsJsonObject();
     }
