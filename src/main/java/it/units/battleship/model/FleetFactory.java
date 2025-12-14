@@ -1,5 +1,6 @@
 package it.units.battleship.model;
 
+import lombok.Getter;
 import lombok.NonNull;
 
 import java.lang.Math;
@@ -18,8 +19,8 @@ import static java.util.stream.Collectors.toList;
  */
 public class FleetFactory {
 
+    @Getter
     private final Grid grid;
-    private final FleetManager manager = new FleetManager();
 
     public FleetFactory(Grid grid){
         this.grid = grid;

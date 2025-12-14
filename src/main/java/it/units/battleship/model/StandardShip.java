@@ -1,7 +1,5 @@
 package it.units.battleship.model;
 
-import it.units.battleship.model.ShipType;
-import lombok.Getter;
 import lombok.NonNull;
 
 import java.util.*;
@@ -14,17 +12,15 @@ import java.util.*;
  */
 public class StandardShip implements IShip {
 
-    private final ShipType type;
-    @Getter
+    private final ShipType shipType;
     private final Set<Coordinate> coordinates;
-    @Getter
     private final Set<Coordinate> hitCoordinates;
 
     public StandardShip(@NonNull Set<Coordinate> coordinates, @NonNull ShipType type){
         if (coordinates.size() != type.getSize()){
             throw new IllegalArgumentException("Ship must have the same number of cells as its type specifies: " + type.getName());
         }
-        this.type = type;
+        this.shipType = type;
         this.coordinates = Collections.unmodifiableSet(new HashSet<>(coordinates));
         this.hitCoordinates = new HashSet<>();
     }
@@ -58,16 +54,7 @@ public class StandardShip implements IShip {
      * @return the number of cells that compose the ship
      */
     public int getSize(){
-        return type.getSize();
-    }
-
-    /**
-     * Retrieves the name of the ship.
-     *
-     * @return the name of the ship as a string
-     */
-    public String getName(){
-        return type.getName();
+        return shipType.getSize();
     }
 
     /**
@@ -79,14 +66,19 @@ public class StandardShip implements IShip {
         return hitCoordinates.size();
     }
 
+    @Override
+    public ShipType getShipType() {
+        return shipType;
+    }
 
-    /**
-     * Retrieves the type of the ship.
-     *
-     * @return the type of the ship as an instance of ShipType
-     */
-    public ShipType getShipType(){
-        return this.type;
+    @Override
+    public Set<Coordinate> getCoordinates() {
+        return Collections.unmodifiableSet(this.coordinates);
+    }
+
+    @Override
+    public Set<Coordinate> getHitCoordinates() {
+        return this.hitCoordinates;
     }
 
 }

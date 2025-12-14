@@ -1,5 +1,7 @@
 package it.units.battleship.model;
 
+import java.util.Set;
+
 /**
  * Represents a ship in the Battleship game.
  * A ship is composed of multiple cells, each located at a specific coordinate on the grid.
@@ -11,5 +13,6 @@ public interface IShip {
     int getSize();
     int getHitsCount();
     ShipType getShipType();
-    String getName();
+    Set<Coordinate> getCoordinates();
+    Set<Coordinate> getHitCoordinates();
 }
