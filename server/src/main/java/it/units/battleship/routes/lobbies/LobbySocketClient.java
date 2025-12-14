@@ -3,6 +3,7 @@ package it.units.battleship.routes.lobbies;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import io.javalin.websocket.*;
+import it.units.battleship.Logger;
 import it.units.battleship.WebServerApp;
 import it.units.battleship.data.socket.WebSocketAuthenticationRequest;
 import it.units.battleship.data.socket.WebSocketMessage;
@@ -13,21 +14,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class LobbySocketClient implements WebSocketConnection {
     final WebServerApp app;
-    final WsConfig config;
+    final WsContext ctx;
+    final AtomicBoolean isAuthenticated = new AtomicBoolean(false);
 
-    WsContext ctx;
-    AtomicBoolean isAuthenticated = new AtomicBoolean(false);
     Lobby lobby;
     LobbiesService.PlayerType playerType;
 
-    public LobbySocketClient(WebServerApp app, WsConfig config) {
+    public LobbySocketClient(WebServerApp app, WsContext ctx) {
+        Logger.log("[LobbySocketClient] New WebSocket connection initialized: " + ctx.sessionId());
         this.app = app;
-        this.config = config;
-        config.onConnect(this::onConnect);
-        config.onMessage(this::onMessage);
-        config.onBinaryMessage(this::onBinaryMessage);
-        config.onClose(this::onClose);
-        config.onError(this::onError);
+        this.ctx = ctx;
     }
 
     void updateLobbyData(){
@@ -38,7 +34,7 @@ public class LobbySocketClient implements WebSocketConnection {
 
     @Override
     public void onConnect(WsConnectContext ctx) {
-        this.ctx = ctx;
+
     }
 
     public void send(String message){
@@ -83,7 +79,6 @@ public class LobbySocketClient implements WebSocketConnection {
 
     @Override
     public void onMessage(WsMessageContext ctx) {
-        this.ctx = ctx;
         String message = ctx.message();
         JsonObject fromJson = app.getGson().fromJson(message, JsonObject.class);
         if (!isAuthenticated.get()){
@@ -100,12 +95,11 @@ public class LobbySocketClient implements WebSocketConnection {
 
     @Override
     public void onBinaryMessage(WsBinaryMessageContext ctx) {
-        this.ctx = ctx;
+
     }
 
     @Override
     public void onClose(WsCloseContext ctx) {
-        this.ctx = ctx;
         if (lobby != null && isAuthenticated.get()){
 
         }
