@@ -12,7 +12,7 @@ import java.util.*;
  * It supports operations such as registering hits, checking if the ship is sunk,
  * and retrieving various attributes of the ship.
  */
-public class BaseShip implements IShip {
+public class StandardShip implements IShip {
 
     private final ShipType type;
     @Getter
@@ -20,9 +20,9 @@ public class BaseShip implements IShip {
     @Getter
     private final Set<Coordinate> hitCoordinates;
 
-    public BaseShip(@NonNull Set<Coordinate> coordinates, @NonNull ShipType type){
-        if (coordinates.size() <= 1){
-            throw new IllegalArgumentException("Ship must have at least two cells");
+    public StandardShip(@NonNull Set<Coordinate> coordinates, @NonNull ShipType type){
+        if (coordinates.size() != type.getSize()){
+            throw new IllegalArgumentException("Ship must have the same number of cells as its type specifies: " + type.getName());
         }
         this.type = type;
         this.coordinates = Collections.unmodifiableSet(new HashSet<>(coordinates));

@@ -24,7 +24,11 @@ public class TestGrid {
                 {emptyCell, emptyCell, emptyCell},
                 {emptyCell, emptyCell, emptyCell}
         };
-        assertTrue(Arrays.deepEquals(expected, grid.getGrid()), "The grid is not initialized correctly.");
+        for(int row = 0; row < 2; row++){
+            for (int col = 0; col < 3; col++){
+                assertEquals(expected[row][col], grid.getState(new Coordinate(row, col)), "The grid is not initialized correctly.");
+            }
+        }
 
     }
 
@@ -43,13 +47,17 @@ public class TestGrid {
                 {emptyCell, emptyCell, emptyCell, emptyCell, emptyCell},
                 {emptyCell, emptyCell, emptyCell, emptyCell, emptyCell}
         };
-        assertTrue(Arrays.deepEquals(expected, grid.getGrid()), "The grid is not initialized correctly.");
+        for(int row = 0; row < 5; row++){
+            for (int col = 0; col < 5; col++){
+                assertEquals(expected[row][col], grid.getState(new Coordinate(row, col)), "The grid is not initialized correctly.");
+            }
+        }
     }
 
     @Test
     public void testChangeGridCellState(){
         grid.changeState(new Coordinate(2,2), CellStates.HIT);
-        assertEquals(CellStates.HIT, grid.getGrid()[2][2], "The grid cell state is not updated correctly.");
+        assertEquals(CellStates.HIT, grid.getState(new Coordinate(2,2)), "The grid cell state is not updated correctly.");
     }
 
     @Test

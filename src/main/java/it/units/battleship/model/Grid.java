@@ -18,10 +18,11 @@ import java.util.List;
 
 public class Grid {
 
-    private final int row;
-    private final int col;
-
     @Getter
+    private final int row;
+    @Getter
+    private final int col;
+    
     private final CellStates[][] grid;
 
     public Grid(int row, int col){

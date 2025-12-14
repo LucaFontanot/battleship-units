@@ -1,6 +1,6 @@
-import it.units.battleship.model.BaseShip;
 import it.units.battleship.model.Coordinate;
 import it.units.battleship.model.ShipType;
+import it.units.battleship.model.StandardShip;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -11,13 +11,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TestShip {
 
-    private static class TestShipImpl extends BaseShip {
+    private static class TestShipImpl extends StandardShip {
         TestShipImpl(Set<Coordinate> coordinates, ShipType type) {
             super(coordinates, type);
         }
     }
 
-    private BaseShip testShip;
+    private StandardShip testShip;
     private Set<Coordinate> testCoordinates;
 
     @BeforeEach
