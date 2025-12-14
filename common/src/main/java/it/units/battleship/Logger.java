@@ -15,6 +15,10 @@ public class Logger {
     @Setter
     private static boolean debugEnabled = false;
 
+    /**
+     * Static initializer to set up the logger and program path.
+     * Sets the "programPath" system property to the absolute path of the logs directory to be used by the logging framework.
+     */
     static {
         System.setProperty("programPath", PathManager.getProgramPath().resolve("logs").toAbsolutePath().normalize().toString());
         logger = LogManager.getLogger(Logger.class);
