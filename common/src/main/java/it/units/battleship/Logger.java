@@ -20,7 +20,6 @@ public class Logger {
      * Sets the "programPath" system property to the absolute path of the logs directory to be used by the logging framework.
      */
     static {
-        System.setProperty("programPath", PathManager.getProgramPath().resolve("logs").toAbsolutePath().normalize().toString());
         logger = LogManager.getLogger(Logger.class);
     }
 
@@ -54,7 +53,7 @@ public class Logger {
      */
     public static void debug(String message) {
         if (debugEnabled) {
-            logger.debug("[DEBUG] {}", message);
+            logger.info("[DEBUG] {}", message);
         }
     }
 
