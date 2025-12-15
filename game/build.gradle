@@ -1,6 +1,10 @@
 dependencies {
+    implementation project(':battleship-common')
     implementation "com.formdev:flatlaf:3.6.2"
     implementation 'com.github.Dansoftowner:jSystemThemeDetector:3.6'
+
+    //Intellij Forms required module
+    implementation "com.intellij:forms_rt:7.0.3"
 }
 
 shadowJar {
