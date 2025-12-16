@@ -56,22 +56,22 @@ public enum ShipType {
      * Calculates the absolute coordinates of a ship on the grid based on its initial coordinate
      * and orientation.
      *
-     * @param init_coordinate the initial coordinate of the ship's starting position, must not be null
+     * @param initCoordinate the initial coordinate of the ship's starting position, must not be null
      * @param orientation the orientation of the ship (e.g., horizontal or vertical), must not be null
      * @return a set of {@link Coordinate} objects representing the ship's absolute positions on the grid
      */
-    public Set<Coordinate> getShipCoordinates(@NonNull Coordinate init_coordinate,@NonNull Orientation orientation){
-        return computeShipCoordinates(orientation.getAngle(), init_coordinate);
+    public Set<Coordinate> getShipCoordinates(@NonNull Coordinate initCoordinate,@NonNull Orientation orientation){
+        return computeShipCoordinates(orientation.getAngle(), initCoordinate);
     }
 
     /**
      * Computes the absolute coordinates of a ship using its initial coordinate and rotation angle on the grid.
      *
      * @param theta the rotation angle in radians to apply to the ship's frame
-     * @param init_coordinate the initial coordinate of the ship's starting position
+     * @param initCoordinate the initial coordinate of the ship's starting position
      * @return a set of {@code Coordinate} objects representing the computed absolute positions of the ship
      */
-    private Set<Coordinate> computeShipCoordinates(Double theta, Coordinate init_coordinate){
+    private Set<Coordinate> computeShipCoordinates(Double theta, Coordinate initCoordinate){
         Double[][] rotation_matrix = {{Math.cos(theta), -Math.sin(theta)},
                                         {Math.sin(theta), Math.cos(theta)}};
 
@@ -80,8 +80,8 @@ public enum ShipType {
                 .map(coordinate -> {
                     int x = coordinate.row();
                     int y = coordinate.col();
-                    return new Coordinate((int) ( init_coordinate.row()+(rotation_matrix[0][0] * x + rotation_matrix[0][1] * y)),
-                            (int) ( init_coordinate.col()+(rotation_matrix[1][0] * x + rotation_matrix[1][1] * y)));
+                    return new Coordinate((int) ( initCoordinate.row()+(rotation_matrix[0][0] * x + rotation_matrix[0][1] * y)),
+                                          (int) ( initCoordinate.col()+(rotation_matrix[1][0] * x + rotation_matrix[1][1] * y)));
                 }).collect(toSet());
     }
 }

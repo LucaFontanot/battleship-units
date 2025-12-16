@@ -11,6 +11,15 @@ import java.util.List;
  * ensuring that the ships are placed according to game rules and do not overlap or come too close to each other.
  */
 public class FleetManager {
+
+    /**
+     * The minimum distance threshold that must be maintained between ships
+     * on the game grid in order to ensure valid placement. This constant
+     * is used to determine whether the placement of a new ship is too close
+     * to an existing one, thereby violating the rules of the game.
+     */
+    private static final int MIN_DISTANCE_THRESHOLD = 1;
+
     private final Grid grid;
     private final List<Ship> fleet = new ArrayList<>();
 
@@ -49,17 +58,24 @@ public class FleetManager {
             return true;
         }else {
             for(Ship existingShip : fleet) {
-                for(Coordinate coordinate : existingShip.getCoordinates()) {
-                    for( Coordinate existingCoordinate : ship.getCoordinates()){
-                        int dx = Math.abs(coordinate.row() - existingCoordinate.row());
-                        int dy = Math.abs(coordinate.col() - existingCoordinate.col());
+                if (!areShipOverlapping(existingShip, ship)){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 
-                        // Invalid if ships overlap or touch (also diagonally).
-                        // Requiring at least 1 empty cell between ships means max(dx, dy) must be >= 2.
-                        if (Math.max(dx, dy) <= 1){
-                            return false;
-                        }
-                    }
+    private boolean areShipOverlapping(@NonNull Ship existingShip, @NonNull Ship ship){
+        for(Coordinate coordinate : existingShip.getCoordinates()) {
+            for( Coordinate existingCoordinate : ship.getCoordinates()){
+                int dx = Math.abs(coordinate.row() - existingCoordinate.row());
+                int dy = Math.abs(coordinate.col() - existingCoordinate.col());
+
+                // Invalid if ships overlap or touch (also diagonally).
+                // Requiring at least 1 empty cell between ships means max(dx, dy) must be >= 2.
+                if (Math.max(dx, dy) <= MIN_DISTANCE_THRESHOLD){
+                    return false;
                 }
             }
         }
