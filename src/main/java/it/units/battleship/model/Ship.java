@@ -1,22 +1,50 @@
 package it.units.battleship.model;
 
+import lombok.Getter;
 import lombok.NonNull;
 
 import java.util.*;
 /**
- * Represents the base implementation of a ship in the Battleship game.
- * The ship is characterized by its type, a set of coordinates it occupies on the grid,
- * and a record of the coordinates that have been hit.
- * It supports operations such as registering hits, checking if the ship is sunk,
- * and retrieving various attributes of the ship.
+ * Represents a ship in a Battleship game. A ship has a type, a set of coordinates indicating
+ * its location on the grid, and a set of hit coordinates indicating which parts of the ship
+ * have been hit.
  */
-public class StandardShip implements IShip {
+public class Ship {
 
+    @Getter
     private final ShipType shipType;
+    @Getter
     private final Set<Coordinate> coordinates;
+    @Getter
     private final Set<Coordinate> hitCoordinates;
 
-    public StandardShip(@NonNull Set<Coordinate> coordinates, @NonNull ShipType type){
+    /**
+     * Creates a new ship on the grid with the specified initial coordinate, orientation, and type.
+     * Validates that the ship's coordinates are within the grid boundaries.
+     *
+     * @param initCoordinate the starting coordinate from which the ship will be placed
+     * @param orientation the orientation of the ship (e.g., horizontal or vertical)
+     * @param type the type of the ship, which defines its size and shape
+     * @param grid the grid on which the ship is to be placed
+     * @return a new {@code Ship} instance positioned within the grid
+     * @throws IllegalArgumentException if any part of the ship exceeds the boundaries of the grid
+     */
+    public static Ship createShip(@NonNull Coordinate initCoordinate,
+                                  @NonNull Orientation orientation,
+                                  @NonNull ShipType type,
+                                  @NonNull Grid grid){
+        Set<Coordinate> shipCoordinates = type.getShipCoordinates(initCoordinate, orientation);
+
+        for (Coordinate coordinate : shipCoordinates) {
+            if (coordinate.row() < 0 || coordinate.row() >= grid.getRow() || coordinate.col() < 0 || coordinate.col() >= grid.getCol()){
+                throw new IllegalArgumentException("The ship coordinates must respect the grid dimension");
+            }
+        }
+
+        return new Ship(shipCoordinates, type);
+    }
+
+    private Ship(@NonNull Set<Coordinate> coordinates, @NonNull ShipType type){
         if (coordinates.size() != type.getSize()){
             throw new IllegalArgumentException("Ship must have the same number of cells as its type specifies: " + type.getName());
         }
@@ -64,21 +92,6 @@ public class StandardShip implements IShip {
      */
     public int getHitsCount(){
         return hitCoordinates.size();
-    }
-
-    @Override
-    public ShipType getShipType() {
-        return shipType;
-    }
-
-    @Override
-    public Set<Coordinate> getCoordinates() {
-        return Collections.unmodifiableSet(this.coordinates);
-    }
-
-    @Override
-    public Set<Coordinate> getHitCoordinates() {
-        return this.hitCoordinates;
     }
 
 }

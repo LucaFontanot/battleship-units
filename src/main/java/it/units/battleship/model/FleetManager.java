@@ -12,29 +12,22 @@ import java.util.List;
  */
 public class FleetManager {
     private final Grid grid;
-    private final FleetFactory factory;
-    private final List<IShip> fleet = new ArrayList<>();
+    private final List<Ship> fleet = new ArrayList<>();
 
-    public FleetManager(@NonNull Grid grid,@NonNull FleetFactory factory){
-        if (!factory.getGrid().equals(grid)){
-            throw new IllegalArgumentException("Factory's grid must be equal to the grid provided as argument");
-        }
+    public FleetManager(@NonNull Grid grid){
         this.grid = grid;
-        this.factory = factory;
     }
 
     /**
-     * Adds a ship to the fleet based on the specified type, orientation, and starting coordinate.
-     * The method validates the placement of the ship to ensure it does not overlap
-     * with existing ships or violate the placement rules before adding it to the fleet.
+     * Adds a ship to the fleet if its placement on the grid is valid. A placement is
+     * considered valid if the ship does not overlap with or come too close to any
+     * other ship already in the fleet.
      *
-     * @param type the type of the ship to be added (e.g., CARRIER, BATTLESHIP, etc.)
-     * @param orientation the orientation of the ship (e.g., HORIZONTAL_RIGHT, VERTICAL_UP, etc.)
-     * @param init_coordinate the starting coordinate for the ship's placement on the grid
-     * @return true if the ship was successfully added to the fleet, false if the placement was invalid
+     * @param ship the ship to be added to the fleet; must be non-null
+     * @return true if the ship is successfully added to the fleet, false if the
+     *         placement is invalid
      */
-    public boolean addShip(@NonNull ShipType type,@NonNull Orientation orientation,@NonNull Coordinate init_coordinate){
-        IShip ship = factory.createShip(type, orientation, init_coordinate);
+    public boolean addShip(@NonNull Ship ship){
         if (!isPlacementValid(ship)){
             return false;
         }
@@ -51,17 +44,19 @@ public class FleetManager {
      * @return true if the placement is valid and the ship can be placed without
      *         conflict; false otherwise
      */
-    private boolean isPlacementValid(@NonNull IShip ship){
+    private boolean isPlacementValid(@NonNull Ship ship){
         if (fleet.isEmpty()){
             return true;
         }else {
-            for(IShip existingShip : fleet) {
+            for(Ship existingShip : fleet) {
                 for(Coordinate coordinate : existingShip.getCoordinates()) {
                     for( Coordinate existingCoordinate : ship.getCoordinates()){
-                        int deltaX = Math.abs(coordinate.row() - existingCoordinate.row());
-                        int deltaY = Math.abs(coordinate.col() - existingCoordinate.col());
-                        //Check if the ships overlap or are too close to each other.
-                        if (deltaX <= 1 || deltaY <= 1){
+                        int dx = Math.abs(coordinate.row() - existingCoordinate.row());
+                        int dy = Math.abs(coordinate.col() - existingCoordinate.col());
+
+                        // Invalid if ships overlap or touch (also diagonally).
+                        // Requiring at least 1 empty cell between ships means max(dx, dy) must be >= 2.
+                        if (Math.max(dx, dy) <= 1){
                             return false;
                         }
                     }
@@ -77,7 +72,7 @@ public class FleetManager {
      * @param ship the ship to be removed; must be non-null
      * @return true if the ship was successfully removed from the fleet, false if the ship was not found
      */
-    public boolean removeShip(@NonNull IShip ship){
+    public boolean removeShipByReference(@NonNull Ship ship){
         return fleet.remove(ship);
     }
 
@@ -87,7 +82,27 @@ public class FleetManager {
      * @param coordinate the coordinate to check for ship removal; must be non-null
      * @return true if a ship occupying the specified coordinate was successfully removed, false otherwise
      */
-    public boolean removeShipFromCoordinate(@NonNull Coordinate coordinate){
+    public boolean removeShipByCoordinate(@NonNull Coordinate coordinate){
         return fleet.removeIf(ship -> ship.getCoordinates().contains(coordinate));
+    }
+
+    /**
+     * Retrieves a ship from the fleet that matches the provided ship reference.
+     *
+     * @param ship the ship to be searched in the fleet; must be non-null
+     * @return the matching ship from the fleet if found, or {@code null} if no match exists
+     */
+    public Ship getShipByReference(@NonNull Ship ship){
+        return fleet.stream().filter(ship::equals).findFirst().orElse(null);
+    }
+
+    /**
+     * Retrieves the ship located at the specified coordinate from the fleet.
+     *
+     * @param coordinate the coordinate to check for a ship; must be non-null
+     * @return the ship located at the given coordinate, or null if no ship is found or the coordinate is invalid
+     */
+    public Ship getShipByCoordinate(@NonNull Coordinate coordinate){
+        return fleet.stream().filter(ship -> ship.getCoordinates().contains(coordinate)).findFirst().orElse(null);
     }
 }
