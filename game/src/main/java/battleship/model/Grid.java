@@ -16,14 +16,15 @@ import lombok.NonNull;
 
 public class Grid {
 
-    private final int row;
-    private final int col;
-
     @Getter
+    private final int row;
+    @Getter
+    private final int col;
+    
     private final CellStates[][] grid;
 
     public Grid(int row, int col){
-        if (row<=0 || col<=0){
+        if (row<=1 || col<=1){
             throw new IllegalArgumentException("Columns and rows value must be strictly positive");
         }
         this.row = row;
