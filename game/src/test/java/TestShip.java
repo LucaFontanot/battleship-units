@@ -1,4 +1,5 @@
 import battleship.model.*;
+import it.units.battleship.Coordinate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

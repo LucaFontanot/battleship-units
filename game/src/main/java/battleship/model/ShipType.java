@@ -1,13 +1,12 @@
 package battleship.model;
 
+import it.units.battleship.Coordinate;
 import lombok.Getter;
 import lombok.NonNull;
 
-import java.awt.*;
 import java.util.List;
 import java.util.Set;
 
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 /**
