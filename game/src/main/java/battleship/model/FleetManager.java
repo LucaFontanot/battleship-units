@@ -1,5 +1,6 @@
 package battleship.model;
 
+import it.units.battleship.Coordinate;
 import lombok.NonNull;
 
 import java.util.ArrayList;
