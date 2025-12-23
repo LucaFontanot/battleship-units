@@ -207,4 +207,70 @@ public class TestFleetManager {
 
         assertNull(retrievedShip, "Expected a null value when attempting to retrieve a ship from an empty fleet.");
     }
+
+    @Test
+    void handleIncomingShot_successfulHit() {
+        Ship ship = Ship.createShip(new Coordinate(2, 2), Orientation.HORIZONTAL_RIGHT, ShipType.DESTROYER, grid);
+
+        fleetManager.addShip(ship);
+
+        Coordinate shotCoordinate = new Coordinate(2, 2);
+        fleetManager.handleIncomingShot(shotCoordinate);
+
+        assertEquals(CellStates.HIT, grid.getState(shotCoordinate), "Expected the grid cell to be updated to HIT.");
+        assertTrue(ship.getHitCoordinates().contains(shotCoordinate), "Expected the shot coordinate to be registered as a hit on the ship.");
+    }
+
+    @Test
+    void handleIncomingShot_miss() {
+        Ship ship = Ship.createShip(new Coordinate(2, 2), Orientation.HORIZONTAL_RIGHT, ShipType.DESTROYER, grid);
+
+        fleetManager.addShip(ship);
+
+        Coordinate shotCoordinate = new Coordinate(3, 3);
+        fleetManager.handleIncomingShot(shotCoordinate);
+
+        assertEquals(CellStates.MISS, grid.getState(shotCoordinate), "Expected the grid cell to be updated to MISS.");
+        assertFalse(ship.getHitCoordinates().contains(shotCoordinate), "Expected the shot coordinate not to be registered as a hit on any ship.");
+    }
+
+    @Test
+    void handleIncomingShot_hitSameCellAgain() {
+        Ship ship = Ship.createShip(new Coordinate(2, 2), Orientation.HORIZONTAL_RIGHT, ShipType.DESTROYER, grid);
+
+        fleetManager.addShip(ship);
+
+        Coordinate shotCoordinate = new Coordinate(2, 2);
+        fleetManager.handleIncomingShot(shotCoordinate);
+        fleetManager.handleIncomingShot(shotCoordinate);
+
+        assertEquals(CellStates.HIT, grid.getState(shotCoordinate), "Expected the grid cell state to remain HIT.");
+        assertEquals(1, ship.getHitCoordinates().size(), "Expected the hit coordinates set to contain only one instance of the hit.");
+    }
+
+    @Test
+    void handleIncomingShot_outOfBounds() {
+        Coordinate outOfBoundsCoordinate = new Coordinate(10, 10);
+
+        assertThrows(IndexOutOfBoundsException.class,
+                () -> fleetManager.handleIncomingShot(outOfBoundsCoordinate),
+                "Expected an IndexOutOfBoundsException when firing at an out-of-bounds coordinate."
+        );
+    }
+
+    @Test
+    void handleIncomingShot_nullCoordinate() {
+        assertThrows(NullPointerException.class,
+                () -> fleetManager.handleIncomingShot(null),
+                "Expected a NullPointerException when firing at a null coordinate."
+        );
+    }
+
+    @Test
+    void handleIncomingShot_onlyMissOnEmptyGrid() {
+        Coordinate shotCoordinate = new Coordinate(1, 1);
+        fleetManager.handleIncomingShot(shotCoordinate);
+
+        assertEquals(CellStates.MISS, grid.getState(shotCoordinate), "Expected the grid cell to be updated to MISS on an empty grid.");
+    }
 }

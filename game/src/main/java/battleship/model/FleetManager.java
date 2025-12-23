@@ -122,4 +122,24 @@ public class FleetManager {
     public Ship getShipByCoordinate(@NonNull Coordinate coordinate){
         return fleet.stream().filter(ship -> ship.getCoordinates().contains(coordinate)).findFirst().orElse(null);
     }
+
+    /**
+     * Handles an incoming shot targeting the specified coordinate. If the coordinate
+     * is occupied by a ship, it records a hit on the ship and updates the grid state
+     * to indicate a hit. If no ship is found at the coordinate, the grid state is
+     * updated to indicate a miss.
+     *
+     * @param coordinate the coordinate of the incoming shot; must be non-null
+     */
+    public void handleIncomingShot(@NonNull Coordinate coordinate){
+        Ship ship = getShipByCoordinate(coordinate);
+        if (ship != null){
+            boolean isNewHit = ship.addHit(coordinate);
+            if (isNewHit){
+                grid.changeState(coordinate, CellStates.HIT);
+            }
+        }else {
+            grid.changeState(coordinate, CellStates.MISS);
+        }
+    }
 }
