@@ -142,4 +142,13 @@ public class FleetManager {
             grid.changeState(coordinate, CellStates.MISS);
         }
     }
+
+    /**
+     * Checks whether the game is over by determining if all ships in the fleet have been sunk.
+     *
+     * @return true if all ships in the fleet are sunk, indicating the game is over; false otherwise
+     */
+    public boolean isGameOver(){
+        return fleet.stream().allMatch(Ship::isSunk);
+    }
 }

@@ -3,6 +3,8 @@ import it.units.battleship.Coordinate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.Set;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
@@ -272,5 +274,62 @@ public class TestFleetManager {
         fleetManager.handleIncomingShot(shotCoordinate);
 
         assertEquals(CellStates.MISS, grid.getState(shotCoordinate), "Expected the grid cell to be updated to MISS on an empty grid.");
+    }
+
+    @Test
+    void isGameOver_AllShipsSunk() {
+        Ship ship1 = Ship.createShip(new Coordinate(0, 0), Orientation.HORIZONTAL_RIGHT, ShipType.DESTROYER, grid);
+        fleetManager.addShip(ship1);
+
+        ship1.getCoordinates().forEach(ship1::addHit);
+
+        assertTrue(fleetManager.isGameOver(), "Expected the game to be over when all ships are sunk.");
+    }
+
+    @Test
+    void isGameOver_SomeShipsSunk() {
+        Ship ship1 = Ship.createShip(new Coordinate(0, 0), Orientation.HORIZONTAL_RIGHT, ShipType.DESTROYER, grid);
+        Ship ship2 = Ship.createShip(new Coordinate(2, 2), Orientation.HORIZONTAL_RIGHT, ShipType.CRUISER, grid);
+        fleetManager.addShip(ship1);
+        fleetManager.addShip(ship2);
+
+        ship1.getCoordinates().forEach(ship1::addHit);
+
+        assertFalse(fleetManager.isGameOver(), "Expected the game not to be over when not all ships are sunk.");
+    }
+
+    @Test
+    void isGameOver_NoShipsInFleet() {
+        assertTrue(fleetManager.isGameOver(), "Expected the game to be over when there are no ships in the fleet.");
+    }
+
+    @Test
+    void isGameOver_EmptyFleetAfterRemoval() {
+        Ship ship = Ship.createShip(new Coordinate(0, 0), Orientation.HORIZONTAL_RIGHT, ShipType.DESTROYER, grid);
+        fleetManager.addShip(ship);
+        fleetManager.removeShipByReference(ship);
+
+        assertTrue(fleetManager.isGameOver(), "Expected the game to be over when all ships are removed from the fleet.");
+    }
+
+    @Test
+    void isGameOver_AllShipsInitiallyUnsunk() {
+        Ship ship1 = Ship.createShip(new Coordinate(1, 1), Orientation.HORIZONTAL_RIGHT, ShipType.DESTROYER, grid);
+        Ship ship2 = Ship.createShip(new Coordinate(3, 3), Orientation.HORIZONTAL_RIGHT, ShipType.CRUISER, grid);
+        fleetManager.addShip(ship1);
+        fleetManager.addShip(ship2);
+
+        assertFalse(fleetManager.isGameOver(), "Expected the game not to be over when no ships are sunk.");
+    }
+
+    @Test
+    void isGameOver_AllShipsPartiallyDamaged() {
+        Ship ship = Ship.createShip(new Coordinate(0, 0), Orientation.HORIZONTAL_RIGHT, ShipType.DESTROYER, grid);
+        fleetManager.addShip(ship);
+        Set<Coordinate> coordinates = ship.getCoordinates();
+
+        coordinates.stream().findFirst().ifPresent(ship::addHit);
+
+        assertFalse(fleetManager.isGameOver(), "Expected the game not to be over when ships are only partially damaged.");
     }
 }
