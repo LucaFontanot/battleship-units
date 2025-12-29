@@ -1,0 +1,19 @@
+12-16-25 18:36:20.250 Starting Javalin ...
+12-16-25 18:36:20.257 jetty-11.0.25; built: 2025-03-13T00:15:57.301Z; git: a2e9fae3ad8320f2a713d4fa29bba356a99d1295; jvm 25.0.1+8-27
+12-16-25 18:36:20.297 Session workerName=node0
+12-16-25 18:36:20.303 Started o.e.j.s.ServletContextHandler@3a0ad912{/,null,AVAILABLE}
+12-16-25 18:36:20.308 Started ServerConnector@637e24d2{HTTP/1.1, (http/1.1)}{0.0.0.0:7000}
+12-16-25 18:36:20.312 Started Server@6940223{STARTING}[11.0.25,sto=0] @658ms
+12-16-25 18:36:20.312 
+       __                  ___           _____
+      / /___ __   ______ _/ (_)___      / ___/
+ __  / / __ `/ | / / __ `/ / / __ \    / __ \
+/ /_/ / /_/ /| |/ / /_/ / / / / / /   / /_/ /
+\____/\__,_/ |___/\__,_/_/_/_/ /_/    \____/
+
+       https://javalin.io/documentation
+
+12-16-25 18:36:20.313 Javalin started in 115ms \o/
+12-16-25 18:36:20.315 Listening on http://localhost:7000/
+12-16-25 18:36:20.327 You are running Javalin 6.7.0 (released June 22, 2025. Your Javalin version is 177 days old. Consider checking for a newer version.).
+12-16-25 18:36:20.343 [LOG] [GET] /api/ping [0:0:0:0:0:0:0:1]

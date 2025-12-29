@@ -1,5 +1,12 @@
 package battleship.controller;
 
+import battleship.handlers.AbstractPlayerCommunication;
+import battleship.handlers.CommunicationEvents;
+import battleship.model.FleetManager;
+import battleship.model.Grid;
+import it.units.battleship.Coordinate;
+import it.units.battleship.GameState;
+
 /**
  * Manages the core game flow and logic of the Battleship game.
  *
@@ -13,5 +20,35 @@ package battleship.controller;
  *     (e.g., by calling isSunk() on all ships in the navy).
  */
 
-public class GameController {
+public class GameController extends AbstractPlayerCommunication implements CommunicationEvents {
+
+    private final Grid grid;
+    private final FleetManager fleetManager;
+    private GameState gameState;
+
+    public GameController(Grid grid, FleetManager fleetManager) {
+        this.grid = grid;
+        this.fleetManager = fleetManager;
+        this.gameState = GameState.SETUP;
+    }
+
+    public void handleGridClick(Coordinate coordinate) {
+        switch (gameState) {
+            case SETUP:
+
+                break;
+            case MY_TURN:
+                break;
+        }
+    }
+
+    @Override
+    public void sendMessage(String message) {
+
+    }
+
+    @Override
+    public void sendShot(Coordinate shotCoordinates) {
+
+    }
 }
