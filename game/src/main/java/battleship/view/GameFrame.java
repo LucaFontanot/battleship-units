@@ -21,5 +21,5 @@ package battleship.view;
  */
 
 
-public class GameFrame implements GameView{
+public class GameFrame{
 }
