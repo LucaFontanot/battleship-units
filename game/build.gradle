@@ -5,6 +5,14 @@ dependencies {
 
     //Intellij Forms required module
     implementation "com.intellij:forms_rt:7.0.3"
+
+    testImplementation 'org.mockito:mockito-core:5.14.2'
+}
+
+test {
+    useJUnitPlatform()
+
+    jvmArgs("-XX:+EnableDynamicAgentLoading", "-Dnet.bytebuddy.experimental=true")
 }
 
 shadowJar {

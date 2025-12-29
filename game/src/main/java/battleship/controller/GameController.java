@@ -4,8 +4,11 @@ import battleship.handlers.AbstractPlayerCommunication;
 import battleship.handlers.CommunicationEvents;
 import battleship.model.FleetManager;
 import battleship.model.Grid;
+import battleship.view.GameView;
 import it.units.battleship.Coordinate;
 import it.units.battleship.GameState;
+import lombok.Getter;
+import lombok.NonNull;
 
 /**
  * Manages the core game flow and logic of the Battleship game.
@@ -20,35 +23,18 @@ import it.units.battleship.GameState;
  *     (e.g., by calling isSunk() on all ships in the navy).
  */
 
-public class GameController extends AbstractPlayerCommunication implements CommunicationEvents {
+public class GameController {
 
     private final Grid grid;
     private final FleetManager fleetManager;
+    @Getter
     private GameState gameState;
+    private final GameView view;
 
-    public GameController(Grid grid, FleetManager fleetManager) {
+    public GameController(@NonNull Grid grid,@NonNull FleetManager fleetManager,@NonNull GameView view) {
         this.grid = grid;
         this.fleetManager = fleetManager;
+        this.view = view;
         this.gameState = GameState.SETUP;
-    }
-
-    public void handleGridClick(Coordinate coordinate) {
-        switch (gameState) {
-            case SETUP:
-
-                break;
-            case MY_TURN:
-                break;
-        }
-    }
-
-    @Override
-    public void sendMessage(String message) {
-
-    }
-
-    @Override
-    public void sendShot(Coordinate shotCoordinates) {
-
     }
 }
