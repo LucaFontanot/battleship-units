@@ -4,7 +4,10 @@ import it.units.battleship.Coordinate;
 import lombok.NonNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * The FleetManager class is responsible for managing a fleet of ships within a specified grid.
@@ -23,9 +26,41 @@ public class FleetManager {
 
     private final Grid grid;
     private final List<Ship> fleet = new ArrayList<>();
+    private final Map<ShipType, Integer> requiredFleetConfiguration;
 
-    public FleetManager(@NonNull Grid grid){
+    public FleetManager(@NonNull Grid grid, @NonNull Map<ShipType, Integer> requiredFleetConfiguration){
         this.grid = grid;
+        this.requiredFleetConfiguration = requiredFleetConfiguration;
+    }
+
+    /**
+     * Determines whether the fleet is complete by comparing the current fleet configuration
+     * against the required fleet configuration. A fleet is considered complete if it contains
+     * the exact number of ships of each type specified in the required fleet configuration.
+     *
+     * @return true if the current fleet matches the required fleet configuration exactly; false otherwise
+     */
+    public boolean isFleetComplete(){
+        Map<ShipType, Long> currentFleetCounts = fleet.stream().collect(Collectors.groupingBy(Ship::getShipType, Collectors.counting()));
+
+        for (Map.Entry<ShipType, Integer> entry : requiredFleetConfiguration.entrySet()){
+            ShipType shipType = entry.getKey();
+            int count = entry.getValue();
+            Long currentCount = currentFleetCounts.getOrDefault(shipType, 0L);
+            if (currentCount != count){
+                return false;
+            }
+        }
+        return fleet.size() == requiredFleetConfiguration.values().stream().mapToInt(Integer::intValue).sum();
+    }
+
+    /**
+     * Retrieves an unmodifiable view of the current fleet of ships.
+     *
+     * @return a containing the ships in the fleet. The returned list is unmodifiable.
+     */
+    public List<Ship> getFleet() {
+        return Collections.unmodifiableList(fleet);
     }
 
     /**
@@ -38,11 +73,36 @@ public class FleetManager {
      *         placement is invalid
      */
     public boolean addShip(@NonNull Ship ship){
-        if (!isPlacementValid(ship)){
+        if (!canAddShipType(ship) || !isPlacementValid(ship)){
             return false;
         }
         fleet.add(ship);
         return true;
+    }
+
+    /**
+     * Determines whether a ship of the given type can be added to the fleet based on the
+     * allowed configuration.
+     *
+     * @param ship the ship to be evaluated; must be non-null
+     * @return true if the ship can be added to the fleet based on the configuration, false otherwise
+     */
+    private boolean canAddShipType(@NonNull Ship ship){
+        Integer maxAllowed = requiredFleetConfiguration.get(ship.getShipType());
+        if (maxAllowed == null){
+            return false;
+        }
+        return countShipsOfType(ship.getShipType()) < maxAllowed;
+    }
+
+    /**
+     * Counts the number of ships of the specified type present in the fleet.
+     *
+     * @param shipType the type of ships to be counted; must be non-null
+     * @return the count of ships of the specified type in the fleet
+     */
+    private int countShipsOfType(@NonNull ShipType shipType){
+        return (int) fleet.stream().filter(ship -> ship.getShipType() == shipType).count();
     }
 
     /**
