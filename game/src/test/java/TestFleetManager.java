@@ -3,6 +3,7 @@ import it.units.battleship.Coordinate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.Map;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -12,10 +13,12 @@ public class TestFleetManager {
 
     private FleetManager fleetManager;
     private Grid grid;
+
     @BeforeEach
     void setUp() {
         grid = new Grid(10,10);
-        fleetManager = new FleetManager(grid);
+        Map<ShipType, Integer> requiredFleetConfiguration = Map.of(ShipType.DESTROYER, 2, ShipType.CARRIER, 1);
+        fleetManager = new FleetManager(grid, requiredFleetConfiguration);
     }
 
     @Test
@@ -26,9 +29,9 @@ public class TestFleetManager {
 
     @Test
     void testAddShipOverlapping() {
-        Ship ship1 = Ship.createShip(new Coordinate(3, 3), Orientation.HORIZONTAL_RIGHT, ShipType.CRUISER, grid);
+        Ship ship1 = Ship.createShip(new Coordinate(3, 3), Orientation.HORIZONTAL_RIGHT, ShipType.DESTROYER, grid);
         fleetManager.addShip(ship1);
-        Ship ship2 = Ship.createShip(new Coordinate(3, 4), Orientation.HORIZONTAL_RIGHT, ShipType.FRIGATE, grid);
+        Ship ship2 = Ship.createShip(new Coordinate(3, 4), Orientation.HORIZONTAL_RIGHT, ShipType.CARRIER, grid);
         boolean result = fleetManager.addShip(ship2);
 
         assertFalse(result, "Expected the method to return false when adding a ship overlapping with an existing ship.");
@@ -36,7 +39,7 @@ public class TestFleetManager {
 
     @Test
     void testAddShipTooClose() {
-        Ship ship1 = Ship.createShip(new Coordinate(4, 4), Orientation.HORIZONTAL_RIGHT, ShipType.CRUISER, grid);
+        Ship ship1 = Ship.createShip(new Coordinate(4, 4), Orientation.HORIZONTAL_RIGHT, ShipType.DESTROYER, grid);
         fleetManager.addShip(ship1);
         Ship ship2 = Ship.createShip(new Coordinate(5, 5), Orientation.VERTICAL_DOWN, ShipType.DESTROYER, grid);
         boolean result = fleetManager.addShip(ship2);
@@ -46,9 +49,9 @@ public class TestFleetManager {
 
     @Test
     void testAddShipValidPlacement() {
-        Ship ship1 = Ship.createShip(new Coordinate(0, 0), Orientation.HORIZONTAL_RIGHT, ShipType.CRUISER, grid);
+        Ship ship1 = Ship.createShip(new Coordinate(0, 0), Orientation.HORIZONTAL_RIGHT, ShipType.DESTROYER, grid);
         fleetManager.addShip(ship1);
-        Ship ship2 = Ship.createShip(new Coordinate(5, 5), Orientation.VERTICAL_DOWN, ShipType.FRIGATE, grid);
+        Ship ship2 = Ship.createShip(new Coordinate(5, 5), Orientation.VERTICAL_DOWN, ShipType.DESTROYER, grid);
         boolean result = fleetManager.addShip(ship2);
 
         assertTrue(result, "Expected the method to return true when adding a ship with valid placement.");
@@ -64,7 +67,7 @@ public class TestFleetManager {
     @Test
     void testRemoveShipFromCoordinate_ShipByReferenceExistsAtCoordinate() {
         Ship ship1 = Ship.createShip(new Coordinate(2, 3),  Orientation.HORIZONTAL_RIGHT, ShipType.DESTROYER, grid);
-        Ship ship2 = Ship.createShip(new Coordinate(5, 5), Orientation.VERTICAL_DOWN, ShipType.FRIGATE, grid);
+        Ship ship2 = Ship.createShip(new Coordinate(5, 5), Orientation.VERTICAL_DOWN, ShipType.CARRIER, grid);
 
         fleetManager.addShip(ship1);
         fleetManager.addShip(ship2);
@@ -77,7 +80,7 @@ public class TestFleetManager {
 
     @Test
     void testRemoveShipFromCoordinate_NoShipByReferenceExistsAtCoordinate() {
-        Ship ship = Ship.createShip(new Coordinate(4, 4), Orientation.HORIZONTAL_RIGHT, ShipType.BATTLESHIP, grid);
+        Ship ship = Ship.createShip(new Coordinate(4, 4), Orientation.HORIZONTAL_RIGHT, ShipType.DESTROYER, grid);
         fleetManager.addShip(ship);
 
         boolean result = fleetManager.removeShipByCoordinate(new Coordinate(7, 7));
@@ -87,7 +90,7 @@ public class TestFleetManager {
 
     @Test
     void testRemoveShipByReferenceByCoordinate_ExactMatchForMiddleCoordinate() {
-        Ship ship = Ship.createShip(new Coordinate(3, 3),Orientation.HORIZONTAL_RIGHT, ShipType.CRUISER, grid );
+        Ship ship = Ship.createShip(new Coordinate(3, 3),Orientation.HORIZONTAL_RIGHT, ShipType.DESTROYER, grid );
         fleetManager.addShip(ship);
 
         boolean result = fleetManager.removeShipByCoordinate(new Coordinate(3, 4));
@@ -203,7 +206,7 @@ public class TestFleetManager {
 
     @Test
     void testGetShipByReference_EmptyFleet() {
-        Ship ship = Ship.createShip(new Coordinate(5, 5), Orientation.VERTICAL_UP,ShipType.FRIGATE, grid);
+        Ship ship = Ship.createShip(new Coordinate(5, 5), Orientation.VERTICAL_UP,ShipType.CARRIER, grid);
 
         Ship retrievedShip = fleetManager.getShipByReference(ship);
 
@@ -289,7 +292,7 @@ public class TestFleetManager {
     @Test
     void isGameOver_SomeShipsSunk() {
         Ship ship1 = Ship.createShip(new Coordinate(0, 0), Orientation.HORIZONTAL_RIGHT, ShipType.DESTROYER, grid);
-        Ship ship2 = Ship.createShip(new Coordinate(2, 2), Orientation.HORIZONTAL_RIGHT, ShipType.CRUISER, grid);
+        Ship ship2 = Ship.createShip(new Coordinate(2, 2), Orientation.HORIZONTAL_RIGHT, ShipType.CARRIER, grid);
         fleetManager.addShip(ship1);
         fleetManager.addShip(ship2);
 
@@ -315,7 +318,7 @@ public class TestFleetManager {
     @Test
     void isGameOver_AllShipsInitiallyUnsunk() {
         Ship ship1 = Ship.createShip(new Coordinate(1, 1), Orientation.HORIZONTAL_RIGHT, ShipType.DESTROYER, grid);
-        Ship ship2 = Ship.createShip(new Coordinate(3, 3), Orientation.HORIZONTAL_RIGHT, ShipType.CRUISER, grid);
+        Ship ship2 = Ship.createShip(new Coordinate(3, 3), Orientation.HORIZONTAL_RIGHT, ShipType.CARRIER, grid);
         fleetManager.addShip(ship1);
         fleetManager.addShip(ship2);
 
@@ -331,5 +334,88 @@ public class TestFleetManager {
         coordinates.stream().findFirst().ifPresent(ship::addHit);
 
         assertFalse(fleetManager.isGameOver(), "Expected the game not to be over when ships are only partially damaged.");
+    }
+
+    @Test
+    void isFleetComplete_EmptyFleet_ShouldReturnFalse() {
+        boolean result = fleetManager.isFleetComplete();
+
+        assertFalse(result, "Expected fleet to be incomplete when no ships are added.");
+    }
+
+    @Test
+    void isFleetComplete_ExactRequiredFleet_ShouldReturnTrue() {
+        Ship destroyer1 = Ship.createShip(new Coordinate(0, 0), Orientation.HORIZONTAL_RIGHT, ShipType.DESTROYER, grid);
+        Ship destroyer2 = Ship.createShip(new Coordinate(2, 0), Orientation.HORIZONTAL_RIGHT, ShipType.DESTROYER, grid);
+        Ship carrier = Ship.createShip(new Coordinate(5, 5), Orientation.VERTICAL_DOWN, ShipType.CARRIER, grid);
+
+        fleetManager.addShip(destroyer1);
+        fleetManager.addShip(destroyer2);
+        fleetManager.addShip(carrier);
+
+        boolean result = fleetManager.isFleetComplete();
+
+        assertTrue(result, "Expected fleet to be complete when all required ships are added.");
+    }
+
+    @Test
+    void isFleetComplete_MissingShipType_ShouldReturnFalse() {
+        Ship destroyer1 = Ship.createShip(new Coordinate(0, 0), Orientation.HORIZONTAL_RIGHT, ShipType.DESTROYER, grid);
+        Ship destroyer2 = Ship.createShip(new Coordinate(2, 0), Orientation.HORIZONTAL_RIGHT, ShipType.DESTROYER, grid);
+
+        fleetManager.addShip(destroyer1);
+        fleetManager.addShip(destroyer2);
+
+        boolean result = fleetManager.isFleetComplete();
+
+        assertFalse(result, "Expected fleet to be incomplete when a required ship type is missing.");
+    }
+
+    @Test
+    void isFleetComplete_ExtraShipsAdded_ShouldReturnFalse() {
+        Ship destroyer1 = Ship.createShip(new Coordinate(0, 0), Orientation.HORIZONTAL_RIGHT, ShipType.DESTROYER, grid);
+        Ship carrier = Ship.createShip(new Coordinate(5, 5), Orientation.VERTICAL_DOWN, ShipType.CARRIER, grid);
+
+        fleetManager.addShip(destroyer1);
+        fleetManager.addShip(carrier);
+
+        boolean result = fleetManager.isFleetComplete();
+
+        assertFalse(result, "Expected fleet to be incomplete when extra ships are added.");
+    }
+
+    @Test
+    void isFleetComplete_OneShipOfEachRequiredType_ShouldReturnFalse() {
+        Ship destroyer = Ship.createShip(new Coordinate(0, 0), Orientation.HORIZONTAL_RIGHT, ShipType.DESTROYER, grid);
+        Ship cruiser = Ship.createShip(new Coordinate(3, 3), Orientation.VERTICAL_DOWN, ShipType.CARRIER, grid);
+
+        fleetManager.addShip(destroyer);
+        fleetManager.addShip(cruiser);
+
+        boolean result = fleetManager.isFleetComplete();
+
+        assertFalse(result, "Expected fleet to be incomplete when the count of a required ship type is not met.");
+    }
+
+    @Test
+    void testAddShip_SuccessWithinConfigLimit(){
+        Ship ship = Ship.createShip(new Coordinate(0, 0), Orientation.HORIZONTAL_RIGHT, ShipType.DESTROYER, grid);
+        assertTrue(fleetManager.addShip(ship));
+        assertEquals(1, fleetManager.getFleet().size());
+    }
+
+    @Test
+    void testAddShip_FailureExceedingConfigLimit(){
+        Ship ship = Ship.createShip(new Coordinate(0, 0), Orientation.HORIZONTAL_RIGHT, ShipType.CARRIER, grid);
+        assertTrue(fleetManager.addShip(ship));
+        Ship ship2 = Ship.createShip(new Coordinate(8, 0), Orientation.HORIZONTAL_RIGHT, ShipType.CARRIER, grid);
+        assertFalse(fleetManager.addShip(ship2));
+        assertEquals(1, fleetManager.getFleet().size());
+    }
+
+    @Test
+    void testAddShip_FailureShipTypeNotInConfig(){
+        Ship ship = Ship.createShip(new Coordinate(0, 0), Orientation.HORIZONTAL_RIGHT, ShipType.FRIGATE, grid);
+        assertFalse(fleetManager.addShip(ship));
     }
 }
