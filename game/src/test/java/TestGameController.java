@@ -141,4 +141,35 @@ public class TestGameController {
         verify(mockView).displayErrorAlert(anyString());
         assertEquals(GameState.SETUP, gameController.getGameState());
     }
+
+    @Test
+    void testProcessShot_Hit() {
+        Coordinate target = new Coordinate(5, 5);
+        when(mockGrid.gridSerialization()).thenReturn("updated_grid");
+        when(mockFleetManager.getFleet()).thenReturn(java.util.Collections.emptyList());
+
+        // Action
+        gameController.processShot(target);
+
+        // Verify
+        verify(mockFleetManager).handleIncomingShot(any(Coordinate.class));
+        verify(mockView).updatePlayerGrid(anyString(), anyList());
+    }
+
+    @Test
+    void testProcessShot_Sunk() {
+        Coordinate target = new Coordinate(5, 5);
+        Ship mockShip = org.mockito.Mockito.mock(Ship.class);
+        when(mockShip.isSunk()).thenReturn(true);
+        when(mockFleetManager.getShipByCoordinate(target)).thenReturn(mockShip);
+        when(mockGrid.gridSerialization()).thenReturn("updated_grid");
+
+        // Action
+        gameController.processShot(target);
+
+        // Verify
+        verify(mockFleetManager).handleIncomingShot(target);
+        verify(mockView).displayShipSunk(mockShip);
+        verify(mockView).updatePlayerGrid(anyString(), anyList());
+    }
 }
