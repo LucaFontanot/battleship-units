@@ -1,9 +1,6 @@
 package battleship.controller;
 
-import battleship.handlers.AbstractPlayerCommunication;
-import battleship.handlers.CommunicationEvents;
-import battleship.model.FleetManager;
-import battleship.model.Grid;
+import battleship.model.*;
 import battleship.view.GameView;
 import it.units.battleship.Coordinate;
 import it.units.battleship.GameState;
@@ -36,5 +33,43 @@ public class GameController {
         this.fleetManager = fleetManager;
         this.view = view;
         this.gameState = GameState.SETUP;
+    }
+
+    public void startGame(){
+        view.showSetupPhase();
+        view.updateSystemMessage("Place your ships on the grid.");
+        view.updatePlayerGrid(grid.gridSerialization(), fleetManager.getFleet());
+    }
+
+    public void placeShip(@NonNull ShipType shipType,@NonNull Orientation orientation,@NonNull Coordinate coordinate){
+        try {
+            Ship ship = Ship.createShip(coordinate, orientation, shipType, grid);
+            if (fleetManager.addShip(ship)){
+                view.updateSystemMessage("Ship placed successfully.");
+                view.updatePlayerGrid(grid.gridSerialization(), fleetManager.getFleet());
+            }else {
+                view.displayErrorAlert("Ship placement failed collision with other ships or goes out of the grid or is not part of the fleet configuration. Please try again.");
+            }
+        }catch (IllegalArgumentException e){
+            view.displayErrorAlert("Invalid ship placement. Please try again.");
+        }
+    }
+
+    public void removeShip(@NonNull Coordinate coordinate){
+        if (fleetManager.removeShipByCoordinate(coordinate)){
+            view.updateSystemMessage("Ship removed successfully.");
+            view.updatePlayerGrid(grid.gridSerialization(), fleetManager.getFleet());
+        }else {
+            view.displayErrorAlert("Ship removal failed. Please try again.");
+        }
+    }
+
+    public void confirmSetup(){
+        if (fleetManager.isFleetComplete()){
+            gameState = GameState.WAITING;
+            view.showGamePhase();
+        }else {
+            view.displayErrorAlert("Please place all your ships before starting the game.");
+        }
     }
 }
