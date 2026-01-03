@@ -72,4 +72,15 @@ public class GameController {
             view.displayErrorAlert("Please place all your ships before starting the game.");
         }
     }
+
+    public void processShot(@NonNull Coordinate coordinate) {
+        fleetManager.handleIncomingShot(coordinate);
+        
+        Ship ship = fleetManager.getShipByCoordinate(coordinate);
+        if (ship != null && ship.isSunk()) {
+            view.displayShipSunk(ship);
+        }
+
+        view.updatePlayerGrid(grid.gridSerialization(), fleetManager.getFleet());
+    }
 }
