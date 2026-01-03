@@ -157,19 +157,16 @@ public class TestGameController {
     }
 
     @Test
-    void testProcessShot_Sunk() {
+    void testProcessShot_GameOver() {
         Coordinate target = new Coordinate(5, 5);
-        Ship mockShip = org.mockito.Mockito.mock(Ship.class);
-        when(mockShip.isSunk()).thenReturn(true);
-        when(mockFleetManager.getShipByCoordinate(target)).thenReturn(mockShip);
+        when(mockFleetManager.isGameOver()).thenReturn(true);
         when(mockGrid.gridSerialization()).thenReturn("updated_grid");
 
         // Action
         gameController.processShot(target);
 
         // Verify
-        verify(mockFleetManager).handleIncomingShot(target);
-        verify(mockView).displayShipSunk(mockShip);
-        verify(mockView).updatePlayerGrid(anyString(), anyList());
+        assertEquals(GameState.GAME_OVER, gameController.getGameState());
+        verify(mockView).showEndGamePhase(anyString());
     }
 }

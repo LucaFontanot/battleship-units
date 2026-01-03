@@ -82,5 +82,13 @@ public class GameController {
         }
 
         view.updatePlayerGrid(grid.gridSerialization(), fleetManager.getFleet());
+        gameOver();
+    }
+
+    public void gameOver(){
+        if (fleetManager.isGameOver()){
+            gameState = GameState.GAME_OVER;
+            view.showEndGamePhase("Defeat!");
+        }
     }
 }
