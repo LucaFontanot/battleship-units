@@ -169,4 +169,26 @@ public class TestGameController {
         assertEquals(GameState.GAME_OVER, gameController.getGameState());
         verify(mockView).showEndGamePhase(anyString());
     }
+
+    @Test
+    void testOnGameStartPlayerTurn() {
+        // Action
+        gameController.onGameStart(true);
+
+        // Verify
+        assertEquals(GameState.MY_TURN, gameController.getGameState());
+        verify(mockView).setPlayerTurn(true);
+        verify(mockView).updateSystemMessage("It's your turn.");
+    }
+
+    @Test
+    void testOnGameStartOpponentTurn() {
+        // Action
+        gameController.onGameStart(false);
+
+        // Verify
+        assertEquals(GameState.OPPONENT_TURN, gameController.getGameState());
+        verify(mockView).setPlayerTurn(false);
+        verify(mockView).updateSystemMessage("Waiting for opponent's turn..");
+    }
 }
