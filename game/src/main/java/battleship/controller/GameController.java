@@ -91,4 +91,16 @@ public class GameController {
             view.showEndGamePhase("Defeat!");
         }
     }
+
+    public void onGameStart(boolean isMyTurn){
+        if (isMyTurn){
+            this.gameState = GameState.MY_TURN;
+            view.setPlayerTurn(true);
+            view.updateSystemMessage("It's your turn.");
+        }else {
+            this.gameState = GameState.OPPONENT_TURN;
+            view.setPlayerTurn(false);
+            view.updateSystemMessage("Waiting for opponent's turn..");
+        }
+    }
 }
