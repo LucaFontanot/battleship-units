@@ -14,6 +14,24 @@ public class TestFleetManager {
     private FleetManager fleetManager;
     private Grid grid;
 
+    @Test
+    void handleIncomingShot_sunkShipGridSerialization(){
+        grid = new Grid(4,4);
+        Map<ShipType, Integer> requiredFleetConfiguration = Map.of(ShipType.DESTROYER, 2, ShipType.CARRIER, 1);
+        fleetManager = new FleetManager(grid, requiredFleetConfiguration);
+        Ship ship1 = Ship.createShip(new Coordinate(0, 0), Orientation.HORIZONTAL_RIGHT, ShipType.DESTROYER, grid);
+        fleetManager.addShip(ship1);
+
+        ship1.getCoordinates().forEach(coord -> fleetManager.handleIncomingShot(coord));
+
+        Ship ship2 = Ship.createShip(new Coordinate(0, 3), Orientation.VERTICAL_DOWN, ShipType.DESTROYER, grid);
+        fleetManager.addShip(ship2);
+
+        ship2.getCoordinates().forEach(coord -> fleetManager.handleIncomingShot(coord));
+
+        assertEquals("KK0K000K00000000",grid.gridSerialization());
+    }
+
     @BeforeEach
     void setUp() {
         grid = new Grid(10,10);

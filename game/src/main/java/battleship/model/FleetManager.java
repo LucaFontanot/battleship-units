@@ -197,6 +197,9 @@ public class FleetManager {
             boolean isNewHit = ship.addHit(coordinate);
             if (isNewHit){
                 grid.changeState(coordinate, CellStates.HIT);
+                if (ship.isSunk()){
+                    ship.getCoordinates().forEach(coord -> grid.changeState(coord, CellStates.SUNK));
+                }
             }
         }else {
             grid.changeState(coordinate, CellStates.MISS);

@@ -83,6 +83,7 @@ public class Grid {
      * - '0' for CellStates.EMPTY
      * - 'X' for CellStates.HIT
      * - 'M' for CellStates.MISS
+     * - 'K' for CellStates.SUNK
      *
      * @return a string representation of the grid's current state
      */
