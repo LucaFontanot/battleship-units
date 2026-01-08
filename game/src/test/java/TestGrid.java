@@ -79,12 +79,14 @@ public class TestGrid {
 
         CellStates hitCell = CellStates.HIT;
         CellStates missCell = CellStates.MISS;
+        CellStates sunkCell = CellStates.SUNK;
 
         grid.changeState(new Coordinate(2,4), hitCell);
         grid.changeState(new Coordinate(3,1), missCell);
+        grid.changeState(new Coordinate(4,3), sunkCell);
         grid.changeState(new Coordinate(4,4), hitCell);
 
-        String expected = "00000000000000X0M0000000X";
+        String expected = "00000000000000X0M000000KX";
 
         assertEquals(expected, grid.gridSerialization(), "The grid is not serialized correctly.");
     }
@@ -99,10 +101,10 @@ public class TestGrid {
     public void testFullGridSerialization() {
         Grid grid = new Grid(2, 2);
         grid.changeState(new Coordinate(0, 0), CellStates.HIT);
-        grid.changeState(new Coordinate(0, 1), CellStates.MISS);
+        grid.changeState(new Coordinate(0, 1), CellStates.SUNK);
         grid.changeState(new Coordinate(1, 0), CellStates.MISS);
         grid.changeState(new Coordinate(1, 1), CellStates.HIT);
-        String expectedSerialization = "XMMX";
+        String expectedSerialization = "XKMX";
         assertEquals(expectedSerialization, grid.gridSerialization(), "Full grid serialization failed.");
     }
 
