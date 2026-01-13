@@ -15,9 +15,11 @@ public class Ship {
     @Getter
     private final ShipType shipType;
     @Getter
-    private final Set<Coordinate> coordinates;
+    private final LinkedHashSet<Coordinate> coordinates;
     @Getter
     private final Set<Coordinate> hitCoordinates;
+    @Getter
+    private final Orientation orientation;
 
     /**
      * Creates a new ship on the grid with the specified initial coordinate, orientation, and type.
@@ -34,7 +36,7 @@ public class Ship {
                                   @NonNull Orientation orientation,
                                   @NonNull ShipType type,
                                   @NonNull Grid grid){
-        Set<Coordinate> shipCoordinates = type.getShipCoordinates(initCoordinate, orientation);
+        LinkedHashSet<Coordinate> shipCoordinates = type.getShipCoordinates(initCoordinate, orientation);
 
         for (Coordinate coordinate : shipCoordinates) {
             if (coordinate.row() < 0 || coordinate.row() >= grid.getRow() || coordinate.col() < 0 || coordinate.col() >= grid.getCol()){
@@ -42,16 +44,17 @@ public class Ship {
             }
         }
 
-        return new Ship(shipCoordinates, type);
+        return new Ship(shipCoordinates, type, orientation);
     }
 
-    private Ship(@NonNull Set<Coordinate> coordinates, @NonNull ShipType type){
+    private Ship(@NonNull LinkedHashSet<Coordinate> coordinates, @NonNull ShipType type, @NonNull Orientation orientation){
         if (coordinates.size() != type.getSize()){
             throw new IllegalArgumentException("Ship must have the same number of cells as its type specifies: " + type.getName());
         }
         this.shipType = type;
-        this.coordinates = Collections.unmodifiableSet(new HashSet<>(coordinates));
+        this.coordinates = new LinkedHashSet<>(coordinates);
         this.hitCoordinates = new HashSet<>();
+        this.orientation = orientation;
     }
 
     /**
@@ -94,5 +97,4 @@ public class Ship {
     public int getHitsCount(){
         return hitCoordinates.size();
     }
-
 }

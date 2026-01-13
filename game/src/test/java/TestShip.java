@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -103,7 +104,7 @@ public class TestShip {
 
         Ship ship = Ship.createShip(initCoordinate, orientation, type, grid);
 
-        Set<Coordinate> originalCoordinates = ship.getCoordinates();
+        LinkedHashSet<Coordinate> originalCoordinates = ship.getCoordinates();
         assertThrows(UnsupportedOperationException.class, () ->
                         originalCoordinates.add(new Coordinate(0, 0)),
                 "Expected UnsupportedOperationException when attempting to modify coordinates."

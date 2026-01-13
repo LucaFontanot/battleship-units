@@ -3,8 +3,8 @@ import it.units.battleship.Coordinate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -240,7 +240,7 @@ public class TestFleetManager {
         Coordinate shotCoordinate = new Coordinate(2, 2);
         fleetManager.handleIncomingShot(shotCoordinate);
 
-        assertEquals(CellStates.HIT, grid.getState(shotCoordinate), "Expected the grid cell to be updated to HIT.");
+        assertEquals(CellState.HIT, grid.getState(shotCoordinate), "Expected the grid cell to be updated to HIT.");
         assertTrue(ship.getHitCoordinates().contains(shotCoordinate), "Expected the shot coordinate to be registered as a hit on the ship.");
     }
 
@@ -253,7 +253,7 @@ public class TestFleetManager {
         Coordinate shotCoordinate = new Coordinate(3, 3);
         fleetManager.handleIncomingShot(shotCoordinate);
 
-        assertEquals(CellStates.MISS, grid.getState(shotCoordinate), "Expected the grid cell to be updated to MISS.");
+        assertEquals(CellState.MISS, grid.getState(shotCoordinate), "Expected the grid cell to be updated to MISS.");
         assertFalse(ship.getHitCoordinates().contains(shotCoordinate), "Expected the shot coordinate not to be registered as a hit on any ship.");
     }
 
@@ -267,7 +267,7 @@ public class TestFleetManager {
         fleetManager.handleIncomingShot(shotCoordinate);
         fleetManager.handleIncomingShot(shotCoordinate);
 
-        assertEquals(CellStates.HIT, grid.getState(shotCoordinate), "Expected the grid cell state to remain HIT.");
+        assertEquals(CellState.HIT, grid.getState(shotCoordinate), "Expected the grid cell state to remain HIT.");
         assertEquals(1, ship.getHitCoordinates().size(), "Expected the hit coordinates set to contain only one instance of the hit.");
     }
 
@@ -294,7 +294,7 @@ public class TestFleetManager {
         Coordinate shotCoordinate = new Coordinate(1, 1);
         fleetManager.handleIncomingShot(shotCoordinate);
 
-        assertEquals(CellStates.MISS, grid.getState(shotCoordinate), "Expected the grid cell to be updated to MISS on an empty grid.");
+        assertEquals(CellState.MISS, grid.getState(shotCoordinate), "Expected the grid cell to be updated to MISS on an empty grid.");
     }
 
     @Test
@@ -347,7 +347,7 @@ public class TestFleetManager {
     void isGameOver_AllShipsPartiallyDamaged() {
         Ship ship = Ship.createShip(new Coordinate(0, 0), Orientation.HORIZONTAL_RIGHT, ShipType.DESTROYER, grid);
         fleetManager.addShip(ship);
-        Set<Coordinate> coordinates = ship.getCoordinates();
+        LinkedHashSet<Coordinate> coordinates = ship.getCoordinates();
 
         coordinates.stream().findFirst().ifPresent(ship::addHit);
 

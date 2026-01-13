@@ -1,4 +1,4 @@
-import battleship.model.CellStates;
+import battleship.model.CellState;
 import it.units.battleship.Coordinate;
 import battleship.model.Grid;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,8 +17,8 @@ public class TestGrid {
     @Test
     public void testGridCreation_RectangulareDimensions(){
         Grid grid = new Grid(2, 3);
-        CellStates emptyCell = CellStates.EMPTY;
-        CellStates[][] expected = {
+        CellState emptyCell = CellState.EMPTY;
+        CellState[][] expected = {
                 {emptyCell, emptyCell, emptyCell},
                 {emptyCell, emptyCell, emptyCell}
         };
@@ -37,8 +37,8 @@ public class TestGrid {
 
     @Test
     public void testInitGrid(){
-        CellStates emptyCell = CellStates.EMPTY;
-        CellStates[][] expected = {
+        CellState emptyCell = CellState.EMPTY;
+        CellState[][] expected = {
                 {emptyCell, emptyCell, emptyCell, emptyCell, emptyCell},
                 {emptyCell, emptyCell, emptyCell, emptyCell, emptyCell},
                 {emptyCell, emptyCell, emptyCell, emptyCell, emptyCell},
@@ -54,32 +54,32 @@ public class TestGrid {
 
     @Test
     public void testChangeGridCellState(){
-        grid.changeState(new Coordinate(2,2), CellStates.HIT);
-        assertEquals(CellStates.HIT, grid.getState(new Coordinate(2,2)), "The grid cell state is not updated correctly.");
+        grid.changeState(new Coordinate(2,2), CellState.HIT);
+        assertEquals(CellState.HIT, grid.getState(new Coordinate(2,2)), "The grid cell state is not updated correctly.");
     }
 
     @Test
     public void testChangeGridCellState_OutOfBounds(){
-        assertThrowsExactly(IndexOutOfBoundsException.class, () -> grid.changeState(new Coordinate(-1,-1), CellStates.HIT));
+        assertThrowsExactly(IndexOutOfBoundsException.class, () -> grid.changeState(new Coordinate(-1,-1), CellState.HIT));
     }
 
     @Test
     public void testChangeGridCellStateOutOfBounds(){
-        assertThrowsExactly(IndexOutOfBoundsException.class, () -> grid.changeState(new Coordinate(5,5), CellStates.HIT));
+        assertThrowsExactly(IndexOutOfBoundsException.class, () -> grid.changeState(new Coordinate(5,5), CellState.HIT));
     }
 
     @Test
     public void testGetGridCellState(){
-        grid.changeState(new Coordinate(2,1), CellStates.HIT);
-        assertEquals(CellStates.HIT, grid.getState(new Coordinate(2,1)), "The grid cell state is not extracted correctly.");
+        grid.changeState(new Coordinate(2,1), CellState.HIT);
+        assertEquals(CellState.HIT, grid.getState(new Coordinate(2,1)), "The grid cell state is not extracted correctly.");
     }
 
     @Test
     public void testGridSerialization(){
 
-        CellStates hitCell = CellStates.HIT;
-        CellStates missCell = CellStates.MISS;
-        CellStates sunkCell = CellStates.SUNK;
+        CellState hitCell = CellState.HIT;
+        CellState missCell = CellState.MISS;
+        CellState sunkCell = CellState.SUNK;
 
         grid.changeState(new Coordinate(2,4), hitCell);
         grid.changeState(new Coordinate(3,1), missCell);
@@ -100,19 +100,19 @@ public class TestGrid {
     @Test
     public void testFullGridSerialization() {
         Grid grid = new Grid(2, 2);
-        grid.changeState(new Coordinate(0, 0), CellStates.HIT);
-        grid.changeState(new Coordinate(0, 1), CellStates.SUNK);
-        grid.changeState(new Coordinate(1, 0), CellStates.MISS);
-        grid.changeState(new Coordinate(1, 1), CellStates.HIT);
+        grid.changeState(new Coordinate(0, 0), CellState.HIT);
+        grid.changeState(new Coordinate(0, 1), CellState.SUNK);
+        grid.changeState(new Coordinate(1, 0), CellState.MISS);
+        grid.changeState(new Coordinate(1, 1), CellState.HIT);
         String expectedSerialization = "XKMX";
         assertEquals(expectedSerialization, grid.gridSerialization(), "Full grid serialization failed.");
     }
 
     @Test
     public void testGridSerializationNoOverwrites() {
-        grid.changeState(new Coordinate(0, 0), CellStates.HIT);
-        grid.changeState(new Coordinate(0, 1), CellStates.HIT);
-        grid.changeState(new Coordinate(0, 0), CellStates.EMPTY);
+        grid.changeState(new Coordinate(0, 0), CellState.HIT);
+        grid.changeState(new Coordinate(0, 1), CellState.HIT);
+        grid.changeState(new Coordinate(0, 0), CellState.EMPTY);
         String expectedSerialization = "0X00000000000000000000000";
         assertEquals(expectedSerialization, grid.gridSerialization(), "Serialization with a reverted cell state failed.");
     }

@@ -4,10 +4,8 @@ import it.units.battleship.Coordinate;
 import lombok.Getter;
 import lombok.NonNull;
 
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
-
-import static java.util.stream.Collectors.toSet;
 
 /**
  * The ShipType enum represents different types of ships in the Battleship game.
@@ -59,7 +57,7 @@ public enum ShipType {
      * @param orientation the orientation of the ship (e.g., horizontal or vertical), must not be null
      * @return a set of {@link Coordinate} objects representing the ship's absolute positions on the grid
      */
-    public Set<Coordinate> getShipCoordinates(@NonNull Coordinate initCoordinate,@NonNull Orientation orientation){
+    public LinkedHashSet<Coordinate> getShipCoordinates(@NonNull Coordinate initCoordinate,@NonNull Orientation orientation){
         return computeShipCoordinates(orientation.getAngle(), initCoordinate);
     }
 
@@ -70,17 +68,18 @@ public enum ShipType {
      * @param initCoordinate the initial coordinate of the ship's starting position
      * @return a set of {@code Coordinate} objects representing the computed absolute positions of the ship
      */
-    private Set<Coordinate> computeShipCoordinates(Double theta, Coordinate initCoordinate){
+    private LinkedHashSet<Coordinate> computeShipCoordinates(Double theta, Coordinate initCoordinate){
         Double[][] rotation_matrix = {{Math.cos(theta), -Math.sin(theta)},
                                         {Math.sin(theta), Math.cos(theta)}};
 
-        return getShipFrame()
-                .stream()
-                .map(coordinate -> {
-                    int x = coordinate.row();
-                    int y = coordinate.col();
-                    return new Coordinate((int) ( initCoordinate.row()+(rotation_matrix[0][0] * x + rotation_matrix[0][1] * y)),
-                                          (int) ( initCoordinate.col()+(rotation_matrix[1][0] * x + rotation_matrix[1][1] * y)));
-                }).collect(toSet());
+        LinkedHashSet<Coordinate> coordinates = new LinkedHashSet<>();
+        for (Coordinate coordinate : getShipFrame()) {
+            int x = coordinate.row();
+            int y = coordinate.col();
+            int newRow = (int) (initCoordinate.row() + (rotation_matrix[0][0] * x + rotation_matrix[0][1] * y));
+            int newCol = (int) (initCoordinate.col() + (rotation_matrix[1][0] * x + rotation_matrix[1][1] * y));
+            coordinates.add(new Coordinate(newRow, newCol));
+        }
+        return coordinates;
     }
 }
