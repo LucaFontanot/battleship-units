@@ -11,7 +11,7 @@ import lombok.NonNull;
  *
  * The grid tracks the state of all ships and can determine if the game has been won by checking if all ships have been hit.
  *
- * @see CellStates for possible cell states
+ * @see CellState for possible cell states
  * @see Coordinate for coordinate system
  */
 
@@ -22,7 +22,7 @@ public class Grid {
     @Getter
     private final int col;
     
-    private final CellStates[][] grid;
+    private final CellState[][] grid;
 
     public Grid(int row, int col){
         if (row<=1 || col<=1){
@@ -31,7 +31,7 @@ public class Grid {
         this.row = row;
         this.col = col;
 
-        this.grid = new CellStates[row][col];
+        this.grid = new CellState[row][col];
 
         this.initializeGrid();
     }
@@ -42,7 +42,7 @@ public class Grid {
     private void initializeGrid(){
         for (int i=0; i < row; i++){
             for (int j=0; j < col; j++){
-                grid[i][j] = CellStates.EMPTY;
+                grid[i][j] = CellState.EMPTY;
             }
         }
     }
@@ -54,7 +54,7 @@ public class Grid {
      * @param newState the new state to assign to the specified cell; must be non-null
      * @throws IndexOutOfBoundsException if the specified coordinate is outside the grid's dimensions
      */
-    public void changeState(@NonNull Coordinate coordinate, @NonNull CellStates newState){
+    public void changeState(@NonNull Coordinate coordinate, @NonNull CellState newState){
         if (coordinate.row() < 0 || coordinate.row() >= row || coordinate.col() < 0 || coordinate.col() >= col) {
             throw new IndexOutOfBoundsException("Coordinates must respect grid dimension");
         }
@@ -69,7 +69,7 @@ public class Grid {
      * @return the state of the cell at the specified coordinate
      * @throws IndexOutOfBoundsException if the specified coordinate is outside the grid's dimensions
      */
-    public CellStates getState(@NonNull Coordinate coordinate){
+    public CellState getState(@NonNull Coordinate coordinate){
         if (coordinate.row() < 0 || coordinate.row() >= row || coordinate.col() < 0 || coordinate.col() >= col) {
             throw new IndexOutOfBoundsException("Coordinates must respect grid dimension");
         }

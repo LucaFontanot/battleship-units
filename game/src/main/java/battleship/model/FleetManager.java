@@ -196,13 +196,13 @@ public class FleetManager {
         if (ship != null){
             boolean isNewHit = ship.addHit(coordinate);
             if (isNewHit){
-                grid.changeState(coordinate, CellStates.HIT);
+                grid.changeState(coordinate, CellState.HIT);
                 if (ship.isSunk()){
-                    ship.getCoordinates().forEach(coord -> grid.changeState(coord, CellStates.SUNK));
+                    ship.getCoordinates().forEach(coord -> grid.changeState(coord, CellState.SUNK));
                 }
             }
         }else {
-            grid.changeState(coordinate, CellStates.MISS);
+            grid.changeState(coordinate, CellState.MISS);
         }
     }
 

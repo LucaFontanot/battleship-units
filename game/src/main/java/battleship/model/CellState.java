@@ -1,6 +1,6 @@
 package battleship.model;
 
-public enum CellStates {
+public enum CellState {
     EMPTY('0'),
     HIT('X'),
     SUNK('K'),
@@ -8,7 +8,7 @@ public enum CellStates {
 
     public final char representation;
 
-    CellStates(char representation){
+    CellState(char representation){
         this.representation = representation;
     }
 }
