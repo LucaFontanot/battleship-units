@@ -1,6 +1,7 @@
 package battleship.model;
 
 import it.units.battleship.Coordinate;
+import lombok.Getter;
 import lombok.NonNull;
 
 import java.util.ArrayList;
@@ -24,6 +25,7 @@ public class FleetManager {
      */
     private static final int MIN_DISTANCE_THRESHOLD = 1;
 
+    @Getter
     private final Grid grid;
     private final List<Ship> fleet = new ArrayList<>();
     private final Map<ShipType, Integer> requiredFleetConfiguration;
