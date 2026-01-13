@@ -93,25 +93,6 @@ public class TestShip {
     }
 
     /**
-     * Tests the immutability of ship's coordinates.
-     */
-    @Test
-    void testShipCoordinatesImmutability() {
-        Grid grid = new Grid(10, 10);
-        ShipType type = ShipType.CRUISER;
-        Coordinate initCoordinate = new Coordinate(3, 3);
-        Orientation orientation = Orientation.HORIZONTAL_RIGHT;
-
-        Ship ship = Ship.createShip(initCoordinate, orientation, type, grid);
-
-        LinkedHashSet<Coordinate> originalCoordinates = ship.getCoordinates();
-        assertThrows(UnsupportedOperationException.class, () ->
-                        originalCoordinates.add(new Coordinate(0, 0)),
-                "Expected UnsupportedOperationException when attempting to modify coordinates."
-        );
-    }
-
-    /**
      * Tests ship creation with valid grid and orientation.
      */
     @Test

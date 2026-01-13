@@ -68,16 +68,27 @@ public enum ShipType {
      * @param initCoordinate the initial coordinate of the ship's starting position
      * @return a set of {@code Coordinate} objects representing the computed absolute positions of the ship
      */
-    private LinkedHashSet<Coordinate> computeShipCoordinates(Double theta, Coordinate initCoordinate){
-        Double[][] rotation_matrix = {{Math.cos(theta), -Math.sin(theta)},
-                                        {Math.sin(theta), Math.cos(theta)}};
+    private LinkedHashSet<Coordinate> computeShipCoordinates(Double theta, Coordinate initCoordinate) {
+        Double[][] rotation_matrix = {
+                {Math.cos(theta), -Math.sin(theta)},
+                {Math.sin(theta), Math.cos(theta)}
+        };
 
         LinkedHashSet<Coordinate> coordinates = new LinkedHashSet<>();
+
         for (Coordinate coordinate : getShipFrame()) {
             int x = coordinate.row();
             int y = coordinate.col();
-            int newRow = (int) (initCoordinate.row() + (rotation_matrix[0][0] * x + rotation_matrix[0][1] * y));
-            int newCol = (int) (initCoordinate.col() + (rotation_matrix[1][0] * x + rotation_matrix[1][1] * y));
+
+            double relativeRow = rotation_matrix[0][0] * x + rotation_matrix[0][1] * y;
+            double relativeCol = rotation_matrix[1][0] * x + rotation_matrix[1][1] * y;
+
+            int rotX = (int) Math.round(relativeRow);
+            int rotY = (int) Math.round(relativeCol);
+
+            int newRow = initCoordinate.row() + rotX;
+            int newCol = initCoordinate.col() + rotY;
+
             coordinates.add(new Coordinate(newRow, newCol));
         }
         return coordinates;
