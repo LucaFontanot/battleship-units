@@ -1,5 +1,14 @@
 package battleship.view;
 
+import battleship.model.FleetManager;
+import battleship.model.Ship;
+import battleship.ui.grid.GridUI;
+import battleship.ui.setup.SetupPanel;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.List;
+
 /**
  * Represents the main window (frame) of the Battleship game's graphical user interface (GUI).
  *
@@ -21,5 +30,85 @@ package battleship.view;
  */
 
 
-public class GameFrame{
+public class GameFrame extends JFrame implements GameView {
+    private SetupPanel setupPanel;
+    private JPanel currentPanel;
+
+    private final JLabel systemMessage = new JLabel(" ");
+
+    public GameFrame(FleetManager fleetManager) {
+        setTitle("Battleship");
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setLayout(new BorderLayout());
+
+        setupPanel = new SetupPanel(fleetManager);
+
+        add(systemMessage, BorderLayout.NORTH);
+        add(setupPanel, BorderLayout.CENTER);
+
+        currentPanel = setupPanel;
+
+        pack();
+        setLocationRelativeTo(null);
+    }
+
+    @Override
+    public void open() {
+        setVisible(true);
+    }
+
+    @Override
+    public void showSetupPhase() {
+        switchPanel(setupPanel);
+        systemMessage.setText("Setup phase: place your ships.");
+    }
+
+    @Override
+    public void showGamePhase() {
+        systemMessage.setText("Game started.");
+    }
+
+    @Override
+    public void updatePlayerGrid(String serializedGrid, List<Ship> fleet) {
+        if (currentPanel instanceof SetupPanel setup) {
+            setup.getGridUI().reload();
+        }
+    }
+
+    @Override
+    public void updateOpponentGrid(String serializedGrid) {
+    }
+
+    @Override
+    public void updateSystemMessage(String message) {
+        systemMessage.setText(message);
+    }
+
+    @Override
+    public void displayErrorAlert(String message) {
+        JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
+    }
+
+    @Override
+    public void showEndGamePhase(String winner) {
+        JOptionPane.showMessageDialog(this, "Winner: " + winner);
+    }
+
+    @Override
+    public void displayShipSunk(Ship ship) {
+        JOptionPane.showMessageDialog(this, "Ship sunk: " + ship.getShipType());
+    }
+
+    @Override
+    public void setPlayerTurn(boolean isPlayerTurn) {
+    }
+
+    private void switchPanel(JPanel panel) {
+        getContentPane().removeAll();
+        add(systemMessage, BorderLayout.NORTH);
+        add(panel, BorderLayout.CENTER);
+        currentPanel = panel;
+        revalidate();
+        repaint();
+    }
 }

@@ -17,7 +17,7 @@ import java.util.List;
 
 public interface GameView {
 
-    void show();
+    void open();
 
     /**
      * Displays the setup phase of the Battleship game.
