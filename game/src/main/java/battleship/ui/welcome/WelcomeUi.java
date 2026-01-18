@@ -1,7 +1,12 @@
 package battleship.ui.welcome;
 
+import battleship.controller.GameController;
+import battleship.model.FleetManager;
+import battleship.model.Grid;
+import battleship.model.ShipType;
 import battleship.ui.ImageLoader;
 import battleship.ui.ThemeSelector;
+import battleship.view.GameFrame;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
@@ -9,6 +14,7 @@ import it.units.battleship.Logger;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Map;
 
 public class WelcomeUi implements WelcomeUiActions {
     final JFrame frame = new JFrame("Battleship - Welcome");
@@ -47,8 +53,27 @@ public class WelcomeUi implements WelcomeUiActions {
 
     @Override
     public void onSinglePlayerSelected() {
+        frame.dispose();
 
+        Grid playerGrid = new Grid(10, 10);
+
+        Map<ShipType, Integer> fleetConfiguration = Map.of(
+                ShipType.DESTROYER, 2,
+                ShipType.FRIGATE, 2,
+                ShipType.CRUISER, 1,
+                ShipType.BATTLESHIP, 1,
+                ShipType.CARRIER, 1
+        );
+
+        FleetManager fleetManager = new FleetManager(playerGrid, fleetConfiguration);
+
+        GameFrame gameFrame = new GameFrame(fleetManager);
+        GameController controller = new GameController(playerGrid, fleetManager, gameFrame);
+
+        gameFrame.open();
+        controller.startGame();
     }
+
 
     @Override
     public void onLocalMultiplayerSelected() {
