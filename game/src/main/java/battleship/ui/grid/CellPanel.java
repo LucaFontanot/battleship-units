@@ -2,10 +2,13 @@ package battleship.ui.grid;
 
 import battleship.model.CellState;
 import battleship.model.Grid;
+import battleship.ui.setup.PlacementContext;
 import it.units.battleship.Coordinate;
+import lombok.Setter;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 
 public class CellPanel extends JLabel {
@@ -15,15 +18,21 @@ public class CellPanel extends JLabel {
     static final Color MISS_COLOR = new Color(0x0000FF);
     static final Color EMPTY_COLOR = new Color(0xFFFFFF);
     static final Color SUNK_COLOR = new Color(0xFF0303);
+    static final Color SELECTED_VALID_COLOR = new Color(0xAAFFAA);
 
     final Grid grid;
     final Coordinate coordinate;
     private Color baseColor; // colore base della cella
+    private boolean preview = false;
+    @Setter
+    private CellHoverListener hoverListener;
+
 
     public CellPanel(Grid grid, Coordinate coordinate) {
         this.grid = grid;
         this.coordinate = coordinate;
-        setOpaque(true);
+
+        setOpaque(false);
         setHorizontalAlignment(CENTER);
         setVerticalAlignment(CENTER);
         setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
@@ -32,12 +41,17 @@ public class CellPanel extends JLabel {
 
         addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
-            public void mouseEntered(java.awt.event.MouseEvent e) {
-
+            public void mouseEntered(MouseEvent e) {
+                if (hoverListener != null) {
+                    hoverListener.onCellHover(coordinate);
+                }
             }
-            @Override
-            public void mouseExited(java.awt.event.MouseEvent e) {
 
+            @Override
+            public void mouseExited(MouseEvent e) {
+                if (hoverListener != null) {
+                    hoverListener.onCellExit();
+                }
             }
         });
     }
@@ -71,4 +85,27 @@ public class CellPanel extends JLabel {
         setBackground(applyOpacity(baseColor, OPACITY));
         repaint();
     }
+
+    public void setPreview(boolean preview) {
+        this.preview = preview;
+        repaint();
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        Graphics2D g2 = (Graphics2D) g.create();
+
+        g2.setColor(baseColor);
+        g2.fillRect(0, 0, getWidth(), getHeight());
+
+        if (preview) {
+            g2.setColor(SELECTED_VALID_COLOR);
+            g2.fillRect(0, 0, getWidth(), getHeight());
+        }
+
+        g2.dispose();
+
+        super.paintComponent(g);
+    }
+
 }

@@ -9,7 +9,7 @@ import lombok.Getter;
 import javax.swing.*;
 import java.awt.*;
 
-public class SetupPanel extends JPanel {
+public class SetupPanel extends JPanel implements PlacementContext {
 
     @Getter
     private final GridUI gridUI;
@@ -22,7 +22,7 @@ public class SetupPanel extends JPanel {
     public SetupPanel(FleetManager fleetManager) {
         setLayout(new BorderLayout());
 
-        gridUI = new GridUI(fleetManager);
+        gridUI = new GridUI(fleetManager, this);
         shipPalette = new JPanel();
         shipPalette.setLayout(new BoxLayout(shipPalette, BoxLayout.Y_AXIS));
 
@@ -61,6 +61,5 @@ public class SetupPanel extends JPanel {
         }
         selected.setBorder(BorderFactory.createLineBorder(Color.GREEN, 2));
     }
-
 }
 
