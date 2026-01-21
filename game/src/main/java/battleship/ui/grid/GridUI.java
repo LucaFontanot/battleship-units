@@ -7,6 +7,7 @@ import battleship.ui.TextureLoader;
 import battleship.ui.setup.PlacementContext;
 import it.units.battleship.Coordinate;
 import it.units.battleship.Logger;
+import lombok.Getter;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,12 +17,14 @@ import java.util.Set;
 public class GridUI extends JPanel implements CellHoverListener {
     final Grid grid;
     final FleetManager fleetManager;
+    @Getter
     final int cols;
+    @Getter
     final int rows;
     private CellPanel[][] cells;
     private final PlacementContext placementContext;
 
-    public GridUI(FleetManager fleetManager, PlacementContext placementContext) {
+    public GridUI(FleetManager fleetManager, PlacementContext placementContext, CellClickListener clickListener) {
         this.grid = fleetManager.getGrid();
         this.fleetManager = fleetManager;
         this.placementContext = placementContext;
@@ -36,6 +39,9 @@ public class GridUI extends JPanel implements CellHoverListener {
             for (int c = 0; c < cols; c++) {
                 cells[r][c] = new CellPanel(grid, new Coordinate(r, c));
                 cells[r][c].setHoverListener(this);
+                cells[r][c].setClickListener(clickListener);
+
+
                 add(cells[r][c]);
             }
         }
@@ -72,20 +78,21 @@ public class GridUI extends JPanel implements CellHoverListener {
     public void clearPlacementPreview() {
         for (CellPanel[] row : cells) {
             for (CellPanel cell : row) {
-                cell.setPreview(false);
+                cell.setPreview(false, true);
             }
         }
     }
 
-    public void showPlacementPreview(Set<Coordinate> coords) {
+
+    public void showPlacementPreview(java.util.Set<Coordinate> coords, boolean valid) {
         clearPlacementPreview();
         for (Coordinate c : coords) {
-            if (c.row() >= 0 && c.row() < rows &&
-                    c.col() >= 0 && c.col() < cols) {
-                cells[c.row()][c.col()].setPreview(true);
+            if (c.row() >= 0 && c.row() < rows && c.col() >= 0 && c.col() < cols) {
+                cells[c.row()][c.col()].setPreview(true, valid);
             }
         }
     }
+
     @Override
     public void onCellHover(Coordinate coordinate) {
         clearPlacementPreview();
@@ -93,11 +100,25 @@ public class GridUI extends JPanel implements CellHoverListener {
         if (placementContext == null) return;
         if (placementContext.getSelectedShipType() == null) return;
 
-        var ship = placementContext.getSelectedShipType();
+        var shipType = placementContext.getSelectedShipType();
         var orientation = placementContext.getSelectedOrientation();
 
-        var coords = ship.getShipCoordinates(coordinate, orientation);
-        showPlacementPreview(coords);
+        var coords = shipType.getShipCoordinates(coordinate, orientation);
+
+        boolean valid = true;
+        for (Coordinate c : coords) {
+            if (c.row() < 0 || c.row() >= rows || c.col() < 0 || c.col() >= cols) {
+                valid = false;
+                break;
+            }
+
+            if (cells[c.row()][c.col()].isSelected()) {
+                valid = false;
+                break;
+            }
+        }
+
+        showPlacementPreview(coords, valid);
     }
 
     @Override
@@ -105,5 +126,19 @@ public class GridUI extends JPanel implements CellHoverListener {
         clearPlacementPreview();
     }
 
+    public void markSelected(Set<Coordinate> coords) {
+        for (Coordinate c : coords) {
+            if (c.row() >= 0 && c.row() < rows && c.col() >= 0 && c.col() < cols) {
+                cells[c.row()][c.col()].setSelected(true);
+            }
+        }
+    }
 
+    public void clearSelected() {
+        for (CellPanel[] row : cells) {
+            for (CellPanel cell : row) {
+                cell.setSelected(false);
+            }
+        }
+    }
 }

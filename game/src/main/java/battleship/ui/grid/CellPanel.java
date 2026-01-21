@@ -4,6 +4,7 @@ import battleship.model.CellState;
 import battleship.model.Grid;
 import battleship.ui.setup.PlacementContext;
 import it.units.battleship.Coordinate;
+import lombok.Getter;
 import lombok.Setter;
 
 import javax.swing.*;
@@ -18,14 +19,22 @@ public class CellPanel extends JLabel {
     static final Color MISS_COLOR = new Color(0x0000FF);
     static final Color EMPTY_COLOR = new Color(0xFFFFFF);
     static final Color SUNK_COLOR = new Color(0xFF0303);
-    static final Color SELECTED_VALID_COLOR = new Color(0xAAFFAA);
+    static final Color SELECT_VALID_COLOR = new Color(0xAAFFAA);
+    static final Color SELECT_INVALID_COLOR = new Color(0xFFAAAA);
+    static final Color SELECTED_COLOR = new Color(0xFFFF00);
 
     final Grid grid;
     final Coordinate coordinate;
     private Color baseColor; // colore base della cella
     private boolean preview = false;
+    private boolean previewValid = true;
+    @Getter
+    private boolean selected = false;
+
     @Setter
     private CellHoverListener hoverListener;
+    @Setter
+    private CellClickListener clickListener;
 
 
     public CellPanel(Grid grid, Coordinate coordinate) {
@@ -53,6 +62,14 @@ public class CellPanel extends JLabel {
                     hoverListener.onCellExit();
                 }
             }
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (clickListener != null) {
+                    clickListener.onCellClicked(coordinate);
+                }
+            }
+
         });
     }
 
@@ -86,8 +103,15 @@ public class CellPanel extends JLabel {
         repaint();
     }
 
-    public void setPreview(boolean preview) {
+    public void setPreview(boolean preview, boolean valid) {
         this.preview = preview;
+        this.previewValid = valid;
+        repaint();
+    }
+
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
         repaint();
     }
 
@@ -98,13 +122,17 @@ public class CellPanel extends JLabel {
         g2.setColor(baseColor);
         g2.fillRect(0, 0, getWidth(), getHeight());
 
+        if (selected) {
+            g2.setColor(SELECTED_COLOR);
+            g2.fillRect(0, 0, getWidth(), getHeight());
+        }
+
         if (preview) {
-            g2.setColor(SELECTED_VALID_COLOR);
+            g2.setColor(previewValid ? SELECT_VALID_COLOR : SELECT_INVALID_COLOR);
             g2.fillRect(0, 0, getWidth(), getHeight());
         }
 
         g2.dispose();
-
         super.paintComponent(g);
     }
 

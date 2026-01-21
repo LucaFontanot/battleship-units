@@ -3,13 +3,15 @@ package battleship.ui.setup;
 import battleship.model.FleetManager;
 import battleship.model.Orientation;
 import battleship.model.ShipType;
+import battleship.ui.grid.CellClickListener;
 import battleship.ui.grid.GridUI;
+import it.units.battleship.Coordinate;
 import lombok.Getter;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class SetupPanel extends JPanel implements PlacementContext {
+public class SetupPanel extends JPanel implements PlacementContext, CellClickListener {
 
     @Getter
     private final GridUI gridUI;
@@ -22,7 +24,7 @@ public class SetupPanel extends JPanel implements PlacementContext {
     public SetupPanel(FleetManager fleetManager) {
         setLayout(new BorderLayout());
 
-        gridUI = new GridUI(fleetManager, this);
+        gridUI = new GridUI(fleetManager, this, this);
         shipPalette = new JPanel();
         shipPalette.setLayout(new BoxLayout(shipPalette, BoxLayout.Y_AXIS));
 
@@ -50,7 +52,6 @@ public class SetupPanel extends JPanel implements PlacementContext {
 
         add(shipPalette, BorderLayout.WEST);
         add(gridUI, BorderLayout.CENTER);
-
     }
 
     private void highlightSelectedShipButton(JButton selected) {
@@ -61,5 +62,31 @@ public class SetupPanel extends JPanel implements PlacementContext {
         }
         selected.setBorder(BorderFactory.createLineBorder(Color.GREEN, 2));
     }
+
+    @Override
+    public void onCellClicked(Coordinate coordinate) {
+        if (selectedShipType == null) {
+            Toolkit.getDefaultToolkit().beep();
+            return;
+        }
+
+        var coords = selectedShipType.getShipCoordinates(coordinate, selectedOrientation);
+
+        int rows = gridUI.getRows();
+        int cols = gridUI.getCols();
+
+        for (Coordinate c : coords) {
+            if (c.row() < 0 || c.row() >= rows || c.col() < 0 || c.col() >= cols) {
+                Toolkit.getDefaultToolkit().beep();
+                return;
+            }
+        }
+
+        gridUI.markSelected(coords);
+
+        gridUI.clearPlacementPreview();
+    }
+
+
 }
 
