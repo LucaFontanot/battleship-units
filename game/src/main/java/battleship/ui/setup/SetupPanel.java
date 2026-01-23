@@ -2,6 +2,7 @@ package battleship.ui.setup;
 
 import battleship.model.FleetManager;
 import battleship.model.Orientation;
+import battleship.model.Ship;
 import battleship.model.ShipType;
 import battleship.ui.grid.CellClickListener;
 import battleship.ui.grid.GridUI;
@@ -15,7 +16,10 @@ public class SetupPanel extends JPanel implements PlacementContext, CellClickLis
 
     @Getter
     private final GridUI gridUI;
+    private final FleetManager fleetManager;
+
     private final JPanel shipPalette;
+
     @Getter
     private ShipType selectedShipType = null;
     @Getter
@@ -23,8 +27,9 @@ public class SetupPanel extends JPanel implements PlacementContext, CellClickLis
     private static final Dimension BUTTON_SIZE = new Dimension(120, 30);
 
     public SetupPanel(FleetManager fleetManager) {
-        setLayout(new BorderLayout());
+        this.fleetManager = fleetManager;
 
+        setLayout(new BorderLayout());
         gridUI = new GridUI(fleetManager, this, this);
         shipPalette = new JPanel();
         shipPalette.setLayout(new BoxLayout(shipPalette, BoxLayout.Y_AXIS));
@@ -89,23 +94,28 @@ public class SetupPanel extends JPanel implements PlacementContext, CellClickLis
             return;
         }
 
-        var coords = selectedShipType.getShipCoordinates(coordinate, selectedOrientation);
+        try {
+            Ship ship = Ship.createShip(coordinate, selectedOrientation, selectedShipType, fleetManager.getGrid());
+            boolean ok = fleetManager.addShip(ship);
 
-        int rows = gridUI.getRows();
-        int cols = gridUI.getCols();
-
-        for (Coordinate c : coords) {
-            if (c.row() < 0 || c.row() >= rows || c.col() < 0 || c.col() >= cols) {
+            if (!ok) {
                 Toolkit.getDefaultToolkit().beep();
+                gridUI.showPlacementPreview(ship.getCoordinates(), false);
                 return;
             }
+
+            gridUI.markSelected(ship.getCoordinates());
+            gridUI.clearPlacementPreview();
+
+        } catch (IllegalArgumentException ex) {
+            Toolkit.getDefaultToolkit().beep();
+
+            var coords = selectedShipType.getShipCoordinates(coordinate, selectedOrientation);
+            gridUI.showPlacementPreview(coords, false);
         }
-
-        gridUI.markSelected(coords);
-
-        gridUI.clearPlacementPreview();
     }
 
-
 }
+
+
 

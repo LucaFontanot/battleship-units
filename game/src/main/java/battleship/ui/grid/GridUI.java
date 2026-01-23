@@ -84,7 +84,7 @@ public class GridUI extends JPanel implements CellHoverListener {
     }
 
 
-    public void showPlacementPreview(java.util.Set<Coordinate> coords, boolean valid) {
+    public void showPlacementPreview(Set<Coordinate> coords, boolean valid) {
         clearPlacementPreview();
         for (Coordinate c : coords) {
             if (c.row() >= 0 && c.row() < rows && c.col() >= 0 && c.col() < cols) {
