@@ -109,6 +109,7 @@ public class GridUI extends JPanel implements CellHoverListener {
         for (Coordinate c : coords) {
             if (c.row() < 0 || c.row() >= rows || c.col() < 0 || c.col() >= cols) {
                 valid = false;
+
                 break;
             }
 

@@ -43,12 +43,16 @@ public class GameFrame extends JFrame implements GameView {
 
         setupPanel = new SetupPanel(fleetManager);
 
+        systemMessage.setBorder(BorderFactory.createEmptyBorder(20, 20, 0, 0));
+        systemMessage.setVerticalAlignment(SwingConstants.CENTER);
+
         add(systemMessage, BorderLayout.NORTH);
         add(setupPanel, BorderLayout.CENTER);
 
         currentPanel = setupPanel;
 
         pack();
+        setSize(650, 550);
         setLocationRelativeTo(null);
     }
 

@@ -20,6 +20,7 @@ public class SetupPanel extends JPanel implements PlacementContext, CellClickLis
     private ShipType selectedShipType = null;
     @Getter
     private Orientation selectedOrientation = Orientation.HORIZONTAL_RIGHT;
+    private static final Dimension BUTTON_SIZE = new Dimension(120, 30);
 
     public SetupPanel(FleetManager fleetManager) {
         setLayout(new BorderLayout());
@@ -27,9 +28,17 @@ public class SetupPanel extends JPanel implements PlacementContext, CellClickLis
         gridUI = new GridUI(fleetManager, this, this);
         shipPalette = new JPanel();
         shipPalette.setLayout(new BoxLayout(shipPalette, BoxLayout.Y_AXIS));
+        shipPalette.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
+        shipPalette.setPreferredSize(new Dimension(160, 0));
 
         for (ShipType type : ShipType.values()) {
             JButton shipButton = new JButton(type.getName());
+
+            shipButton.setPreferredSize(BUTTON_SIZE);
+            shipButton.setMaximumSize(BUTTON_SIZE);
+            shipButton.setMinimumSize(BUTTON_SIZE);
+            shipButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+            shipButton.setFocusPainted(false);
 
             shipButton.addActionListener(e -> {
                 selectedShipType = type;
@@ -37,9 +46,16 @@ public class SetupPanel extends JPanel implements PlacementContext, CellClickLis
             });
 
             shipPalette.add(shipButton);
+            shipPalette.add(Box.createVerticalStrut(10));
         }
 
         JButton rotateButton = new JButton("Rotate");
+
+        rotateButton.setPreferredSize(BUTTON_SIZE);
+        rotateButton.setMaximumSize(BUTTON_SIZE);
+        rotateButton.setMinimumSize(BUTTON_SIZE);
+        rotateButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        rotateButton.setFocusPainted(false);
 
         rotateButton.addActionListener(e -> {
             Orientation[] values = Orientation.values();
@@ -47,11 +63,14 @@ public class SetupPanel extends JPanel implements PlacementContext, CellClickLis
             selectedOrientation = values[(index + 1) % values.length];
         });
 
-        shipPalette.add(Box.createVerticalStrut(10));
+        shipPalette.add(Box.createVerticalStrut(20));
         shipPalette.add(rotateButton);
 
         add(shipPalette, BorderLayout.WEST);
-        add(gridUI, BorderLayout.CENTER);
+        JPanel gridWrapper = new JPanel(new GridBagLayout());
+        gridWrapper.add(gridUI);
+
+        add(gridWrapper, BorderLayout.CENTER);
     }
 
     private void highlightSelectedShipButton(JButton selected) {
