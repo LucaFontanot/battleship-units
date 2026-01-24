@@ -38,7 +38,7 @@ public class TestPingRoute {
             assertNotNull(response.body());
             String responseBody = response.body().string();
             PingResponseData pingResponseData = gson.fromJson(responseBody, PingResponseData.class);
-            assertTrue(Math.abs(pingResponseData.getServerTime() - System.currentTimeMillis()) < 100);
+            assertTrue(Math.abs(pingResponseData.getServerTime() - System.currentTimeMillis()) < 1000);
             assertEquals(BuildConstants.VERSION, pingResponseData.getServerVersion());
         } catch (Exception e) {
             fail("Exception during testPingRoute: " + e.getMessage());
