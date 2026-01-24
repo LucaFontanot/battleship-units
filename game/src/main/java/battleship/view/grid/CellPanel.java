@@ -1,4 +1,4 @@
-package battleship.ui.grid;
+package battleship.view.grid;
 
 import battleship.model.CellState;
 import battleship.model.Grid;

@@ -1,5 +1,9 @@
 package battleship.view;
 
+import battleship.model.Ship;
+
+import java.util.List;
+
 /**
  * Represents the main window (frame) of the Battleship game's graphical user interface (GUI).
  *
@@ -21,5 +25,54 @@ package battleship.view;
  */
 
 
-public class GameFrame{
+public class GameFrame implements GameView{
+    @Override
+    public void show() {
+
+    }
+
+    @Override
+    public void showSetupPhase() {
+
+    }
+
+    @Override
+    public void showGamePhase() {
+
+    }
+
+    @Override
+    public void updatePlayerGrid(String serializedGrid, List<Ship> fleet) {
+
+    }
+
+    @Override
+    public void updateOpponentGrid(String serializedGrid) {
+
+    }
+
+    @Override
+    public void updateSystemMessage(String message) {
+
+    }
+
+    @Override
+    public void displayErrorAlert(String message) {
+
+    }
+
+    @Override
+    public void showEndGamePhase(String winner) {
+
+    }
+
+    @Override
+    public void displayShipSunk(Ship ship) {
+
+    }
+
+    @Override
+    public void setPlayerTurn(boolean isPlayerTurn) {
+
+    }
 }

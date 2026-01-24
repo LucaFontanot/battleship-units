@@ -1,4 +1,4 @@
-package battleship.ui.welcome;
+package battleship.view.welcome;
 
 /**
  * Interface defining actions that can be performed from the welcome UI.

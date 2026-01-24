@@ -1,9 +1,9 @@
-package battleship.ui.grid;
+package battleship.view.grid;
 
 import battleship.model.FleetManager;
 import battleship.model.Grid;
 import battleship.model.Ship;
-import battleship.ui.TextureLoader;
+import battleship.view.utils.TextureLoader;
 import it.units.battleship.Coordinate;
 import it.units.battleship.Logger;
 

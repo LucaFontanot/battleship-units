@@ -1,7 +1,7 @@
-package battleship.ui.welcome;
+package battleship.view.welcome;
 
-import battleship.ui.ImageLoader;
-import battleship.ui.ThemeSelector;
+import battleship.view.utils.ImageLoader;
+import battleship.view.utils.ThemeSelector;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;

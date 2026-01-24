@@ -1,14 +1,13 @@
 package ui;
 
 import battleship.model.*;
-import battleship.ui.grid.GridUI;
+import battleship.view.grid.GridUI;
 import it.units.battleship.Coordinate;
 import it.units.battleship.Logger;
 import it.units.battleship.service.PathManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.awt.image.BufferedImage;
 import java.util.Map;
 
 public class TestGridUI {

@@ -1,4 +1,4 @@
-package battleship.ui;
+package battleship.view.utils;
 
 import battleship.model.Orientation;
 import battleship.model.Ship;
