@@ -1,6 +1,7 @@
 package battleship.model;
 
 import it.units.battleship.Coordinate;
+import it.units.battleship.ShipType;
 import lombok.Getter;
 import lombok.NonNull;
 
