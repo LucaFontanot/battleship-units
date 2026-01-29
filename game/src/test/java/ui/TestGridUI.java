@@ -26,7 +26,6 @@ public class TestGridUI {
         Assertions.assertThrows(IndexOutOfBoundsException.class, () -> gridUI.getCellAt(10, 10));
         Assertions.assertThrows(IndexOutOfBoundsException.class, () -> gridUI.getCellAt(-1, 0));
     }
-
     @Test
     public void testDisplayDataParsing() {
         GridUI gridUI = new GridUI(2, 2);

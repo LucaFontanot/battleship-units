@@ -7,8 +7,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class TestCellPanel {
 

@@ -17,12 +17,10 @@ import java.util.List;
  * It manages a collection of {@link CellPanel} components arranged in a 2D layout
  * and handles the complex logic of overlaying ship textures onto the grid cells.
  *
- * <p>Key features:</p>
- * <ul>
- *     <li>Decodes serialized grid strings into visual cell states (HIT, MISS, etc.).</li>
- *     <li>Calculates and applies the correct texture segments for ships based on their
- *     position, orientation, and type using {@link TextureLoader}.</li>
- * </ul>
+ * Key features:
+ *  - Decodes serialized grid strings into visual cell states (HIT, MISS, etc.).
+ *  - Calculates and applies the correct texture segments for ships based on their
+ *     position, orientation, and type using {@link TextureLoader}.
  */
 public class GridUI extends JPanel {
     final int cols;
