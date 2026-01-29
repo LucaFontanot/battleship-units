@@ -15,4 +15,12 @@ public interface CommunicationEvents {
      * @param message the message sent by the player
      */
     void onPlayerMessage(String playerName, String message);
+    /**
+     * Called when a player sends the coordinates of a shot during the game.
+     *
+     * @param gridUpdateDTO
+     */
+    void onOpponentGridUpdate(GridUpdateDTO gridUpdateDTO);
+
+    void onShotReceived(ShotRequestDTO shotRequestDTO);
 }

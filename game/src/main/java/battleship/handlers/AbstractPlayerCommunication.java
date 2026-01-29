@@ -40,5 +40,17 @@ public abstract class AbstractPlayerCommunication implements CommunicationEvents
         }
     }
 
+    public void onOpponentGridUpdate(GridUpdateDTO gridUpdateDTO){
+        for (CommunicationEvents listener : communicationEventsListeners) {
+            listener.onOpponentGridUpdate(gridUpdateDTO);
+        }
+    }
+
+    public void onShotReceived(ShotRequestDTO shotRequestDTO){
+        for (CommunicationEvents listener : communicationEventsListeners) {
+            listener.onShotReceived(shotRequestDTO);
+        }
+    }
+
     public abstract <T> void sendMessage(String type, T payload);
 }

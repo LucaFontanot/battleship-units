@@ -13,6 +13,10 @@ import org.java_websocket.handshake.ServerHandshake;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+/**
+ * Handles network communication with the battleship server using WebSockets.
+ * It manages connection lifecycle and serializes/deserializes game messages.
+ */
 @Slf4j
 public class NetworkClient extends AbstractPlayerCommunication{
 
@@ -62,5 +66,25 @@ public class NetworkClient extends AbstractPlayerCommunication{
     private void handleIncomingMessage(String json){
         JsonObject jsonObject = gson.fromJson(json, JsonObject.class);
         String type = jsonObject.get("type").getAsString();
+
+        switch (type){
+            case "grid_update" -> {
+                WebSocketMessage<GridUpdateDTO> msg = gson.fromJson(
+                        json,
+                        new TypeToken<WebSocketMessage<GridUpdateDTO>>(){}.getType()
+                );
+
+                this.communicationEventsListeners.forEach(l -> l.onOpponentGridUpdate(msg.getData()));
+            }
+            case "shot_request" -> {
+                WebSocketMessage<ShotRequestDTO> msg = gson.fromJson(
+                        json,
+                        new TypeToken<WebSocketMessage<ShotRequestDTO>>(){}.getType()
+                );
+
+                this.communicationEventsListeners.forEach(l -> l.onShotReceived(msg.getData()));
+            }
+        }
+
     }
 }
