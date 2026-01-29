@@ -106,7 +106,6 @@ public class SetupPanel extends JPanel implements PlacementContext, CellClickLis
 
             gridUI.markSelected(ship.getCoordinates());
             gridUI.clearPlacementPreview();
-
         } catch (IllegalArgumentException ex) {
             Toolkit.getDefaultToolkit().beep();
 
@@ -114,8 +113,4 @@ public class SetupPanel extends JPanel implements PlacementContext, CellClickLis
             gridUI.showPlacementPreview(coords, false);
         }
     }
-
 }
-
-
-

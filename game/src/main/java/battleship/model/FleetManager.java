@@ -75,7 +75,7 @@ public class FleetManager {
      *         placement is invalid
      */
     public boolean addShip(@NonNull Ship ship){
-        if (!canAddShipType(ship) || !isPlacementValid(ship)){
+        if (!canPlaceShip(ship)){
             return false;
         }
         fleet.add(ship);
@@ -206,6 +206,10 @@ public class FleetManager {
         }else {
             grid.changeState(coordinate, CellState.MISS);
         }
+    }
+
+    public boolean canPlaceShip(@NonNull Ship ship) {
+        return canAddShipType(ship) && isPlacementValid(ship);
     }
 
     /**

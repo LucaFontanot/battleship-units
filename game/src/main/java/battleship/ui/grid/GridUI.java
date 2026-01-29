@@ -103,23 +103,16 @@ public class GridUI extends JPanel implements CellHoverListener {
         var shipType = placementContext.getSelectedShipType();
         var orientation = placementContext.getSelectedOrientation();
 
-        var coords = shipType.getShipCoordinates(coordinate, orientation);
+        try {
+            Ship ship = Ship.createShip(coordinate, orientation, shipType, fleetManager.getGrid());
+            boolean valid = fleetManager.canPlaceShip(ship);
 
-        boolean valid = true;
-        for (Coordinate c : coords) {
-            if (c.row() < 0 || c.row() >= rows || c.col() < 0 || c.col() >= cols) {
-                valid = false;
+            showPlacementPreview(ship.getCoordinates(), valid);
 
-                break;
-            }
-
-            if (cells[c.row()][c.col()].isSelected()) {
-                valid = false;
-                break;
-            }
+        } catch (IllegalArgumentException ex) {
+            var coords = shipType.getShipCoordinates(coordinate, orientation);
+            showPlacementPreview(coords, false);
         }
-
-        showPlacementPreview(coords, valid);
     }
 
     @Override
