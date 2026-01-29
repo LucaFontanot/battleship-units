@@ -1,4 +1,4 @@
-package battleship.ui;
+package battleship.view.utils;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;

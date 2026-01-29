@@ -1,6 +1,6 @@
-package battleship.ui;
+package battleship.view.utils;
 
-import battleship.model.Orientation;
+import it.units.battleship.Orientation;
 import battleship.model.Ship;
 import it.units.battleship.Coordinate;
 import it.units.battleship.Logger;

@@ -1,6 +1,8 @@
 package battleship.handlers;
 
-import it.units.battleship.Coordinate;
+import it.units.battleship.data.socket.WebSocketMessage;
+import it.units.battleship.data.socket.payloads.GridUpdateDTO;
+import it.units.battleship.data.socket.payloads.ShotRequestDTO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,18 +40,17 @@ public abstract class AbstractPlayerCommunication implements CommunicationEvents
         }
     }
 
-    /**
-     * Notifies all registered listeners when a player sends the coordinates of a shot.
-     *
-     * @param playerName the name of the player who performed the shot
-     * @param shotCoordinates the coordinates of the shot provided by the player
-     */
-    public void onShotReceived(String playerName, Coordinate shotCoordinates){
+    public void onOpponentGridUpdate(GridUpdateDTO gridUpdateDTO){
         for (CommunicationEvents listener : communicationEventsListeners) {
-            listener.onShotReceived(playerName, shotCoordinates);
+            listener.onOpponentGridUpdate(gridUpdateDTO);
         }
     }
 
-    public abstract void sendMessage(String message);
-    public abstract void sendShot(Coordinate shotCoordinates);
+    public void onShotReceived(ShotRequestDTO shotRequestDTO){
+        for (CommunicationEvents listener : communicationEventsListeners) {
+            listener.onShotReceived(shotRequestDTO);
+        }
+    }
+
+    public abstract <T> void sendMessage(String type, T payload);
 }

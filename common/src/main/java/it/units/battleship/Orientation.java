@@ -1,4 +1,4 @@
-package battleship.model;
+package it.units.battleship;
 
 import lombok.Getter;
 
