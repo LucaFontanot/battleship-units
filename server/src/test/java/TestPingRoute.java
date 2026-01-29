@@ -13,18 +13,23 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TestPingRoute {
     Thread webServerThread;
+    WebServerApp webServerApp;
     Gson gson = new Gson();
 
     @BeforeEach
-    public void setup() {
-        WebServerApp webServerApp = new WebServerApp(7000);
+    public void setup() throws InterruptedException {
+        webServerApp = new WebServerApp(7000);
         webServerThread = new Thread(webServerApp);
         webServerThread.start();
+        Thread.sleep(1000); // Wait for server to start
     }
 
     @AfterEach
     public void teardown() {
-        webServerThread.interrupt();
+        if (webServerApp != null) {
+            webServerApp.close();
+        }
+        // webServerThread.interrupt(); // No longer needed if we close the app
     }
 
     @Test
