@@ -100,17 +100,17 @@ public class SetupPanel extends JPanel implements PlacementContext, CellClickLis
 
             if (!ok) {
                 Toolkit.getDefaultToolkit().beep();
-                gridUI.showPlacementPreview(ship.getCoordinates(), false);
+                gridUI.showPlacementPreview(ship.getCoordinates(), false, ship);
                 return;
             }
 
-            gridUI.markSelected(ship.getCoordinates());
+            gridUI.placeShip(ship);
             gridUI.clearPlacementPreview();
         } catch (IllegalArgumentException ex) {
             Toolkit.getDefaultToolkit().beep();
 
             var coords = selectedShipType.getShipCoordinates(coordinate, selectedOrientation);
-            gridUI.showPlacementPreview(coords, false);
+            gridUI.showPlacementPreview(coords, false, null);
         }
     }
 }

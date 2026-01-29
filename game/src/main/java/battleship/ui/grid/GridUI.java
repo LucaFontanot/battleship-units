@@ -24,6 +24,11 @@ public class GridUI extends JPanel implements CellHoverListener {
     private CellPanel[][] cells;
     private final PlacementContext placementContext;
 
+    /** GridUI constructor for the SETUP phase
+     * @param fleetManager
+     * @param placementContext for showing placement previews
+     * @param clickListener for handling cell clicks and selections
+     */
     public GridUI(FleetManager fleetManager, PlacementContext placementContext, CellClickListener clickListener) {
         this.grid = fleetManager.getGrid();
         this.fleetManager = fleetManager;
@@ -79,16 +84,27 @@ public class GridUI extends JPanel implements CellHoverListener {
         for (CellPanel[] row : cells) {
             for (CellPanel cell : row) {
                 cell.setPreview(false, true);
+                cell.clearOverlayTexture();
             }
         }
     }
 
-
-    public void showPlacementPreview(Set<Coordinate> coords, boolean valid) {
+    public void showPlacementPreview(Set<Coordinate> coords, boolean valid, Ship previewShip) {
         clearPlacementPreview();
+
         for (Coordinate c : coords) {
             if (c.row() >= 0 && c.row() < rows && c.col() >= 0 && c.col() < cols) {
                 cells[c.row()][c.col()].setPreview(true, valid);
+
+                // overlay ship image (50%)
+                if (previewShip != null) {
+                    BufferedImage img = TextureLoader.getTextureForShip(previewShip, c);
+                    if (img != null) {
+                        cells[c.row()][c.col()].setOverlayTexture(img, 0.5f);
+                    } else {
+                        cells[c.row()][c.col()].clearOverlayTexture();
+                    }
+                }
             }
         }
     }
@@ -107,11 +123,11 @@ public class GridUI extends JPanel implements CellHoverListener {
             Ship ship = Ship.createShip(coordinate, orientation, shipType, fleetManager.getGrid());
             boolean valid = fleetManager.canPlaceShip(ship);
 
-            showPlacementPreview(ship.getCoordinates(), valid);
+            showPlacementPreview(ship.getCoordinates(), valid, ship);
 
         } catch (IllegalArgumentException ex) {
             var coords = shipType.getShipCoordinates(coordinate, orientation);
-            showPlacementPreview(coords, false);
+            showPlacementPreview(coords, false, null);
         }
     }
 
@@ -127,6 +143,21 @@ public class GridUI extends JPanel implements CellHoverListener {
             }
         }
     }
+
+    public void placeShip(Ship ship) {
+        for (Coordinate c : ship.getCoordinates()) {
+            if (c.row() < 0 || c.row() >= rows || c.col() < 0 || c.col() >= cols) continue;
+
+            BufferedImage img = TextureLoader.getTextureForShip(ship, c);
+            if (img != null) {
+                cells[c.row()][c.col()].addTexture(img);
+            }
+            cells[c.row()][c.col()].setSelected(true);
+        }
+        revalidate();
+        repaint();
+    }
+
 
     public void clearSelected() {
         for (CellPanel[] row : cells) {

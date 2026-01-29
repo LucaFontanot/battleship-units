@@ -19,8 +19,8 @@ public class CellPanel extends JLabel {
     static final Color MISS_COLOR = new Color(0x0000FF);
     static final Color EMPTY_COLOR = new Color(0xFFFFFF);
     static final Color SUNK_COLOR = new Color(0xFF0303);
-    static final Color SELECT_VALID_COLOR = new Color(0xAAFFAA);
-    static final Color SELECT_INVALID_COLOR = new Color(0xFFAAAA);
+    static final Color PREVIEW_VALID_COLOR = new Color(0xAAFFAA);
+    static final Color PREVIEW_INVALID_COLOR = new Color(0xFFAAAA);
     static final Color SELECTED_COLOR = new Color(0xFFFF00);
 
     final Grid grid;
@@ -30,6 +30,9 @@ public class CellPanel extends JLabel {
     private boolean previewValid = true;
     @Getter
     private boolean selected = false;
+
+    private BufferedImage overlayTexture = null;
+    private float overlayAlpha = 1.0f;
 
     @Setter
     private CellHoverListener hoverListener;
@@ -83,8 +86,11 @@ public class CellPanel extends JLabel {
     }
 
     public void addTexture(BufferedImage texture) {
-        setIcon(new ImageIcon(texture.getScaledInstance(getWidth(), getHeight(), Image.SCALE_SMOOTH)));
+        int w = Math.max(getWidth(), getPreferredSize().width);
+        int h = Math.max(getHeight(), getPreferredSize().height);
+        setIcon(new ImageIcon(texture.getScaledInstance(w, h, Image.SCALE_SMOOTH)));
     }
+
 
     public void removeTexture() {
         setIcon(null);
@@ -119,21 +125,43 @@ public class CellPanel extends JLabel {
     protected void paintComponent(Graphics g) {
         Graphics2D g2 = (Graphics2D) g.create();
 
+        // background
         g2.setColor(baseColor);
         g2.fillRect(0, 0, getWidth(), getHeight());
 
+        // ship placed (selected)
         if (selected) {
             g2.setColor(SELECTED_COLOR);
             g2.fillRect(0, 0, getWidth(), getHeight());
         }
 
+        // 3) preview (green/red)
         if (preview) {
-            g2.setColor(previewValid ? SELECT_VALID_COLOR : SELECT_INVALID_COLOR);
+            g2.setColor(previewValid ? PREVIEW_VALID_COLOR : PREVIEW_INVALID_COLOR);
             g2.fillRect(0, 0, getWidth(), getHeight());
+        }
+
+        // 4) overlay texture (hover ship)
+        if (overlayTexture != null) {
+            Composite old = g2.getComposite();
+            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, overlayAlpha));
+            g2.drawImage(overlayTexture, 0, 0, getWidth(), getHeight(), null);
+            g2.setComposite(old);
         }
 
         g2.dispose();
         super.paintComponent(g);
+    }
+
+    public void setOverlayTexture(BufferedImage img, float alpha) {
+        this.overlayTexture = img;
+        this.overlayAlpha = Math.max(0f, Math.min(1f, alpha));
+        repaint();
+    }
+
+    public void clearOverlayTexture() {
+        this.overlayTexture = null;
+        repaint();
     }
 
 }
