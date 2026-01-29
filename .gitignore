@@ -6,6 +6,7 @@ build/
 .kotlin
 .idea
 ${sys:programPath}/
+server/${sys:programPath}/
 
 ### IntelliJ IDEA ###
 .idea/modules.xml
