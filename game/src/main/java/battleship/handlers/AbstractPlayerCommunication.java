@@ -1,6 +1,6 @@
 package battleship.handlers;
 
-import it.units.battleship.data.socket.WebSocketMessage;
+import it.units.battleship.data.socket.GameMessageType;
 import it.units.battleship.data.socket.payloads.GridUpdateDTO;
 import it.units.battleship.data.socket.payloads.ShotRequestDTO;
 
@@ -52,5 +52,5 @@ public abstract class AbstractPlayerCommunication implements CommunicationEvents
         }
     }
 
-    public abstract <T> void sendMessage(String type, T payload);
+    public abstract <T> void sendMessage(GameMessageType type, T payload);
 }

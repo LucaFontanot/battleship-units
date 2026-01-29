@@ -9,6 +9,7 @@ import it.units.battleship.Coordinate;
 import it.units.battleship.GameState;
 import battleship.model.Ship;
 import it.units.battleship.Logger;
+import it.units.battleship.data.socket.GameMessageType;
 import it.units.battleship.data.socket.payloads.GridUpdateDTO;
 import it.units.battleship.data.socket.payloads.ShipDTO;
 import it.units.battleship.data.socket.payloads.ShotRequestDTO;
@@ -74,7 +75,7 @@ public class GameController implements CommunicationEvents {
 
         GridUpdateDTO gridUpdateDTO = new GridUpdateDTO(shotOutcome, gridSerialized, fleetDTO);
 
-        communication.sendMessage("grid_update", gridUpdateDTO);
+        communication.sendMessage(GameMessageType.GRID_UPDATE, gridUpdateDTO);
 
         updatePlayerGrid(gridSerialized, fleet);
     }

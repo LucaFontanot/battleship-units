@@ -5,6 +5,7 @@ import battleship.model.Grid;
 import battleship.model.Ship;
 import battleship.view.GameView;
 import it.units.battleship.Coordinate;
+import it.units.battleship.data.socket.GameMessageType;
 import it.units.battleship.data.socket.payloads.GridUpdateDTO;
 import it.units.battleship.data.socket.payloads.ShotRequestDTO;
 import org.junit.jupiter.api.BeforeEach;
@@ -72,7 +73,7 @@ public class TestGameController {
         verify(mockFleetManager).handleIncomingShot(coord);
 
         ArgumentCaptor<GridUpdateDTO> captor = ArgumentCaptor.forClass(GridUpdateDTO.class);
-        verify(mockCommunication).sendMessage(eq("grid_update"), captor.capture());
+        verify(mockCommunication).sendMessage(eq(GameMessageType.GRID_UPDATE), captor.capture());
         assertTrue(captor.getValue().shotOutcome());
 
         verify(mockView).updatePlayerGrid(eq("grid_serialized"), anyList());
@@ -98,7 +99,7 @@ public class TestGameController {
 
         // Assert
         ArgumentCaptor<GridUpdateDTO> captor = ArgumentCaptor.forClass(GridUpdateDTO.class);
-        verify(mockCommunication).sendMessage(eq("grid_update"), captor.capture());
+        verify(mockCommunication).sendMessage(eq(GameMessageType.GRID_UPDATE), captor.capture());
         assertEquals(1, captor.getValue().fleet().size());
     }
 }

@@ -17,6 +17,8 @@ import java.net.URISyntaxException;
  * Handles network communication with the battleship server using WebSockets.
  * It manages connection lifecycle and serializes/deserializes game messages.
  */
+import it.units.battleship.data.socket.GameMessageType;
+
 @Slf4j
 public class NetworkClient extends AbstractPlayerCommunication{
 
@@ -53,9 +55,9 @@ public class NetworkClient extends AbstractPlayerCommunication{
     }
 
     @Override
-    public <T> void sendMessage(String type, T payload) {
+    public <T> void sendMessage(GameMessageType type, T payload) {
         if (client != null && client.isOpen()){
-            WebSocketMessage<T> message = new WebSocketMessage<>(type, payload);
+            WebSocketMessage<T> message = new WebSocketMessage<>(type.getType(), payload);
             String json = gson.toJson(message);
             client.send(json);
         }else {
@@ -65,10 +67,24 @@ public class NetworkClient extends AbstractPlayerCommunication{
 
     private void handleIncomingMessage(String json){
         JsonObject jsonObject = gson.fromJson(json, JsonObject.class);
-        String type = jsonObject.get("type").getAsString();
+        String typeString = jsonObject.get("type").getAsString();
+        
+        GameMessageType type;
+        try {
+            // Find enum matching the string value, or valueOf if names matched
+            // Since enum has custom string names, we need to iterate.
+            type = java.util.Arrays.stream(GameMessageType.values())
+                    .filter(t -> t.getType().equals(typeString))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("Unknown message type: " + typeString));
+                    
+        } catch (IllegalArgumentException e) {
+            Logger.warn("Received unknown message type: " + typeString);
+            return;
+        }
 
         switch (type){
-            case "grid_update" -> {
+            case GRID_UPDATE -> {
                 WebSocketMessage<GridUpdateDTO> msg = gson.fromJson(
                         json,
                         new TypeToken<WebSocketMessage<GridUpdateDTO>>(){}.getType()
@@ -76,7 +92,7 @@ public class NetworkClient extends AbstractPlayerCommunication{
 
                 this.communicationEventsListeners.forEach(l -> l.onOpponentGridUpdate(msg.getData()));
             }
-            case "shot_request" -> {
+            case SHOT_REQUEST -> {
                 WebSocketMessage<ShotRequestDTO> msg = gson.fromJson(
                         json,
                         new TypeToken<WebSocketMessage<ShotRequestDTO>>(){}.getType()
@@ -84,6 +100,7 @@ public class NetworkClient extends AbstractPlayerCommunication{
 
                 this.communicationEventsListeners.forEach(l -> l.onShotReceived(msg.getData()));
             }
+            default -> Logger.log("Unhandled message type: " + type);
         }
 
     }
