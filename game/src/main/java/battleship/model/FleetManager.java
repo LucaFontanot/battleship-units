@@ -29,6 +29,7 @@ public class FleetManager {
     @Getter
     private final Grid grid;
     private final List<Ship> fleet = new ArrayList<>();
+    @Getter
     private final Map<ShipType, Integer> requiredFleetConfiguration;
 
     public FleetManager(@NonNull Grid grid, @NonNull Map<ShipType, Integer> requiredFleetConfiguration){

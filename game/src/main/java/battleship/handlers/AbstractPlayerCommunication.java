@@ -1,6 +1,7 @@
 package battleship.handlers;
 
 import it.units.battleship.data.socket.GameMessageType;
+import it.units.battleship.data.socket.payloads.GameConfigDTO;
 import it.units.battleship.data.socket.payloads.GridUpdateDTO;
 import it.units.battleship.data.socket.payloads.ShotRequestDTO;
 
@@ -49,6 +50,12 @@ public abstract class AbstractPlayerCommunication implements CommunicationEvents
     public void onShotReceived(ShotRequestDTO shotRequestDTO){
         for (CommunicationEvents listener : communicationEventsListeners) {
             listener.onShotReceived(shotRequestDTO);
+        }
+    }
+
+    public void onGameSetupReceived(GameConfigDTO gameConfigDTO){
+        for (CommunicationEvents listener : communicationEventsListeners) {
+            listener.onGameSetupReceived(gameConfigDTO);
         }
     }
 

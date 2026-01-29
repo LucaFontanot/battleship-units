@@ -9,14 +9,14 @@ import it.units.battleship.Coordinate;
 import it.units.battleship.GameState;
 import battleship.model.Ship;
 import it.units.battleship.Logger;
+import it.units.battleship.ShipType;
 import it.units.battleship.data.socket.GameMessageType;
-import it.units.battleship.data.socket.payloads.GridUpdateDTO;
-import it.units.battleship.data.socket.payloads.ShipDTO;
-import it.units.battleship.data.socket.payloads.ShotRequestDTO;
+import it.units.battleship.data.socket.payloads.*;
 import lombok.Getter;
 import lombok.NonNull;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -78,5 +78,9 @@ public class GameController implements CommunicationEvents {
         communication.sendMessage(GameMessageType.GRID_UPDATE, gridUpdateDTO);
 
         updatePlayerGrid(gridSerialized, fleet);
+    }
+
+    @Override
+    public void onGameSetupReceived(GameConfigDTO gameConfigDTO) {
     }
 }

@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import it.units.battleship.Logger;
 import it.units.battleship.data.socket.WebSocketMessage;
+import it.units.battleship.data.socket.payloads.GameConfigDTO;
 import it.units.battleship.data.socket.payloads.GridUpdateDTO;
 import it.units.battleship.data.socket.payloads.ShotRequestDTO;
 import lombok.extern.slf4j.Slf4j;
@@ -99,6 +100,14 @@ public class NetworkClient extends AbstractPlayerCommunication{
                 );
 
                 this.communicationEventsListeners.forEach(l -> l.onShotReceived(msg.getData()));
+            }
+            case GAME_SETUP -> {
+                WebSocketMessage<GameConfigDTO> msg = gson.fromJson(
+                        json,
+                        new TypeToken<WebSocketMessage<GameConfigDTO>>(){}.getType()
+                );
+
+                this.communicationEventsListeners.forEach(l -> l.onGameSetupReceived(msg.getData()));
             }
             default -> Logger.log("Unhandled message type: " + type);
         }
