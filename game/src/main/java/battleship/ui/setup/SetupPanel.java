@@ -25,6 +25,8 @@ public class SetupPanel extends JPanel implements PlacementContext, CellClickLis
     @Getter
     private ShipType selectedShipType = null;
     private JButton selectedShipButton = null;
+    private JButton nextButton;
+
     @Getter
     private Orientation selectedOrientation = Orientation.HORIZONTAL_RIGHT;
     private static final Dimension BUTTON_SIZE = new Dimension(120, 30);
@@ -84,6 +86,20 @@ public class SetupPanel extends JPanel implements PlacementContext, CellClickLis
         gridWrapper.add(gridUI);
 
         add(gridWrapper, BorderLayout.CENTER);
+
+        // next button
+        JPanel bottomBar = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 12));
+        nextButton = new JButton("Next");
+        nextButton.setEnabled(false);
+        nextButton.setFocusPainted(false);
+
+        nextButton.addActionListener(e -> {
+            // TODO
+        });
+
+        bottomBar.add(nextButton);
+        add(bottomBar, BorderLayout.SOUTH);
+
         updateShipButtons();
     }
 
@@ -141,6 +157,10 @@ public class SetupPanel extends JPanel implements PlacementContext, CellClickLis
         }
         shipPalette.revalidate();
         shipPalette.repaint();
+
+        if (nextButton != null) {
+            nextButton.setEnabled(fleetManager.isFleetComplete());
+        }
     }
 
     private void clearShipSelection() {

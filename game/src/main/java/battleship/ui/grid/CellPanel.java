@@ -135,13 +135,13 @@ public class CellPanel extends JLabel {
             g2.fillRect(0, 0, getWidth(), getHeight());
         }
 
-        // 3) preview (green/red)
+        // preview (green/red)
         if (preview) {
             g2.setColor(previewValid ? PREVIEW_VALID_COLOR : PREVIEW_INVALID_COLOR);
             g2.fillRect(0, 0, getWidth(), getHeight());
         }
 
-        // 4) overlay texture (hover ship)
+        // overlay texture (hover ship)
         if (overlayTexture != null) {
             Composite old = g2.getComposite();
             g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, overlayAlpha));
