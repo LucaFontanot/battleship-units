@@ -83,6 +83,32 @@ public class FleetManager {
     }
 
     /**
+     * Calculates the number of remaining ships of a specific type that can be added to the fleet.
+     *
+     * @param shipType the type of ship to check for remaining count; must be non-null
+     * @return the number of remaining ships
+     */
+    public int getRemaining(@NonNull ShipType shipType) {
+        Integer required = requiredFleetConfiguration.get(shipType);
+        if (required == null) {
+            return 0;
+        }
+        int placed = countShipsOfType(shipType);
+        return Math.max(0, required - placed);
+    }
+
+    /**
+     * Retrieves the required count of ships for a specific type as defined in the fleet configuration.
+     *
+     * @param shipType the type of ship to check for required count; must be non-null
+     * @return the required count of ships for the specified type
+     */
+    public int getRequiredCount(@NonNull ShipType shipType) {
+        return requiredFleetConfiguration.getOrDefault(shipType, 0);
+    }
+
+
+    /**
      * Determines whether a ship of the given type can be added to the fleet based on the
      * allowed configuration.
      *

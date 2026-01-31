@@ -11,6 +11,8 @@ import lombok.Getter;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.EnumMap;
+import java.util.Map;
 
 public class SetupPanel extends JPanel implements PlacementContext, CellClickListener {
 
@@ -22,9 +24,12 @@ public class SetupPanel extends JPanel implements PlacementContext, CellClickLis
 
     @Getter
     private ShipType selectedShipType = null;
+    private JButton selectedShipButton = null;
     @Getter
     private Orientation selectedOrientation = Orientation.HORIZONTAL_RIGHT;
     private static final Dimension BUTTON_SIZE = new Dimension(120, 30);
+
+    private final Map<ShipType, JButton> shipButtons = new EnumMap<>(ShipType.class);
 
     public SetupPanel(FleetManager fleetManager) {
         this.fleetManager = fleetManager;
@@ -47,8 +52,11 @@ public class SetupPanel extends JPanel implements PlacementContext, CellClickLis
 
             shipButton.addActionListener(e -> {
                 selectedShipType = type;
+                selectedShipButton = shipButton;
                 highlightSelectedShipButton(shipButton);
             });
+
+            shipButtons.put(type, shipButton);
 
             shipPalette.add(shipButton);
             shipPalette.add(Box.createVerticalStrut(10));
@@ -76,15 +84,7 @@ public class SetupPanel extends JPanel implements PlacementContext, CellClickLis
         gridWrapper.add(gridUI);
 
         add(gridWrapper, BorderLayout.CENTER);
-    }
-
-    private void highlightSelectedShipButton(JButton selected) {
-        for (Component c : shipPalette.getComponents()) {
-            if (c instanceof JButton btn) {
-                btn.setBorder(UIManager.getBorder("Button.border"));
-            }
-        }
-        selected.setBorder(BorderFactory.createLineBorder(Color.GREEN, 2));
+        updateShipButtons();
     }
 
     @Override
@@ -106,11 +106,48 @@ public class SetupPanel extends JPanel implements PlacementContext, CellClickLis
 
             gridUI.placeShip(ship);
             gridUI.clearPlacementPreview();
+            updateShipButtons();
         } catch (IllegalArgumentException ex) {
             Toolkit.getDefaultToolkit().beep();
 
             var coords = selectedShipType.getShipCoordinates(coordinate, selectedOrientation);
             gridUI.showPlacementPreview(coords, false, null);
+        }
+    }
+
+    private void highlightSelectedShipButton(JButton selected) {
+        for (Component c : shipPalette.getComponents()) {
+            if (c instanceof JButton btn) {
+                btn.setBorder(UIManager.getBorder("Button.border"));
+            }
+        }
+        selected.setBorder(BorderFactory.createLineBorder(Color.GREEN, 2));
+    }
+
+    private void updateShipButtons() {
+        for (ShipType type : ShipType.values()) {
+            JButton btn = shipButtons.get(type);
+            if (btn == null) continue;
+
+            int remaining = fleetManager.getRemaining(type);
+            int total = fleetManager.getRequiredCount(type);
+
+            btn.setText(type.getName() + " (" + remaining + "/" + total + ")");
+            btn.setEnabled(remaining > 0);
+
+            if (selectedShipType == type && remaining <= 0) {
+                clearShipSelection();
+            }
+        }
+        shipPalette.revalidate();
+        shipPalette.repaint();
+    }
+
+    private void clearShipSelection() {
+        selectedShipType = null;
+        selectedShipButton = null;
+        for (JButton btn : shipButtons.values()) {
+            btn.setBorder(UIManager.getBorder("Button.border"));
         }
     }
 }
