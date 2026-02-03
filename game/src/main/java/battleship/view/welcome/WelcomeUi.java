@@ -1,6 +1,7 @@
 package battleship.view.welcome;
 
 import battleship.controller.GameController;
+import battleship.controller.handlers.AbstractPlayerCommunication;
 import battleship.model.FleetManager;
 import battleship.model.Grid;
 
@@ -70,7 +71,7 @@ public class WelcomeUi implements WelcomeUiActions {
 
         GameFrame gameFrame = new GameFrame(fleetManager);
 
-        battleship.handlers.AbstractPlayerCommunication dummyComm = new battleship.handlers.AbstractPlayerCommunication() {
+        AbstractPlayerCommunication dummyComm = new AbstractPlayerCommunication() {
                 @Override
                 public void sendMessage(it.units.battleship.data.socket.GameMessageType type, Object payload) {
                                  // Do nothing in single player

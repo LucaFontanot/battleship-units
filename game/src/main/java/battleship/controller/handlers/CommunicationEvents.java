@@ -1,4 +1,4 @@
-package battleship.handlers;
+package battleship.controller.handlers;
 
 import it.units.battleship.Coordinate;
 import it.units.battleship.data.socket.payloads.GameConfigDTO;

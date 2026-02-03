@@ -1,7 +1,7 @@
 package battleship.controller;
 
-import battleship.handlers.AbstractPlayerCommunication;
-import battleship.handlers.CommunicationEvents;
+import battleship.controller.handlers.AbstractPlayerCommunication;
+import battleship.controller.handlers.CommunicationEvents;
 import battleship.model.*;
 import battleship.model.converter.GameDataMapper;
 import battleship.view.GameView;
@@ -14,7 +14,6 @@ import lombok.NonNull;
 
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 
