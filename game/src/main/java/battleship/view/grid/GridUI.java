@@ -1,77 +1,98 @@
-package battleship.ui.grid;
+package battleship.view.grid;
 
-import battleship.model.FleetManager;
+import battleship.controller.GridInteractionObserver;
+import battleship.model.CellState;
 import battleship.model.Grid;
 import battleship.model.Ship;
-import battleship.view.grid.CellClickListener;
-import battleship.view.grid.CellHoverListener;
-import battleship.view.grid.CellPanel;
+import battleship.view.GameView;
 import battleship.view.setup.PlacementContext;
 import battleship.view.utils.TextureLoader;
 import it.units.battleship.Coordinate;
 import it.units.battleship.Logger;
+import it.units.battleship.Orientation;
+import it.units.battleship.ShipType;
 import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.List;
 import java.util.Set;
 
+/**
+ * A specialized Swing component responsible for rendering a game grid.
+ * It manages a collection of {@link CellPanel} components arranged in a 2D layout
+ * and handles the complex logic of overlaying ship textures onto the grid cells.
+ *
+ * Key features:
+ *  - Decodes serialized grid strings into visual cell states (HIT, MISS, etc.).
+ *  - Calculates and applies the correct texture segments for ships based on their
+ *     position, orientation, and type using {@link TextureLoader}.
+ */
 public class GridUI extends JPanel implements CellHoverListener {
-    final Grid grid;
-    final FleetManager fleetManager;
     @Getter
     final int cols;
     @Getter
     final int rows;
     private CellPanel[][] cells;
+
     private final PlacementContext placementContext;
 
-    /** GridUI constructor for the SETUP phase
-     * @param fleetManager
-     * @param placementContext for showing placement previews
-     * @param clickListener for handling cell clicks and selections
-     */
-    public GridUI(FleetManager fleetManager, PlacementContext placementContext, CellClickListener clickListener) {
-        this.grid = fleetManager.getGrid();
-        this.fleetManager = fleetManager;
+    @Setter
+    private GridInteractionObserver observer;
+
+    public GridUI(int rows,
+                  int cols,
+                  GridInteractionObserver observer,
+                  PlacementContext placementContext,
+                  CellClickListener clickListener) {
+        this.cols = cols;
+        this.rows = rows;
+
+        this.observer = observer;
         this.placementContext = placementContext;
-
-        this.cols = grid.getCol();
-        this.rows = grid.getRow();
-
         setLayout(new GridLayout(rows, cols, 0, 0));
         cells = new CellPanel[rows][cols];
-
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
-                cells[r][c] = new CellPanel(new Coordinate(r, c));
+                Coordinate coord = new Coordinate(r,c);
+                cells[r][c] = new CellPanel(coord);
+
                 cells[r][c].setHoverListener(this);
                 cells[r][c].setClickListener(clickListener);
-
 
                 add(cells[r][c]);
             }
         }
     }
 
-
-    public void reload() {
+    public void displayData(@NonNull String gridSerialized, List<Ship> ships){
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
                 cells[r][c].removeTexture();
             }
         }
-        for (Ship ship : fleetManager.getFleet()) {
-            if (ship.isSunk()){
-                for (Coordinate coord : ship.getCoordinates()) {
-                    BufferedImage image = TextureLoader.getTextureForShip(ship, coord);
-                    if (image == null) {
-                        Logger.warn("No texture found for ship at coordinate: " + coord);
-                        continue;
-                    }
-                    cells[coord.row()][coord.col()].addTexture(image);
+
+        int index = 0;
+        for(int r=0; r<rows ; r++){
+            for(int c=0; c<cols; c++){
+                char code = gridSerialized.charAt(index);
+                CellState state = decodeCharToState(code);
+                cells[r][c].updateState(state);
+                index = index + 1;
+            }
+        }
+
+        for (Ship ship : ships) {
+            for (Coordinate coord : ship.getCoordinates()) {
+                BufferedImage image = TextureLoader.getTextureForShip(ship, coord);
+                if (image == null) {
+                    Logger.warn("No texture found for ship at coordinate: " + coord);
+                    continue;
                 }
+                cells[coord.row()][coord.col()].addTexture(image);
             }
         }
         for (int r = 0; r < rows; r++) {
@@ -90,6 +111,22 @@ public class GridUI extends JPanel implements CellHoverListener {
                 cell.clearOverlayTexture();
             }
         }
+    }
+
+    private CellState decodeCharToState(char code){
+        return switch (code){
+            case 'X' -> CellState.HIT;
+            case 'K' -> CellState.SUNK;
+            case 'M' -> CellState.MISS;
+            default -> CellState.EMPTY;
+        };
+    }
+
+    public CellPanel getCellAt(int row, int col) {
+        if (row < 0 || row >= rows || col < 0 || col >= cols) {
+            throw new IndexOutOfBoundsException("Invalid grid coordinates");
+        }
+        return cells[row][col];
     }
 
     public void showPlacementPreview(Set<Coordinate> coords, boolean valid, Ship previewShip) {
@@ -115,27 +152,21 @@ public class GridUI extends JPanel implements CellHoverListener {
     @Override
     public void onCellHover(Coordinate coordinate) {
         clearPlacementPreview();
+        if (observer == null) return;
 
-        if (placementContext == null) return;
-        if (placementContext.getSelectedShipType() == null) return;
+        if (placementContext != null && placementContext.getSelectedShipType() != null){
+            ShipType shipType = placementContext.getSelectedShipType();
+            Orientation orientation = placementContext.getSelectedOrientation();
 
-        var shipType = placementContext.getSelectedShipType();
-        var orientation = placementContext.getSelectedOrientation();
-
-        try {
-            Ship ship = Ship.createShip(coordinate, orientation, shipType, fleetManager.getGrid());
-            boolean valid = fleetManager.canPlaceShip(ship);
-
-            showPlacementPreview(ship.getCoordinates(), valid, ship);
-
-        } catch (IllegalArgumentException ex) {
-            var coords = shipType.getShipCoordinates(coordinate, orientation);
-            showPlacementPreview(coords, false, null);
+            observer.onShipPlacement(coordinate, shipType, orientation);
         }
     }
 
     @Override
     public void onCellExit() {
+        if (observer != null){
+            observer.onShipPlacementExit();
+        }
         clearPlacementPreview();
     }
 

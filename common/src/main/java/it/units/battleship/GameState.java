@@ -3,8 +3,8 @@ package it.units.battleship;
 public enum GameState {
     SETUP("SETUP"),
     WAITING("WAITING"),
-    MY_TURN("MY_TURN"),
-    OPPONENT_TURN("OPPONENT_TURN"),
+    ACTIVE_TURN("ACTIVE_TURN"),
+    WAITING_FOR_OPPONENT("WAITING_FOR_OPPONENT"),
     GAME_OVER("GAME_OVER");
 
     private final String gameState;

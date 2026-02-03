@@ -1,42 +1,46 @@
 package battleship.view;
 
+import battleship.controller.GridInteractionObserver;
 import battleship.model.FleetManager;
 import battleship.model.Ship;
-import battleship.ui.grid.GridUI;
-import battleship.ui.setup.SetupPanel;
+import battleship.view.grid.GridUI;
+import it.units.battleship.Coordinate;
+import lombok.Getter;
+
+import javax.swing.*;
+import java.util.LinkedHashSet;
+import java.util.List;
+import battleship.view.setup.SetupPanel;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.List;
 
 /**
- * Represents the main window (frame) of the Battleship game's graphical user interface (GUI).
+ * The main Swing application window (JFrame) for the Battleship game.
+ * Implements the {@link GameView} interface to bridge the gap between the game logic (Controller)
+ * and the user interface.
  *
- * components that make up the game's visual presentation. It implements GameView
- * interface, providing a concrete Swing-based implementation for renderin the game state
- * and interacting with the user.
- *
- * Responsibilities include:
- * - Setting up the main window properties (title, size, close operation).
- * - Containing and managing other GUI components, such as panels for game grids, status messages,
- *   and control buttons.
- * - Translating user interactions (e.g., mouse clicks on grid cells) into events that can be
- *   processed by the GameController.
- * - Visually rendering the game grids and other dynamic elements based on updates from the model.
- *
- * The actual rendering logic for the grids and handling of specific
- component events will
- * reside within this class or dedicated sub-panels that it manages.
+ * Responsibilities:
+ *  - Acts as the root container for all visual components (Player Grid, Opponent Grid).
+ *  - Delegates specific rendering tasks to specialized components.
+ *  - Manages the high-level layout of the application.
  */
+public class GameFrame extends JFrame implements GameView{
+    @Getter
+    private final GridUI playerGridUI;
+    @Getter
+    private final GridUI opponentGridUI;
 
-
-public class GameFrame extends JFrame implements GameView {
     private SetupPanel setupPanel;
     private JPanel currentPanel;
+    private GridInteractionObserver observer;
 
     private final JLabel systemMessage = new JLabel(" ");
 
     public GameFrame(FleetManager fleetManager) {
+        this.playerGridUI = new GridUI(10,10,null,null,null);
+        this.opponentGridUI = new GridUI(10,10,null,null,null);
+
         setTitle("Battleship");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
@@ -57,6 +61,38 @@ public class GameFrame extends JFrame implements GameView {
     }
 
     @Override
+    public void updatePlayerGrid(String gridSerialized, List<Ship> fleetToRender) {
+        if (currentPanel instanceof SetupPanel setup) {
+            setup.getGridUI().displayData(gridSerialized, fleetToRender);
+        }
+        this.playerGridUI.displayData(gridSerialized, fleetToRender);
+    }
+
+    @Override
+    public void updateOpponentGrid(String gridSerialized, List<Ship> fleetToRender) {
+        this.opponentGridUI.displayData(gridSerialized, fleetToRender);
+    }
+
+    @Override
+    public void updateSystemMessage(String message) {
+
+    }
+
+    @Override
+    public void setGridInputListener(GridInteractionObserver observer) {
+        this.observer = observer;
+
+        if(setupPanel != null){
+            setupPanel.setGridInputListener(observer);
+        }
+        if(opponentGridUI != null){
+            opponentGridUI.setObserver(observer);
+        }if(playerGridUI != null){
+            playerGridUI.setObserver(observer);
+        }
+    }
+
+    @Override
     public void open() {
         setVisible(true);
     }
@@ -70,22 +106,6 @@ public class GameFrame extends JFrame implements GameView {
     @Override
     public void showGamePhase() {
         systemMessage.setText("Game started.");
-    }
-
-    @Override
-    public void updatePlayerGrid(String serializedGrid, List<Ship> fleet) {
-        if (currentPanel instanceof SetupPanel setup) {
-            setup.getGridUI().reload();
-        }
-    }
-
-    @Override
-    public void updateOpponentGrid(String serializedGrid) {
-    }
-
-    @Override
-    public void updateSystemMessage(String message) {
-        systemMessage.setText(message);
     }
 
     @Override
@@ -105,6 +125,13 @@ public class GameFrame extends JFrame implements GameView {
 
     @Override
     public void setPlayerTurn(boolean isPlayerTurn) {
+    }
+
+    @Override
+    public void showPlacementPreview(LinkedHashSet<Coordinate> coord, boolean validShip, Ship ship) {
+        if (currentPanel instanceof SetupPanel setup) {
+            setup.getGridUI().showPlacementPreview(coord, validShip, ship);
+        }
     }
 
     private void switchPanel(JPanel panel) {

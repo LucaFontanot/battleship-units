@@ -1,8 +1,6 @@
-package battleship.ui.grid;
+package battleship.view.grid;
 
 import battleship.model.CellState;
-import battleship.model.Grid;
-import battleship.ui.setup.PlacementContext;
 import it.units.battleship.Coordinate;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,6 +10,15 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 
+/**
+ * Represents a single interactive cell within the Battleship grid.
+ *
+ * Visually, it can display a background color corresponding to its state (Hit, Miss, Empty)
+ * and an optional texture overlay (e.g., a part of a ship).
+ * Functionally, it acts as an input source, capturing mouse clicks and notifying
+ * registered listeners with its.
+ *
+ */
 public class CellPanel extends JLabel {
 
     static final double OPACITY = 0.5;
@@ -23,7 +30,7 @@ public class CellPanel extends JLabel {
     static final Color PREVIEW_INVALID_COLOR = new Color(0xFFAAAA);
     static final Color SELECTED_COLOR = new Color(0xFFFF00);
 
-    final Grid grid;
+    private CellState currentState;
     final Coordinate coordinate;
     private Color baseColor; // colore base della cella
     private boolean preview = false;
@@ -40,10 +47,9 @@ public class CellPanel extends JLabel {
     private CellClickListener clickListener;
 
 
-    public CellPanel(Grid grid, Coordinate coordinate) {
-        this.grid = grid;
+    public CellPanel(Coordinate coordinate) {
         this.coordinate = coordinate;
-
+        this.currentState = CellState.EMPTY;
         setOpaque(false);
         setHorizontalAlignment(CENTER);
         setVerticalAlignment(CENTER);
@@ -71,9 +77,8 @@ public class CellPanel extends JLabel {
                 if (clickListener != null) {
                     clickListener.onCellClicked(coordinate);
                 }
-            }
-
-        });
+            }}
+        );
     }
 
     @Override
@@ -91,14 +96,17 @@ public class CellPanel extends JLabel {
         setIcon(new ImageIcon(texture.getScaledInstance(w, h, Image.SCALE_SMOOTH)));
     }
 
-
     public void removeTexture() {
         setIcon(null);
     }
 
+    public void updateState(CellState newState){
+        this.currentState = newState;
+        refresh();
+    }
+
     public void refresh() {
-        CellState state = grid.getState(coordinate);
-        switch (state) {
+        switch (currentState) {
             case EMPTY -> baseColor = EMPTY_COLOR;
             case HIT -> baseColor = HIT_COLOR;
             case MISS -> baseColor = MISS_COLOR;
@@ -107,6 +115,10 @@ public class CellPanel extends JLabel {
         }
         setBackground(applyOpacity(baseColor, OPACITY));
         repaint();
+    }
+
+    public CellState getCurrentState() {
+        return currentState;
     }
 
     public void setPreview(boolean preview, boolean valid) {

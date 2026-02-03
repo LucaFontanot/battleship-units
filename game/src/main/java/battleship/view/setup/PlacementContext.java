@@ -1,7 +1,8 @@
-package battleship.ui.setup;
+package battleship.view.setup;
 
-import battleship.model.Orientation;
-import battleship.model.ShipType;
+
+import it.units.battleship.Orientation;
+import it.units.battleship.ShipType;
 
 public interface PlacementContext {
     ShipType getSelectedShipType();

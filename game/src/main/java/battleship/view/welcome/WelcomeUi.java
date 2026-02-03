@@ -1,16 +1,17 @@
-package battleship.ui.welcome;
+package battleship.view.welcome;
 
 import battleship.controller.GameController;
 import battleship.model.FleetManager;
 import battleship.model.Grid;
-import battleship.model.ShipType;
-import battleship.ui.ImageLoader;
-import battleship.ui.ThemeSelector;
+
+import battleship.view.utils.ImageLoader;
+import battleship.view.utils.ThemeSelector;
 import battleship.view.GameFrame;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
 import it.units.battleship.Logger;
+import it.units.battleship.ShipType;
 
 import javax.swing.*;
 import java.awt.*;
@@ -68,8 +69,17 @@ public class WelcomeUi implements WelcomeUiActions {
         FleetManager fleetManager = new FleetManager(playerGrid, fleetConfiguration);
 
         GameFrame gameFrame = new GameFrame(fleetManager);
-        GameController controller = new GameController(playerGrid, fleetManager, gameFrame);
 
+        battleship.handlers.AbstractPlayerCommunication dummyComm = new battleship.handlers.AbstractPlayerCommunication() {
+                @Override
+                public void sendMessage(it.units.battleship.data.socket.GameMessageType type, Object payload) {
+                                 // Do nothing in single player
+                                 it.units.battleship.Logger.debug("DummyComm: " + type);
+                }
+        };
+
+        GameController controller = new GameController(playerGrid, fleetManager, dummyComm, gameFrame);
+        gameFrame.setGridInputListener(controller);
         gameFrame.open();
         controller.startGame();
     }

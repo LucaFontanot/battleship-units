@@ -1,12 +1,13 @@
-package battleship.ui.setup;
+package battleship.view.setup;
 
+import battleship.controller.GridInteractionObserver;
 import battleship.model.FleetManager;
-import battleship.model.Orientation;
 import battleship.model.Ship;
-import battleship.model.ShipType;
-import battleship.ui.grid.CellClickListener;
-import battleship.ui.grid.GridUI;
+import battleship.view.grid.CellClickListener;
+import battleship.view.grid.GridUI;
 import it.units.battleship.Coordinate;
+import it.units.battleship.Orientation;
+import it.units.battleship.ShipType;
 import lombok.Getter;
 
 import javax.swing.*;
@@ -37,7 +38,7 @@ public class SetupPanel extends JPanel implements PlacementContext, CellClickLis
         this.fleetManager = fleetManager;
 
         setLayout(new BorderLayout());
-        gridUI = new GridUI(fleetManager, this, this);
+        gridUI = new GridUI(10,10,null, this,this);
         shipPalette = new JPanel();
         shipPalette.setLayout(new BoxLayout(shipPalette, BoxLayout.Y_AXIS));
         shipPalette.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
@@ -101,6 +102,12 @@ public class SetupPanel extends JPanel implements PlacementContext, CellClickLis
         add(bottomBar, BorderLayout.SOUTH);
 
         updateShipButtons();
+    }
+
+    public void setGridInputListener(GridInteractionObserver observer){
+        if (gridUI != null){
+            gridUI.setObserver(observer);
+        }
     }
 
     @Override

@@ -1,6 +1,5 @@
-package battleship.model;
+package it.units.battleship;
 
-import it.units.battleship.Coordinate;
 import lombok.Getter;
 import lombok.NonNull;
 

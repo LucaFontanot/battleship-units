@@ -1,6 +1,7 @@
 package battleship.model;
 
 import it.units.battleship.Coordinate;
+import it.units.battleship.ShipType;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -28,6 +29,7 @@ public class FleetManager {
     @Getter
     private final Grid grid;
     private final List<Ship> fleet = new ArrayList<>();
+    @Getter
     private final Map<ShipType, Integer> requiredFleetConfiguration;
 
     public FleetManager(@NonNull Grid grid, @NonNull Map<ShipType, Integer> requiredFleetConfiguration){
@@ -218,8 +220,9 @@ public class FleetManager {
      * updated to indicate a miss.
      *
      * @param coordinate the coordinate of the incoming shot; must be non-null
+     * @return true if the shot hit or false if is a miss
      */
-    public void handleIncomingShot(@NonNull Coordinate coordinate){
+    public boolean handleIncomingShot(@NonNull Coordinate coordinate){
         Ship ship = getShipByCoordinate(coordinate);
         if (ship != null){
             boolean isNewHit = ship.addHit(coordinate);
@@ -231,7 +234,9 @@ public class FleetManager {
             }
         }else {
             grid.changeState(coordinate, CellState.MISS);
+            return false;
         }
+        return true;
     }
 
     public boolean canPlaceShip(@NonNull Ship ship) {

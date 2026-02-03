@@ -1,6 +1,8 @@
 package battleship.model;
 
 import it.units.battleship.Coordinate;
+import it.units.battleship.Orientation;
+import it.units.battleship.ShipType;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -68,6 +70,11 @@ public class Ship {
             return false;
         }
         return hitCoordinates.add(coordinate);
+    }
+
+
+    public static Ship restoreShip(LinkedHashSet<Coordinate> coordinates, ShipType shipType, Orientation orientation){
+        return new Ship(coordinates, shipType, orientation);
     }
 
     /**

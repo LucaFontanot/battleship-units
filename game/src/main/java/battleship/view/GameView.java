@@ -1,21 +1,25 @@
 package battleship.view;
 
+import battleship.controller.GridInteractionObserver;
 import battleship.model.Ship;
+import it.units.battleship.Coordinate;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 
 /**
- * Represents the view component of the Battleship game, responsible for displaying
- * the game's state and relaying information to the user. This interface defines methods
- * for updating the game interface with player and opponent grid states, messages, and
- * game-over notifications.
+ * Defines the contract between the Game Controller and the User Interface (View).
+ * This interface abstracts the visual presentation layer, allowing the Controller to
+ * update the game state without direct dependency on Swing or specific GUI implementations.
  *
- * Implementing classes should provide specific visual or textual representations
- * of the game state depending on the application's requirements (e.g., a graphical user
- * interface or a text-based command-line interface).
+ * Key responsibilities:
+ *  - Rendering the current state of the player's grid (ships and hits received).
+ *  - Rendering the known state of the opponent's grid (shots fired and their results).
  */
 
 public interface GameView {
+
+    void setGridInputListener(GridInteractionObserver observer);
 
     void open();
 
@@ -44,22 +48,24 @@ public interface GameView {
     void showGamePhase();
 
     /**
-     * Updates the player's grid representation and fleet information in the game view.
+     * Refreshes the visualization of the local player's grid.
+     * This includes displaying the player's fleet positions and the status of any incoming attacks
+     * (e.g., hits, misses, sunk ships).
      *
-     * This method is used to refresh the visual or textual representation of the player's grid,
-     * reflecting the current state of the grid and the fleet placements. It is typically called
-     * after the player's grid or fleet has been modified, such as during ship placement or
-     * after an attack. Since the grid takes track only the hit status of each cell, for reder the fleet
-     * over the grid it needs also the fleet list.
-     *
-     * @param serializedGrid the serialized representation of the player's grid, which encodes
-     *                       the state of each cell (e.g., empty, occupied, hit, miss)
-     * @param fleet          the list of ships currently placed on the player's grid, including
-     *                       their locations and hit statuses
+     * @param gridSerialized A string representation of the grid cells.
+     * @param fleetToRender The list of the player's ships to overlay onto the grid.
      */
-    void updatePlayerGrid(String serializedGrid, List<Ship> fleet);
+    void updatePlayerGrid(String gridSerialized, List<Ship> fleetToRender);
 
-    void updateOpponentGrid(String serializedGrid);
+    /**
+     * Refreshes the visualization of the opponent's grid.
+     * This view is typically limited to showing the results of the player's shots (hits/misses)
+     * and revealed sunken ships, without exposing the opponent's full fleet layout unless ships are sunk.
+     *
+     * @param gridSerialized A string representation of the grid cells.
+     * @param fleetToRender The list of revealed opponent ships (only sunk ones).
+     */
+    void updateOpponentGrid(String gridSerialized, List<Ship> fleetToRender);
 
     void updateSystemMessage(String message);
 
@@ -80,4 +86,5 @@ public interface GameView {
      */
     void setPlayerTurn(boolean isPlayerTurn);
 
+    void showPlacementPreview(LinkedHashSet<Coordinate> coord, boolean validShip, Ship ship);
 }
