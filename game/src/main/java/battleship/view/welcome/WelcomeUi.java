@@ -80,7 +80,6 @@ public class WelcomeUi implements WelcomeUiActions {
         };
 
         GameController controller = new GameController(playerGrid, fleetManager, dummyComm, gameFrame);
-        gameFrame.setGridInputListener(controller);
         gameFrame.open();
         controller.startGame();
     }

@@ -22,7 +22,8 @@ import java.util.Map;
 
 public interface GameView {
 
-    void setGridInputListener(GridInteractionObserver observer);
+    void setPlayerGridListener(GridInteractionObserver observer);
+    void setOpponentGridListener(GridInteractionObserver observer);
 
     void refreshFleetSelection(Map<ShipType, Integer> shipCounts, Map<ShipType, Integer> fleetConfiguration);
 
@@ -95,4 +96,6 @@ public interface GameView {
     void setPlayerTurn(boolean isPlayerTurn);
 
     void showPlacementPreview(LinkedHashSet<Coordinate> coord, boolean validShip, Ship ship);
+
+    void showShotPreview(Coordinate coord);
 }

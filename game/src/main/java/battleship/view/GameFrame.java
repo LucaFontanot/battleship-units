@@ -82,17 +82,14 @@ public class GameFrame extends JFrame implements GameView{
     }
 
     @Override
-    public void setGridInputListener(GridInteractionObserver observer) {
-        this.observer = observer;
+    public void setPlayerGridListener(GridInteractionObserver observer) {
+        playerGridUI.setObserver(observer);
+        setupPanel.getGridUI().setObserver(observer);
+    }
 
-        if(setupPanel != null){
-            setupPanel.setGridInputListener(observer);
-        }
-        if(opponentGridUI != null){
-            opponentGridUI.setObserver(observer);
-        }if(playerGridUI != null){
-            playerGridUI.setObserver(observer);
-        }
+    @Override
+    public void setOpponentGridListener(GridInteractionObserver observer) {
+        opponentGridUI.setObserver(observer);
     }
 
     @Override
@@ -150,6 +147,11 @@ public class GameFrame extends JFrame implements GameView{
         if (currentPanel instanceof SetupPanel setup) {
             setup.getGridUI().showPlacementPreview(coord, validShip, ship);
         }
+    }
+
+    @Override
+    public void showShotPreview(Coordinate coord) {
+
     }
 
     private void switchPanel(JPanel panel) {

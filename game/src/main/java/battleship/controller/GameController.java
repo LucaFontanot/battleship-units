@@ -23,14 +23,112 @@ import java.util.stream.Collectors;
  * Orchestrates the game logic and coordinates communication between the game model,
  * the UI view, and the network communication layer.
  */
-public class GameController implements CommunicationEvents, GridInteractionObserver {
+public class GameController implements CommunicationEvents {
 
     private final Grid grid;
     private final FleetManager fleetManager;
+
     @Getter
     private GameState gameState;
     private final GameView view;
+
     private final AbstractPlayerCommunication communication;
+    /**
+     * Handles player interaction events on the game grid during the game lifecycle.
+     *
+     * Responsibilities include:
+     * - Responding to hover events on the player's grid during the setup phase.
+     * - Handling click events to place ships during the setup phase.
+     */
+    GridInteractionObserver playerHandler = new PlayerGridHandler();
+    GridInteractionObserver opponentHandler = new OpponentGridHandler();
+
+    private class PlayerGridHandler implements GridInteractionObserver{
+
+        @Override
+        public void onGridHover(Coordinate coordinate) {
+            switch (gameState){
+                case SETUP -> handleSetupHover(coordinate);
+            }
+        }
+
+        private void handleSetupHover(Coordinate coordinate){
+            Orientation selectedOrientation = view.getSelectedOrientation();
+            ShipType selectedShipType = view.getSelectedShipType();
+
+            if (selectedShipType == null) return;
+            try {
+                Ship ship = Ship.createShip(coordinate, selectedOrientation, selectedShipType, fleetManager.getGrid());
+                boolean valid = fleetManager.canPlaceShip(ship);
+
+                view.showPlacementPreview(ship.getCoordinates(), valid, ship);
+
+            } catch (IllegalArgumentException ex) {
+                LinkedHashSet<Coordinate> coords = selectedShipType.getShipCoordinates(coordinate, selectedOrientation);
+                view.showPlacementPreview(coords, false, null);
+            }
+        }
+
+        @Override
+        public void onGridClick(Coordinate coordinate) {
+            switch (gameState){
+                case SETUP -> handleSetupClick(coordinate);
+            }
+        }
+
+        private void handleSetupClick(Coordinate coordinate){
+            Orientation selectedOrientation = view.getSelectedOrientation();
+            ShipType selectedShipType = view.getSelectedShipType();
+
+            if (selectedShipType == null) return;
+
+            try {
+                Ship ship = Ship.createShip(coordinate, selectedOrientation, selectedShipType, fleetManager.getGrid());
+                boolean placed = fleetManager.addShip(ship);
+
+                if (placed) {
+                    List<Ship> currentFleet = fleetManager.getFleet();
+
+                    view.updatePlayerGrid(grid.gridSerialization(), currentFleet);
+
+                    Map<ShipType, Integer> shipCounts = fleetManager.getPlacedCounts();
+                    Map<ShipType, Integer> fleetConfiguration = fleetManager.getRequiredFleetConfiguration();
+
+                    view.refreshFleetSelection(shipCounts, fleetConfiguration);
+                } else {
+                    Toolkit.getDefaultToolkit().beep();
+                    view.showPlacementPreview(ship.getCoordinates(), false, ship);
+                }
+            } catch (IllegalArgumentException ex) {
+                Toolkit.getDefaultToolkit().beep();
+
+                LinkedHashSet<Coordinate> coords = selectedShipType.getShipCoordinates(coordinate,selectedOrientation);
+                view.showPlacementPreview(coords, false, null);
+            }
+        }
+    }
+
+    private class OpponentGridHandler implements GridInteractionObserver{
+
+        @Override
+        public void onGridHover(Coordinate coordinate) {
+            switch (gameState){
+                case ACTIVE_TURN -> view.showShotPreview(coordinate);
+            }
+        }
+
+        @Override
+        public void onGridClick(Coordinate coordinate) {
+                switch (gameState){
+                    case ACTIVE_TURN -> handleOpponentGridClick(coordinate);
+                }
+        }
+
+        private void handleOpponentGridClick(Coordinate coordinate){
+            ShotRequestDTO shotRequest = new ShotRequestDTO(coordinate);
+            communication.sendMessage(GameMessageType.SHOT_REQUEST, shotRequest);
+        }
+    }
 
     public GameController(@NonNull Grid grid,@NonNull FleetManager fleetManager,@NonNull AbstractPlayerCommunication communication,@NonNull GameView view) {
         this.grid = grid;
@@ -38,6 +136,9 @@ public class GameController implements CommunicationEvents, GridInteractionObser
         this.fleetManager = fleetManager;
         this.view = view;
         this.gameState = GameState.SETUP;
+
+        view.setOpponentGridListener(opponentHandler);
+        view.setPlayerGridListener(playerHandler);
     }
 
     public void startGame(){
@@ -52,6 +153,14 @@ public class GameController implements CommunicationEvents, GridInteractionObser
 
     }
 
+    /**
+     * Updates the player's grid representation by refreshing the grid visualization and overlaying the fleet positions.
+     *
+     * @param gridSerialized A serialized string representation of the grid containing the current state
+     *                       (e.g., hits, misses, empty cells).
+     * @param shipFleet The list of ships composing the player's fleet, which will be rendered on the grid
+     *                  along with their statuses (e.g., sunk, damaged).
+     */
     public void updatePlayerGrid(String gridSerialized, List<Ship> shipFleet) {
         view.updatePlayerGrid(gridSerialized, shipFleet);
     }
@@ -71,6 +180,7 @@ public class GameController implements CommunicationEvents, GridInteractionObser
 
         view.updateOpponentGrid(gridUpdateDTO.gridSerialized(), fleet);
     }
+
     @Override
     public void onShotReceived(ShotRequestDTO shotRequestDTO) {
         Logger.log("Shot received");
@@ -93,67 +203,5 @@ public class GameController implements CommunicationEvents, GridInteractionObser
 
     @Override
     public void onGameSetupReceived(GameConfigDTO gameConfigDTO) {
-    }
-
-    @Override
-    public void onGridHover(Coordinate coordinate) {
-        switch (gameState){
-            case SETUP -> handleSetupHover(coordinate);
-        }
-    }
-
-    private void handleSetupHover(Coordinate coordinate){
-        Orientation selectedOrientation = view.getSelectedOrientation();
-        ShipType selectedShipType = view.getSelectedShipType();
-
-        if (selectedShipType == null) return;
-        try {
-            Ship ship = Ship.createShip(coordinate, selectedOrientation, selectedShipType, fleetManager.getGrid());
-            boolean valid = fleetManager.canPlaceShip(ship);
-
-            view.showPlacementPreview(ship.getCoordinates(), valid, ship);
-
-        } catch (IllegalArgumentException ex) {
-            LinkedHashSet<Coordinate> coords = selectedShipType.getShipCoordinates(coordinate, selectedOrientation);
-            view.showPlacementPreview(coords, false, null);
-        }
-    }
-
-    @Override
-    public void onGridClick(Coordinate coordinate) {
-        switch (gameState){
-            case SETUP -> handleSetupClick(coordinate);
-        }
-    }
-
-    private void handleSetupClick(Coordinate coordinate){
-        Orientation selectedOrientation = view.getSelectedOrientation();
-        ShipType selectedShipType = view.getSelectedShipType();
-
-        if (selectedShipType == null) return;
-
-        try {
-            Ship ship = Ship.createShip(coordinate, selectedOrientation, selectedShipType, fleetManager.getGrid());
-            boolean placed = fleetManager.addShip(ship);
-
-            if (placed) {
-                List<Ship> currentFleet = fleetManager.getFleet();
-
-                view.updatePlayerGrid(grid.gridSerialization(), currentFleet);
-
-                Map<ShipType, Integer> shipCounts = fleetManager.getPlacedCounts();
-                Map<ShipType, Integer> fleetConfiguration = fleetManager.getRequiredFleetConfiguration();
-
-                view.refreshFleetSelection(shipCounts, fleetConfiguration);
-            } else {
-                Toolkit.getDefaultToolkit().beep();
-                view.showPlacementPreview(ship.getCoordinates(), false, ship);
-            }
-        } catch (IllegalArgumentException ex) {
-            Toolkit.getDefaultToolkit().beep();
-
-            LinkedHashSet<Coordinate> coords = selectedShipType.getShipCoordinates(coordinate,selectedOrientation);
-            view.showPlacementPreview(coords, false, null);
-        }
     }
 }
