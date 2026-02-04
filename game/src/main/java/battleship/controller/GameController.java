@@ -98,62 +98,62 @@ public class GameController implements CommunicationEvents, GridInteractionObser
     @Override
     public void onGridHover(Coordinate coordinate) {
         switch (gameState){
-            case SETUP -> {
-                Orientation selectedOrientation = view.getSelectedOrientation();
-                ShipType selectedShipType = view.getSelectedShipType();
-
-                if (selectedShipType == null) return;
-                try {
-                    Ship ship = Ship.createShip(coordinate, selectedOrientation, selectedShipType, fleetManager.getGrid());
-                    boolean valid = fleetManager.canPlaceShip(ship);
-
-                    view.showPlacementPreview(ship.getCoordinates(), valid, ship);
-
-                } catch (IllegalArgumentException ex) {
-                    LinkedHashSet<Coordinate> coords = selectedShipType.getShipCoordinates(coordinate, selectedOrientation);
-                    view.showPlacementPreview(coords, false, null);
-                }
+            case SETUP -> handleSetupHover(coordinate);
         }
+    }
+
+    private void handleSetupHover(Coordinate coordinate){
+        Orientation selectedOrientation = view.getSelectedOrientation();
+        ShipType selectedShipType = view.getSelectedShipType();
+
+        if (selectedShipType == null) return;
+        try {
+            Ship ship = Ship.createShip(coordinate, selectedOrientation, selectedShipType, fleetManager.getGrid());
+            boolean valid = fleetManager.canPlaceShip(ship);
+
+            view.showPlacementPreview(ship.getCoordinates(), valid, ship);
+
+        } catch (IllegalArgumentException ex) {
+            LinkedHashSet<Coordinate> coords = selectedShipType.getShipCoordinates(coordinate, selectedOrientation);
+            view.showPlacementPreview(coords, false, null);
         }
     }
 
     @Override
     public void onGridClick(Coordinate coordinate) {
         switch (gameState){
-            case SETUP -> {
-                Orientation selectedOrientation = view.getSelectedOrientation();
-                ShipType selectedShipType = view.getSelectedShipType();
+            case SETUP -> handleSetupClick(coordinate);
+        }
+    }
 
-                if (selectedShipType == null) return;
+    private void handleSetupClick(Coordinate coordinate){
+        Orientation selectedOrientation = view.getSelectedOrientation();
+        ShipType selectedShipType = view.getSelectedShipType();
 
-                try {
-                    Ship ship = Ship.createShip(coordinate, selectedOrientation, selectedShipType, fleetManager.getGrid());
-                    boolean placed = fleetManager.addShip(ship);
+        if (selectedShipType == null) return;
 
-                    if (placed) {
-                        List<Ship> currentFleet = fleetManager.getFleet();
+        try {
+            Ship ship = Ship.createShip(coordinate, selectedOrientation, selectedShipType, fleetManager.getGrid());
+            boolean placed = fleetManager.addShip(ship);
 
-                        view.updatePlayerGrid(grid.gridSerialization(), currentFleet);
+            if (placed) {
+                List<Ship> currentFleet = fleetManager.getFleet();
 
-                        Map<ShipType, Integer> shipCounts = currentFleet.stream()
-                                .collect(Collectors.groupingBy(
-                                        Ship::getShipType,
-                                        Collectors.collectingAndThen(Collectors.counting(), Long::intValue)
-                                ));
-                        Map<ShipType, Integer> fleetConfiguration = fleetManager.getRequiredFleetConfiguration();
+                view.updatePlayerGrid(grid.gridSerialization(), currentFleet);
 
-                        view.refreshFleetSelection(shipCounts, fleetConfiguration);
-                    } else {
-                        Toolkit.getDefaultToolkit().beep();
-                        view.showPlacementPreview(ship.getCoordinates(), false, ship);
-                    }
-                } catch (IllegalArgumentException ex) {
-                    Toolkit.getDefaultToolkit().beep();
+                Map<ShipType, Integer> shipCounts = fleetManager.getPlacedCounts();
+                Map<ShipType, Integer> fleetConfiguration = fleetManager.getRequiredFleetConfiguration();
 
-                    LinkedHashSet<Coordinate> coords = selectedShipType.getShipCoordinates(coordinate,selectedOrientation);
-                    view.showPlacementPreview(coords, false, null);
-                }
+                view.refreshFleetSelection(shipCounts, fleetConfiguration);
+            } else {
+                Toolkit.getDefaultToolkit().beep();
+                view.showPlacementPreview(ship.getCoordinates(), false, ship);
             }
+        } catch (IllegalArgumentException ex) {
+            Toolkit.getDefaultToolkit().beep();
+
+            LinkedHashSet<Coordinate> coords = selectedShipType.getShipCoordinates(coordinate,selectedOrientation);
+            view.showPlacementPreview(coords, false, null);
         }
     }
 }
