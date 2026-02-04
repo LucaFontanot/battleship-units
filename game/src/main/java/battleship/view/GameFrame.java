@@ -124,18 +124,13 @@ public class GameFrame extends JFrame implements GameView{
     }
 
     @Override
+    public void showEndGamePhase(String message) {
+
+    }
+
+    @Override
     public void displayErrorAlert(String message) {
         JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
-    }
-
-    @Override
-    public void showEndGamePhase(String winner) {
-        JOptionPane.showMessageDialog(this, "Winner: " + winner);
-    }
-
-    @Override
-    public void displayShipSunk(Ship ship) {
-        JOptionPane.showMessageDialog(this, "Ship sunk: " + ship.getShipType());
     }
 
     @Override

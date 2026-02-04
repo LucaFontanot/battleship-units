@@ -125,6 +125,9 @@ public class GameController implements CommunicationEvents {
         }
 
         private void handleOpponentGridClick(Coordinate coordinate){
+            gameState = GameState.WAITING_FOR_OPPONENT;
+
+            view.setPlayerTurn(false);
             ShotRequestDTO shotRequest = new ShotRequestDTO(coordinate);
             communication.sendMessage(GameMessageType.SHOT_REQUEST, shotRequest);
         }
@@ -195,6 +198,9 @@ public class GameController implements CommunicationEvents {
         String gridSerialized = grid.gridSerialization();
         updatePlayerGrid(gridSerialized, fleetManager.getFleet());
 
+        gameState = GameState.ACTIVE_TURN;
+        view.setPlayerTurn(true);
+
         if (fleetManager.isGameOver()) {
             handleGameOver();
         }
@@ -204,10 +210,23 @@ public class GameController implements CommunicationEvents {
         gameState = GameState.GAME_OVER;
         GameStatusDTO gameStatusDTO = new GameStatusDTO(GameState.GAME_OVER, "You win!");
         communication.sendMessage(GameMessageType.GAME_OVER, gameStatusDTO);
-        view.showSystemMessage("You lost!");
+        view.showEndGamePhase("You lost! All your ships are sunk.");
+        view.setPlayerTurn(false);
     }
 
     @Override
     public void onGameSetupReceived(GameConfigDTO gameConfigDTO) {
+    }
+
+    @Override
+    public void onGameStatusReceived(GameStatusDTO gameStatusDTO) {
+        gameState = gameStatusDTO.state();
+        String message = gameStatusDTO.message();
+        switch (gameState){
+            case GAME_OVER -> {
+                view.showEndGamePhase(message);
+                view.setPlayerTurn(false);
+            }
+        }
     }
 }

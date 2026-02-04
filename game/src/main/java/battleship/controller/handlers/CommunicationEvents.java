@@ -1,7 +1,6 @@
 package battleship.controller.handlers;
-
-import it.units.battleship.Coordinate;
 import it.units.battleship.data.socket.payloads.GameConfigDTO;
+import it.units.battleship.data.socket.payloads.GameStatusDTO;
 import it.units.battleship.data.socket.payloads.GridUpdateDTO;
 import it.units.battleship.data.socket.payloads.ShotRequestDTO;
 
@@ -26,4 +25,5 @@ public interface CommunicationEvents {
     void onShotReceived(ShotRequestDTO shotRequestDTO);
 
     void onGameSetupReceived(GameConfigDTO gameConfigDTO);
+    void onGameStatusReceived(GameStatusDTO gameStatusDTO);
 }
