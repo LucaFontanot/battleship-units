@@ -439,4 +439,36 @@ public class TestFleetManager {
         Ship ship = Ship.createShip(new Coordinate(0, 0), Orientation.HORIZONTAL_RIGHT, ShipType.FRIGATE, grid);
         assertFalse(fleetManager.addShip(ship));
     }
+
+    @Test
+    void testGetPlacedCounts_EmptyFleet() {
+        Map<ShipType, Integer> counts = fleetManager.getPlacedCounts();
+        assertTrue(counts.isEmpty(), "Expected empty map for empty fleet.");
+    }
+
+    @Test
+    void testGetPlacedCounts_PartiallyPlaced() {
+        Ship ship1 = Ship.createShip(new Coordinate(0, 0), Orientation.HORIZONTAL_RIGHT, ShipType.DESTROYER, grid);
+        fleetManager.addShip(ship1);
+
+        Map<ShipType, Integer> counts = fleetManager.getPlacedCounts();
+        assertEquals(1, counts.size());
+        assertEquals(1, counts.get(ShipType.DESTROYER));
+    }
+
+    @Test
+    void testGetPlacedCounts_MultipleShipTypes() {
+        Ship ship1 = Ship.createShip(new Coordinate(0, 0), Orientation.HORIZONTAL_RIGHT, ShipType.DESTROYER, grid);
+        Ship ship2 = Ship.createShip(new Coordinate(2, 0), Orientation.HORIZONTAL_RIGHT, ShipType.DESTROYER, grid);
+        Ship ship3 = Ship.createShip(new Coordinate(5, 5), Orientation.VERTICAL_DOWN, ShipType.CARRIER, grid);
+
+        fleetManager.addShip(ship1);
+        fleetManager.addShip(ship2);
+        fleetManager.addShip(ship3);
+
+        Map<ShipType, Integer> counts = fleetManager.getPlacedCounts();
+        assertEquals(2, counts.size()); // DESTROYER and CARRIER
+        assertEquals(2, counts.get(ShipType.DESTROYER));
+        assertEquals(1, counts.get(ShipType.CARRIER));
+    }
 }

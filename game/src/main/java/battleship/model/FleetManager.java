@@ -251,4 +251,18 @@ public class FleetManager {
     public boolean isGameOver(){
         return fleet.stream().allMatch(Ship::isSunk);
     }
+
+    /**
+     * Calculates the number of ships of each type currently placed in the fleet.
+     *
+     * @return a map associating each ShipType with the number of ships of that type
+     *         already present in the fleet.
+     */
+    public Map<ShipType, Integer> getPlacedCounts(){
+        return fleet.stream()
+                .collect(Collectors.groupingBy(
+                        Ship::getShipType,
+                        Collectors.collectingAndThen(Collectors.counting(), Long::intValue)
+                ));
+    }
 }
