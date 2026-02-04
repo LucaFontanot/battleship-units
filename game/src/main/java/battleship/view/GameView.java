@@ -3,9 +3,12 @@ package battleship.view;
 import battleship.controller.GridInteractionObserver;
 import battleship.model.Ship;
 import it.units.battleship.Coordinate;
+import it.units.battleship.Orientation;
+import it.units.battleship.ShipType;
 
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Defines the contract between the Game Controller and the User Interface (View).
@@ -20,6 +23,11 @@ import java.util.List;
 public interface GameView {
 
     void setGridInputListener(GridInteractionObserver observer);
+
+    void refreshFleetSelection(Map<ShipType, Integer> shipCounts, Map<ShipType, Integer> fleetConfiguration);
+
+    Orientation getSelectedOrientation();
+    ShipType getSelectedShipType();
 
     void open();
 

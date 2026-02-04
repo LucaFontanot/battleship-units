@@ -2,9 +2,7 @@ package battleship.view.grid;
 
 import battleship.controller.GridInteractionObserver;
 import battleship.model.CellState;
-import battleship.model.Grid;
 import battleship.model.Ship;
-import battleship.view.GameView;
 import battleship.view.setup.PlacementContext;
 import battleship.view.utils.TextureLoader;
 import it.units.battleship.Coordinate;
@@ -31,7 +29,7 @@ import java.util.Set;
  *  - Calculates and applies the correct texture segments for ships based on their
  *     position, orientation, and type using {@link TextureLoader}.
  */
-public class GridUI extends JPanel implements CellHoverListener {
+public class GridUI extends JPanel implements CellInteractionListener {
     @Getter
     final int cols;
     @Getter
@@ -46,8 +44,7 @@ public class GridUI extends JPanel implements CellHoverListener {
     public GridUI(int rows,
                   int cols,
                   GridInteractionObserver observer,
-                  PlacementContext placementContext,
-                  CellClickListener clickListener) {
+                  PlacementContext placementContext) {
         this.cols = cols;
         this.rows = rows;
 
@@ -60,8 +57,7 @@ public class GridUI extends JPanel implements CellHoverListener {
                 Coordinate coord = new Coordinate(r,c);
                 cells[r][c] = new CellPanel(coord);
 
-                cells[r][c].setHoverListener(this);
-                cells[r][c].setClickListener(clickListener);
+                cells[r][c].setCellListener(this);
 
                 add(cells[r][c]);
             }
@@ -153,21 +149,24 @@ public class GridUI extends JPanel implements CellHoverListener {
     public void onCellHover(Coordinate coordinate) {
         clearPlacementPreview();
         if (observer == null) return;
-
-        if (placementContext != null && placementContext.getSelectedShipType() != null){
-            ShipType shipType = placementContext.getSelectedShipType();
-            Orientation orientation = placementContext.getSelectedOrientation();
-
-            observer.onShipPlacement(coordinate, shipType, orientation);
-        }
+        observer.onGridHover(coordinate);
     }
 
     @Override
     public void onCellExit() {
-        if (observer != null){
-            observer.onShipPlacementExit();
-        }
         clearPlacementPreview();
+    }
+
+    @Override
+    public void onCellClicked(Coordinate coordinate) {
+        ShipType selectedShipType = placementContext.getSelectedShipType();
+
+        if (selectedShipType == null) {
+            Toolkit.getDefaultToolkit().beep();
+            return;
+        }
+        if (observer == null) return;
+        observer.onGridClick(coordinate);
     }
 
     public void markSelected(Set<Coordinate> coords) {

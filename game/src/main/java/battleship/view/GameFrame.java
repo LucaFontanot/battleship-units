@@ -5,6 +5,8 @@ import battleship.model.FleetManager;
 import battleship.model.Ship;
 import battleship.view.grid.GridUI;
 import it.units.battleship.Coordinate;
+import it.units.battleship.Orientation;
+import it.units.battleship.ShipType;
 import lombok.Getter;
 
 import javax.swing.*;
@@ -14,6 +16,7 @@ import battleship.view.setup.SetupPanel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Map;
 
 /**
  * The main Swing application window (JFrame) for the Battleship game.
@@ -37,15 +40,15 @@ public class GameFrame extends JFrame implements GameView{
 
     private final JLabel systemMessage = new JLabel(" ");
 
-    public GameFrame(FleetManager fleetManager) {
-        this.playerGridUI = new GridUI(10,10,null,null,null);
-        this.opponentGridUI = new GridUI(10,10,null,null,null);
+    public GameFrame() {
+        this.playerGridUI = new GridUI(10,10,null,null);
+        this.opponentGridUI = new GridUI(10,10,null,null);
 
         setTitle("Battleship");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        setupPanel = new SetupPanel(fleetManager);
+        setupPanel = new SetupPanel();
 
         systemMessage.setBorder(BorderFactory.createEmptyBorder(20, 20, 0, 0));
         systemMessage.setVerticalAlignment(SwingConstants.CENTER);
@@ -90,6 +93,21 @@ public class GameFrame extends JFrame implements GameView{
         }if(playerGridUI != null){
             playerGridUI.setObserver(observer);
         }
+    }
+
+    @Override
+    public void refreshFleetSelection(Map<ShipType, Integer> shipCounts, Map<ShipType, Integer> fleetConfiguration) {
+        setupPanel.updateShipButtons(shipCounts, fleetConfiguration);
+    }
+
+    @Override
+    public Orientation getSelectedOrientation() {
+        return setupPanel.getSelectedOrientation();
+    }
+
+    @Override
+    public ShipType getSelectedShipType() {
+        return setupPanel.getSelectedShipType();
     }
 
     @Override

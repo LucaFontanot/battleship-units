@@ -69,7 +69,7 @@ public class WelcomeUi implements WelcomeUiActions {
 
         FleetManager fleetManager = new FleetManager(playerGrid, fleetConfiguration);
 
-        GameFrame gameFrame = new GameFrame(fleetManager);
+        GameFrame gameFrame = new GameFrame();
 
         AbstractPlayerCommunication dummyComm = new AbstractPlayerCommunication() {
                 @Override

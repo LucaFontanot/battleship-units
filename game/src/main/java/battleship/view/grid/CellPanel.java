@@ -42,9 +42,7 @@ public class CellPanel extends JLabel {
     private float overlayAlpha = 1.0f;
 
     @Setter
-    private CellHoverListener hoverListener;
-    @Setter
-    private CellClickListener clickListener;
+    private CellInteractionListener cellListener;
 
 
     public CellPanel(Coordinate coordinate) {
@@ -60,22 +58,22 @@ public class CellPanel extends JLabel {
         addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                if (hoverListener != null) {
-                    hoverListener.onCellHover(coordinate);
+                if (cellListener != null) {
+                    cellListener.onCellHover(coordinate);
                 }
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-                if (hoverListener != null) {
-                    hoverListener.onCellExit();
+                if (cellListener != null) {
+                    cellListener.onCellExit();
                 }
             }
 
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (clickListener != null) {
-                    clickListener.onCellClicked(coordinate);
+                if (cellListener != null) {
+                    cellListener.onCellClicked(coordinate);
                 }
             }}
         );

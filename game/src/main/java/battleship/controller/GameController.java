@@ -12,8 +12,10 @@ import it.units.battleship.data.socket.payloads.*;
 import lombok.Getter;
 import lombok.NonNull;
 
+import java.awt.*;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -39,6 +41,15 @@ public class GameController implements CommunicationEvents, GridInteractionObser
     }
 
     public void startGame(){
+        List<Ship> currentFleet = fleetManager.getFleet();
+        Map<ShipType, Integer> shipCounts = currentFleet.stream()
+                .collect(Collectors.groupingBy(
+                        Ship::getShipType,
+                        Collectors.collectingAndThen(Collectors.counting(), Long::intValue)
+                ));
+        Map<ShipType, Integer> fleetConfiguration = fleetManager.getRequiredFleetConfiguration(); // Saranno tutti 0
+        view.refreshFleetSelection(shipCounts, fleetConfiguration);
+
     }
 
     public void updatePlayerGrid(String gridSerialized, List<Ship> shipFleet) {
@@ -85,21 +96,64 @@ public class GameController implements CommunicationEvents, GridInteractionObser
     }
 
     @Override
-    public void onShipPlacement(Coordinate coordinate, ShipType shipType, Orientation orientation) {
-        try {
-            Ship ship = Ship.createShip(coordinate, orientation, shipType, fleetManager.getGrid());
-            boolean valid = fleetManager.canPlaceShip(ship);
+    public void onGridHover(Coordinate coordinate) {
+        switch (gameState){
+            case SETUP -> {
+                Orientation selectedOrientation = view.getSelectedOrientation();
+                ShipType selectedShipType = view.getSelectedShipType();
 
-            view.showPlacementPreview(ship.getCoordinates(), valid, ship);
+                if (selectedShipType == null) return;
+                try {
+                    Ship ship = Ship.createShip(coordinate, selectedOrientation, selectedShipType, fleetManager.getGrid());
+                    boolean valid = fleetManager.canPlaceShip(ship);
 
-        } catch (IllegalArgumentException ex) {
-            LinkedHashSet<Coordinate> coords = shipType.getShipCoordinates(coordinate, orientation);
-            view.showPlacementPreview(coords, false, null);
+                    view.showPlacementPreview(ship.getCoordinates(), valid, ship);
+
+                } catch (IllegalArgumentException ex) {
+                    LinkedHashSet<Coordinate> coords = selectedShipType.getShipCoordinates(coordinate, selectedOrientation);
+                    view.showPlacementPreview(coords, false, null);
+                }
+        }
         }
     }
 
     @Override
-    public void onShipPlacementExit() {
+    public void onGridClick(Coordinate coordinate) {
+        switch (gameState){
+            case SETUP -> {
+                Orientation selectedOrientation = view.getSelectedOrientation();
+                ShipType selectedShipType = view.getSelectedShipType();
 
+                if (selectedShipType == null) return;
+
+                try {
+                    Ship ship = Ship.createShip(coordinate, selectedOrientation, selectedShipType, fleetManager.getGrid());
+                    boolean placed = fleetManager.addShip(ship);
+
+                    if (placed) {
+                        List<Ship> currentFleet = fleetManager.getFleet();
+
+                        view.updatePlayerGrid(grid.gridSerialization(), currentFleet);
+
+                        Map<ShipType, Integer> shipCounts = currentFleet.stream()
+                                .collect(Collectors.groupingBy(
+                                        Ship::getShipType,
+                                        Collectors.collectingAndThen(Collectors.counting(), Long::intValue)
+                                ));
+                        Map<ShipType, Integer> fleetConfiguration = fleetManager.getRequiredFleetConfiguration();
+
+                        view.refreshFleetSelection(shipCounts, fleetConfiguration);
+                    } else {
+                        Toolkit.getDefaultToolkit().beep();
+                        view.showPlacementPreview(ship.getCoordinates(), false, ship);
+                    }
+                } catch (IllegalArgumentException ex) {
+                    Toolkit.getDefaultToolkit().beep();
+
+                    LinkedHashSet<Coordinate> coords = selectedShipType.getShipCoordinates(coordinate,selectedOrientation);
+                    view.showPlacementPreview(coords, false, null);
+                }
+            }
+        }
     }
 }

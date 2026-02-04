@@ -1,25 +1,22 @@
 package battleship.view.setup;
 
 import battleship.controller.GridInteractionObserver;
-import battleship.model.FleetManager;
-import battleship.model.Ship;
-import battleship.view.grid.CellClickListener;
 import battleship.view.grid.GridUI;
-import it.units.battleship.Coordinate;
+import it.units.battleship.Logger;
 import it.units.battleship.Orientation;
 import it.units.battleship.ShipType;
 import lombok.Getter;
+import lombok.extern.java.Log;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.EnumMap;
 import java.util.Map;
 
-public class SetupPanel extends JPanel implements PlacementContext, CellClickListener {
+public class SetupPanel extends JPanel implements PlacementContext {
 
     @Getter
     private final GridUI gridUI;
-    private final FleetManager fleetManager;
 
     private final JPanel shipPalette;
 
@@ -34,11 +31,10 @@ public class SetupPanel extends JPanel implements PlacementContext, CellClickLis
 
     private final Map<ShipType, JButton> shipButtons = new EnumMap<>(ShipType.class);
 
-    public SetupPanel(FleetManager fleetManager) {
-        this.fleetManager = fleetManager;
+    public SetupPanel() {
 
         setLayout(new BorderLayout());
-        gridUI = new GridUI(10,10,null, this,this);
+        gridUI = new GridUI(10,10,null, this);
         shipPalette = new JPanel();
         shipPalette.setLayout(new BoxLayout(shipPalette, BoxLayout.Y_AXIS));
         shipPalette.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
@@ -100,41 +96,11 @@ public class SetupPanel extends JPanel implements PlacementContext, CellClickLis
 
         bottomBar.add(nextButton);
         add(bottomBar, BorderLayout.SOUTH);
-
-        updateShipButtons();
     }
 
     public void setGridInputListener(GridInteractionObserver observer){
         if (gridUI != null){
             gridUI.setObserver(observer);
-        }
-    }
-
-    @Override
-    public void onCellClicked(Coordinate coordinate) {
-        if (selectedShipType == null) {
-            Toolkit.getDefaultToolkit().beep();
-            return;
-        }
-
-        try {
-            Ship ship = Ship.createShip(coordinate, selectedOrientation, selectedShipType, fleetManager.getGrid());
-            boolean ok = fleetManager.addShip(ship);
-
-            if (!ok) {
-                Toolkit.getDefaultToolkit().beep();
-                gridUI.showPlacementPreview(ship.getCoordinates(), false, ship);
-                return;
-            }
-
-            gridUI.placeShip(ship);
-            gridUI.clearPlacementPreview();
-            updateShipButtons();
-        } catch (IllegalArgumentException ex) {
-            Toolkit.getDefaultToolkit().beep();
-
-            var coords = selectedShipType.getShipCoordinates(coordinate, selectedOrientation);
-            gridUI.showPlacementPreview(coords, false, null);
         }
     }
 
@@ -147,16 +113,25 @@ public class SetupPanel extends JPanel implements PlacementContext, CellClickLis
         selected.setBorder(BorderFactory.createLineBorder(Color.GREEN, 2));
     }
 
-    private void updateShipButtons() {
+    public void updateShipButtons(Map<ShipType, Integer> placedShip,
+                                  Map<ShipType, Integer> fleetConfiguration) {
+
+        boolean isFleetComplete = true;
         for (ShipType type : ShipType.values()) {
-            JButton btn = shipButtons.get(type);
-            if (btn == null) continue;
+            JButton button = shipButtons.get(type);
+            if (button == null) continue;
 
-            int remaining = fleetManager.getRemaining(type);
-            int total = fleetManager.getRequiredCount(type);
+            int placed = placedShip.getOrDefault(type, 0);
+            int total = fleetConfiguration.getOrDefault(type, 0);
+            int remaining = total - placed;
 
-            btn.setText(type.getName() + " (" + remaining + "/" + total + ")");
-            btn.setEnabled(remaining > 0);
+            if (placed < total){
+                isFleetComplete = false;
+                continue;
+            }
+
+            button.setText(type.getName() + " (" + remaining + "/" + total + ")");
+            button.setEnabled(remaining > 0);
 
             if (selectedShipType == type && remaining <= 0) {
                 clearShipSelection();
@@ -166,7 +141,7 @@ public class SetupPanel extends JPanel implements PlacementContext, CellClickLis
         shipPalette.repaint();
 
         if (nextButton != null) {
-            nextButton.setEnabled(fleetManager.isFleetComplete());
+            nextButton.setEnabled(isFleetComplete);
         }
     }
 
