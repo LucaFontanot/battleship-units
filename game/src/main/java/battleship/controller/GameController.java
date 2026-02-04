@@ -186,19 +186,25 @@ public class GameController implements CommunicationEvents {
         Logger.log("Shot received");
 
         Coordinate shotCoord = shotRequestDTO.coord();
-
         boolean shotOutcome = fleetManager.handleIncomingShot(shotCoord);
-
         List<Ship> fleet = fleetManager.getFleet();
-        List<Ship> sunkShipFleet = fleet.stream().filter(ship -> ship.isSunk()).collect(Collectors.toList());
-        List<ShipDTO> fleetDTO = GameDataMapper.toShipDTO(sunkShipFleet);
-        String gridSerialized = grid.gridSerialization();
 
-        GridUpdateDTO gridUpdateDTO = new GridUpdateDTO(shotOutcome, gridSerialized, fleetDTO);
-
+        GridUpdateDTO gridUpdateDTO = GameDataMapper.toGridUpdateDTO(shotOutcome, grid, fleet);
         communication.sendMessage(GameMessageType.GRID_UPDATE, gridUpdateDTO);
 
-        updatePlayerGrid(gridSerialized, fleet);
+        String gridSerialized = grid.gridSerialization();
+        updatePlayerGrid(gridSerialized, fleetManager.getFleet());
+
+        if (fleetManager.isGameOver()) {
+            handleGameOver();
+        }
+    }
+
+    private void handleGameOver() {
+        gameState = GameState.GAME_OVER;
+        GameStatusDTO gameStatusDTO = new GameStatusDTO(GameState.GAME_OVER, "You win!");
+        communication.sendMessage(GameMessageType.GAME_OVER, gameStatusDTO);
+        view.showSystemMessage("You lost!");
     }
 
     @Override

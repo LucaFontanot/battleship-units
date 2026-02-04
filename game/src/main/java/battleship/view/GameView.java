@@ -24,7 +24,6 @@ public interface GameView {
 
     void setPlayerGridListener(GridInteractionObserver observer);
     void setOpponentGridListener(GridInteractionObserver observer);
-
     void refreshFleetSelection(Map<ShipType, Integer> shipCounts, Map<ShipType, Integer> fleetConfiguration);
 
     Orientation getSelectedOrientation();
@@ -76,7 +75,7 @@ public interface GameView {
      */
     void updateOpponentGrid(String gridSerialized, List<Ship> fleetToRender);
 
-    void updateSystemMessage(String message);
+    void showSystemMessage(String message);
 
     void displayErrorAlert(String message);
 

@@ -77,7 +77,7 @@ public class GameFrame extends JFrame implements GameView{
     }
 
     @Override
-    public void updateSystemMessage(String message) {
+    public void showSystemMessage(String message) {
 
     }
 

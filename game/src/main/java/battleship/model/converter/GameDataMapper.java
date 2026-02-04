@@ -1,6 +1,8 @@
 package battleship.model.converter;
 
+import battleship.model.Grid;
 import battleship.model.Ship;
+import it.units.battleship.data.socket.payloads.GridUpdateDTO;
 import it.units.battleship.data.socket.payloads.ShipDTO;
 
 import java.util.List;
@@ -57,5 +59,22 @@ public class GameDataMapper{
                                             s.getCoordinates(),
                                             s.getOrientation()))
                 .collect(Collectors.toList());
+    }
+    /**
+     * Creates a GridUpdateDTO from the current game state after processing a shot.
+     *
+     * @param shotOutcome    True if the shot was a hit, false otherwise.
+     * @param grid           The grid to serialize.
+     * @param fleet          The complete fleet to extract sunk ships from.
+     * @return A GridUpdateDTO ready for transmission.
+     */
+    public static GridUpdateDTO toGridUpdateDTO(boolean shotOutcome, Grid grid, List<Ship> fleet) {
+        List<Ship> sunkShips = fleet.stream()
+                .filter(Ship::isSunk)
+                .toList();
+        List<ShipDTO> sunkShipsDTO = toShipDTO(sunkShips);
+        String gridSerialized = grid.gridSerialization();
+
+        return new GridUpdateDTO(shotOutcome, gridSerialized, sunkShipsDTO);
     }
 }
