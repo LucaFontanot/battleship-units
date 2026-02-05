@@ -18,9 +18,11 @@ class TestLocalPlayerCommunication {
 
     @Test
     void computerTargetsAdjacentAfterHit() {
+        int gridRows = 5;
+        int gridCols = 5;
         LocalPlayerCommunication communication = new LocalPlayerCommunication(
-                5,
-                5,
+                gridRows,
+                gridCols,
                 Map.of(ShipType.DESTROYER, 1),
                 new FixedRandom()
         );
@@ -30,10 +32,11 @@ class TestLocalPlayerCommunication {
         communication.sendMessage(GameMessageType.SHOT_REQUEST, new ShotRequestDTO(new Coordinate(4, 4)));
         assertNotNull(listener.lastShotRequest);
         Coordinate firstShot = listener.lastShotRequest.coord();
+        assertEquals(new Coordinate(0, 0), firstShot);
 
         communication.sendMessage(
                 GameMessageType.GRID_UPDATE,
-                new GridUpdateDTO(true, "0".repeat(25), List.of())
+                new GridUpdateDTO(true, "0".repeat(gridRows * gridCols), List.of())
         );
 
         communication.sendMessage(GameMessageType.SHOT_REQUEST, new ShotRequestDTO(new Coordinate(4, 3)));

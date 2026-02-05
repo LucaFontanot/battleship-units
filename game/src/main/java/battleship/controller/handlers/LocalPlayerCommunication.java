@@ -16,6 +16,7 @@ import it.units.battleship.data.socket.payloads.ShotRequestDTO;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -29,7 +30,7 @@ public class LocalPlayerCommunication extends AbstractPlayerCommunication {
     private final Random random;
     private final int rows;
     private final int cols;
-    private final Set<Coordinate> availableShots = new HashSet<>();
+    private final Set<Coordinate> availableShots = new LinkedHashSet<>();
     private final Set<Coordinate> pendingHits = new HashSet<>();
     private Coordinate lastComputerShot;
 
@@ -49,11 +50,12 @@ public class LocalPlayerCommunication extends AbstractPlayerCommunication {
 
     @Override
     public <T> void sendMessage(GameMessageType type, T payload) {
-        switch (type) {
-            case SHOT_REQUEST -> handlePlayerShot((ShotRequestDTO) payload);
-            case GRID_UPDATE -> handleComputerShotResult((GridUpdateDTO) payload);
-            case GAME_OVER, GAME_SETUP, TURN_CHANGE, ERROR -> {
-            }
+        if (type == GameMessageType.SHOT_REQUEST) {
+            handlePlayerShot((ShotRequestDTO) payload);
+            return;
+        }
+        if (type == GameMessageType.GRID_UPDATE) {
+            handleComputerShotResult((GridUpdateDTO) payload);
         }
     }
 
