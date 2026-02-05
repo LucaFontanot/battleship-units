@@ -4,6 +4,7 @@ import battleship.model.Grid;
 import battleship.model.Ship;
 import it.units.battleship.data.socket.payloads.GridUpdateDTO;
 import it.units.battleship.data.socket.payloads.ShipDTO;
+import lombok.NonNull;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,7 +29,7 @@ public class GameDataMapper{
      * @param dtos The list of DTOs received from the network. Can be null.
      * @return A list of reconstructed {@link Ship} objects. Returns an empty list if the input is null.
      */
-    public static List<Ship> toShipList(List<ShipDTO> dtos){
+    public static List<Ship> toShipList(@NonNull List<ShipDTO> dtos){
         if (dtos == null) return List.of();
         return dtos.stream().map(GameDataMapper::toShip).collect(Collectors.toList());
     }
@@ -40,7 +41,7 @@ public class GameDataMapper{
      * @param dto The ShipDTO to convert.
      * @return A {@link Ship} instance with the properties defined in the DTO.
      */
-    public static Ship toShip (ShipDTO dto){
+    public static Ship toShip (@NonNull ShipDTO dto){
         return Ship.restoreShip(new java.util.LinkedHashSet<>(dto.coordinates()),
                                 dto.type(),
                                 dto.orientation());
@@ -53,7 +54,7 @@ public class GameDataMapper{
      * @param fleet The list of local {@link Ship} objects.
      * @return A list of {@link ShipDTO} ready for serialization.
      */
-    public static List<ShipDTO> toShipDTO(List<Ship> fleet){
+    public static List<ShipDTO> toShipDTO(@NonNull List<Ship> fleet){
         return fleet.stream()
                 .map(s -> new ShipDTO(s.getShipType(),
                                             s.getCoordinates(),
@@ -68,7 +69,7 @@ public class GameDataMapper{
      * @param fleet          The complete fleet to extract sunk ships from.
      * @return A GridUpdateDTO ready for transmission.
      */
-    public static GridUpdateDTO toGridUpdateDTO(boolean shotOutcome, Grid grid, List<Ship> fleet) {
+    public static GridUpdateDTO toGridUpdateDTO(boolean shotOutcome,@NonNull Grid grid,@NonNull List<Ship> fleet) {
         List<Ship> sunkShips = fleet.stream()
                 .filter(Ship::isSunk)
                 .toList();
