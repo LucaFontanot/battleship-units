@@ -68,23 +68,29 @@ public class NetworkClient extends AbstractPlayerCommunication{
     }
 
     private void handleIncomingMessage(String json){
-        JsonObject jsonObject = gson.fromJson(json, JsonObject.class);
-        String typeString = jsonObject.get("type").getAsString();
-        
-        GameMessageType type;
         try {
-            // Find enum matching the string value, or valueOf if names matched
-            // Since enum has custom string names, we need to iterate.
-            type = java.util.Arrays.stream(GameMessageType.values())
+            JsonObject jsonObject = gson.fromJson(json, JsonObject.class);
+            if (jsonObject == null || !jsonObject.has("type")) return;
+
+            String typeString = jsonObject.get("type").getAsString();
+
+            GameMessageType type = java.util.Arrays.stream(GameMessageType.values())
                     .filter(t -> t.getType().equals(typeString))
                     .findFirst()
-                    .orElseThrow(() -> new IllegalArgumentException("Unknown message type: " + typeString));
-                    
-        } catch (IllegalArgumentException e) {
-            Logger.warn("Received unknown message type: " + typeString);
-            return;
-        }
+                    .orElse(null);
 
+            if (type == null){
+                Logger.warn("Received unknown message type: " + typeString);
+                return;
+            }
+
+            dispatchMessage(type, json);
+        } catch (Exception e) {
+            Logger.error("Failed to parse incoming JSON: " + e.getMessage());
+        }
+    }
+
+    private void dispatchMessage(GameMessageType type, String json){
         switch (type){
             case GRID_UPDATE -> {
                 WebSocketMessage<GridUpdateDTO> msg = gson.fromJson(
@@ -120,6 +126,5 @@ public class NetworkClient extends AbstractPlayerCommunication{
             }
             default -> Logger.log("Unhandled message type: " + type);
         }
-
     }
 }
