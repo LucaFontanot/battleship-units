@@ -25,6 +25,7 @@ import java.util.Set;
 public class LocalPlayerCommunication extends AbstractPlayerCommunication {
 
     private static final int MAX_PLACEMENT_ATTEMPTS = 1000;
+    private static final Orientation[] ORIENTATIONS = Orientation.values();
     private final Grid computerGrid;
     private final FleetManager computerFleet;
     private final Random random;
@@ -139,7 +140,10 @@ public class LocalPlayerCommunication extends AbstractPlayerCommunication {
             int attempts = 0;
             while (placed < entry.getValue()) {
                 if (attempts++ > MAX_PLACEMENT_ATTEMPTS) {
-                    throw new IllegalStateException("Unable to place fleet with current grid size.");
+                    throw new IllegalStateException(
+                            "Unable to place " + entry.getKey() + " (" + placed + "/" + entry.getValue()
+                                    + ") on " + rows + "x" + cols + " grid."
+                    );
                 }
                 Coordinate coord = new Coordinate(random.nextInt(rows), random.nextInt(cols));
                 Orientation orientation = randomOrientation();
@@ -155,7 +159,6 @@ public class LocalPlayerCommunication extends AbstractPlayerCommunication {
     }
 
     private Orientation randomOrientation() {
-        Orientation[] values = Orientation.values();
-        return values[random.nextInt(values.length)];
+        return ORIENTATIONS[random.nextInt(ORIENTATIONS.length)];
     }
 }
