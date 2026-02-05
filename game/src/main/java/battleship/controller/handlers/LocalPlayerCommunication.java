@@ -142,7 +142,8 @@ public class LocalPlayerCommunication extends AbstractPlayerCommunication {
                 if (attempts++ > MAX_PLACEMENT_ATTEMPTS) {
                     throw new IllegalStateException(
                             "Unable to place " + entry.getKey() + " (" + placed + "/" + entry.getValue()
-                                    + ") on " + rows + "x" + cols + " grid."
+                                    + ") on " + rows + "x" + cols
+                                    + " grid. Grid may be too small for the fleet configuration."
                     );
                 }
                 Coordinate coord = new Coordinate(random.nextInt(rows), random.nextInt(cols));
