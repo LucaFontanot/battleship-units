@@ -2,6 +2,7 @@ package battleship.view.welcome;
 
 import battleship.controller.GameController;
 import battleship.controller.handlers.AbstractPlayerCommunication;
+import battleship.controller.handlers.LocalPlayerCommunication;
 import battleship.model.FleetManager;
 import battleship.model.Grid;
 
@@ -71,15 +72,10 @@ public class WelcomeUi implements WelcomeUiActions {
 
         GameFrame gameFrame = new GameFrame();
 
-        AbstractPlayerCommunication dummyComm = new AbstractPlayerCommunication() {
-                @Override
-                public void sendMessage(it.units.battleship.data.socket.GameMessageType type, Object payload) {
-                                 // Do nothing in single player
-                                 it.units.battleship.Logger.debug("DummyComm: " + type);
-                }
-        };
+        AbstractPlayerCommunication localComm = new LocalPlayerCommunication(10, 10, fleetConfiguration);
 
-        GameController controller = new GameController(playerGrid, fleetManager, dummyComm, gameFrame);
+        GameController controller = new GameController(playerGrid, fleetManager, localComm, gameFrame);
+        localComm.addCommunicationEventsListener(controller);
         gameFrame.open();
         controller.startGame();
     }
