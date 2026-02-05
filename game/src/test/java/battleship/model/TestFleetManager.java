@@ -1,6 +1,6 @@
-import battleship.model.*;
+package battleship.model;
+
 import it.units.battleship.Coordinate;
-import battleship.model.Ship;
 import it.units.battleship.Orientation;
 import it.units.battleship.ShipType;
 import org.junit.jupiter.api.BeforeEach;

@@ -1,6 +1,6 @@
-import battleship.model.CellState;
+package battleship.model;
+
 import it.units.battleship.Coordinate;
-import battleship.model.Grid;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
