@@ -25,13 +25,13 @@ public class NetworkOutputHandler implements NetworkOutputActions {
 
     @Override
     public void sendGameStatus(@NonNull GameState gameState, String message) {
-        GameStatusDTO gameStatusDTO = new GameStatusDTO(gameState, message);
+        GameStatusDTO gameStatusDTO = GameDataMapper.toGameStatusDTO(gameState, message);
         communication.sendMessage(GameMessageType.TURN_CHANGE, gameStatusDTO);
     }
 
     @Override
     public void sendShotRequest(Coordinate coordinate) {
-        ShotRequestDTO shotRequestDTO = new ShotRequestDTO(coordinate);
+        ShotRequestDTO shotRequestDTO = GameDataMapper.toShotRequestDTO(coordinate);
         communication.sendMessage(GameMessageType.SHOT_REQUEST, shotRequestDTO);
     }
 

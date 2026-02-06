@@ -4,16 +4,13 @@ import battleship.model.FleetManager;
 import battleship.model.Grid;
 import battleship.model.Ship;
 import it.units.battleship.Coordinate;
+import it.units.battleship.GameState;
 import it.units.battleship.Orientation;
 import it.units.battleship.ShipType;
-import it.units.battleship.data.socket.payloads.GridUpdateDTO;
-import it.units.battleship.data.socket.payloads.ShipDTO;
+import it.units.battleship.data.socket.payloads.*;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -221,6 +218,35 @@ public class TestGameDataMapper {
     }
 
     @Test
+    void testToGameConfigDTO() {
+        Map<ShipType, Integer> fleetRules = Map.of(ShipType.BATTLESHIP, 1, ShipType.DESTROYER, 2);
+        GameConfigDTO dto = GameDataMapper.toGameConfigDTO(10, 10, fleetRules);
+
+        assertNotNull(dto);
+        assertEquals(10, dto.rows());
+        assertEquals(10, dto.cols());
+        assertEquals(fleetRules, dto.fleetRules());
+    }
+
+    @Test
+    void testToGameStatusDTO() {
+        GameStatusDTO dto = GameDataMapper.toGameStatusDTO(GameState.ACTIVE_TURN, "Your turn!");
+
+        assertNotNull(dto);
+        assertEquals(GameState.ACTIVE_TURN, dto.state());
+        assertEquals("Your turn!", dto.message());
+    }
+
+    @Test
+    void testToShotRequestDTO() {
+        Coordinate coord = new Coordinate(3, 4);
+        ShotRequestDTO dto = GameDataMapper.toShotRequestDTO(coord);
+
+        assertNotNull(dto);
+        assertEquals(coord, dto.coord());
+    }
+
+    @Test
     void testToShipDTO_WithNullFleet_ThrowsException() {
         assertThrows(NullPointerException.class,
                 () -> GameDataMapper.toShipDTO(null));
@@ -249,5 +275,23 @@ public class TestGameDataMapper {
         Grid grid = new Grid(5, 5);
         assertThrows(NullPointerException.class,
                 () -> GameDataMapper.toGridUpdateDTO(true, grid, null));
+    }
+
+    @Test
+    void testToGameConfigDTO_WithNullFleetConfiguration_ThrowsException() {
+        assertThrows(NullPointerException.class,
+                () -> GameDataMapper.toGameConfigDTO(10, 10, null));
+    }
+
+    @Test
+    void testToGameStatusDTO_WithNullState_ThrowsException() {
+        assertThrows(NullPointerException.class,
+                () -> GameDataMapper.toGameStatusDTO(null, "Msg"));
+    }
+
+    @Test
+    void testToShotRequestDTO_WithNullCoordinate_ThrowsException() {
+        assertThrows(NullPointerException.class,
+                () -> GameDataMapper.toShotRequestDTO(null));
     }
 }

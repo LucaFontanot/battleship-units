@@ -2,11 +2,14 @@ package battleship.model.converter;
 
 import battleship.model.Grid;
 import battleship.model.Ship;
-import it.units.battleship.data.socket.payloads.GridUpdateDTO;
-import it.units.battleship.data.socket.payloads.ShipDTO;
+import it.units.battleship.Coordinate;
+import it.units.battleship.GameState;
+import it.units.battleship.ShipType;
+import it.units.battleship.data.socket.payloads.*;
 import lombok.NonNull;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -77,5 +80,17 @@ public class GameDataMapper{
         String gridSerialized = grid.gridSerialization();
 
         return new GridUpdateDTO(shotOutcome, gridSerialized, sunkShipsDTO);
+    }
+
+    public static GameConfigDTO toGameConfigDTO(int rows, int cols,@NonNull Map<ShipType, Integer> fleetConfiguration){
+        return new GameConfigDTO(rows, cols, fleetConfiguration);
+    }
+
+    public static GameStatusDTO toGameStatusDTO(@NonNull GameState gameState, String message){
+        return new GameStatusDTO(gameState, message);
+    }
+
+    public static ShotRequestDTO toShotRequestDTO(@NonNull Coordinate coordinate){
+        return  new ShotRequestDTO(coordinate);
     }
 }

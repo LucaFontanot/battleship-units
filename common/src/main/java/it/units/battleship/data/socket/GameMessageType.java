@@ -30,11 +30,6 @@ public enum GameMessageType {
     TURN_CHANGE("turn_change"),
 
     /**
-     * Sent when a win/loss condition is detected to terminate the session.
-     */
-    GAME_OVER("game_over"),
-
-    /**
      * Used for protocol errors or unexpected communication failures.
      */
     ERROR("error");
