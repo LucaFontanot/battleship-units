@@ -247,6 +247,56 @@ public class TestGameDataMapper {
     }
 
     @Test
+    void testToCoordinate() {
+        Coordinate coord = new Coordinate(5, 6);
+        ShotRequestDTO dto = new ShotRequestDTO(coord);
+        Coordinate extracted = GameDataMapper.toCoordinate(dto);
+        assertEquals(coord, extracted);
+    }
+
+    @Test
+    void testToGameState() {
+        GameStatusDTO dto = new GameStatusDTO(GameState.WAITING_FOR_OPPONENT, "Waiting...");
+        assertEquals(GameState.WAITING_FOR_OPPONENT, GameDataMapper.toGameState(dto));
+    }
+
+    @Test
+    void testToMessage() {
+        GameStatusDTO dto = new GameStatusDTO(GameState.ACTIVE_TURN, "Msg");
+        assertEquals("Msg", GameDataMapper.toMessage(dto));
+        assertNull(GameDataMapper.toMessage(null));
+    }
+
+    @Test
+    void testToFleetRules() {
+        Map<ShipType, Integer> rules = Map.of(ShipType.BATTLESHIP, 3);
+        GameConfigDTO dto = new GameConfigDTO(10, 10, rules);
+        assertEquals(rules, GameDataMapper.toFleetRules(dto));
+    }
+
+    @Test
+    void testToRowsAndCols() {
+        GameConfigDTO dto = new GameConfigDTO(8, 12, Map.of());
+        assertEquals(8, GameDataMapper.toRows(dto));
+        assertEquals(12, GameDataMapper.toCols(dto));
+    }
+
+    @Test
+    void testGridUpdateExtraction() {
+        Ship ship = Ship.createShip(new Coordinate(0,0), Orientation.HORIZONTAL_RIGHT, ShipType.FRIGATE, new Grid(10,10));
+        LinkedHashSet<Coordinate> coords = ship.getCoordinates();
+        ShipDTO shipDTO = new ShipDTO(ShipType.FRIGATE, coords, Orientation.HORIZONTAL_RIGHT);
+        GridUpdateDTO dto = new GridUpdateDTO(true, "grid_str", List.of(shipDTO));
+
+        assertEquals(true, GameDataMapper.toShotOutcome(dto));
+        assertEquals("grid_str", GameDataMapper.toGridSerialized(dto));
+
+        List<Ship> extractedShips = GameDataMapper.toShipList(dto);
+        assertEquals(1, extractedShips.size());
+        assertEquals(ShipType.FRIGATE, extractedShips.get(0).getShipType());
+    }
+
+    @Test
     void testToShipDTO_WithNullFleet_ThrowsException() {
         assertThrows(NullPointerException.class,
                 () -> GameDataMapper.toShipDTO(null));
@@ -255,7 +305,7 @@ public class TestGameDataMapper {
     @Test
     void testToShipList_WithNullFleet_ThrowsException() {
         assertThrows(NullPointerException.class,
-                () -> GameDataMapper.toShipList(null));
+                () -> GameDataMapper.toShipList((List<ShipDTO>) null));
     }
 
     @Test

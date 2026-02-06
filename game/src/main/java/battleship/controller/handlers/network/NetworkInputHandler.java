@@ -29,18 +29,17 @@ public class NetworkInputHandler implements CommunicationEvents {
     public void onOpponentGridUpdate(GridUpdateDTO gridUpdateDTO) {
         Logger.log("Grid update");
 
-        List<ShipDTO> fleetDTO = gridUpdateDTO.fleet();
+        List<Ship> fleet = GameDataMapper.toShipList(gridUpdateDTO);
+        String gridSerialized = GameDataMapper.toGridSerialized(gridUpdateDTO);
 
-        List<Ship> fleet = GameDataMapper.toShipList(fleetDTO);
-
-        networkActions.processOpponentGridUpdate(gridUpdateDTO.gridSerialized(), fleet);
+        networkActions.processOpponentGridUpdate(gridSerialized, fleet);
     }
 
     @Override
     public void onShotReceived(ShotRequestDTO shotRequestDTO) {
         Logger.log("Shot received");
 
-        Coordinate shotCoord = shotRequestDTO.coord();
+        Coordinate shotCoord = GameDataMapper.toCoordinate(shotRequestDTO);
         networkActions.processIncomingShot(shotCoord);
     }
 
@@ -51,8 +50,8 @@ public class NetworkInputHandler implements CommunicationEvents {
 
     @Override
     public void onGameStatusReceived(GameStatusDTO gameStatusDTO) {
-        GameState gameState = gameStatusDTO.state();
-        String message = gameStatusDTO.message();
+        GameState gameState = GameDataMapper.toGameState(gameStatusDTO);
+        String message = GameDataMapper.toMessage(gameStatusDTO);
         networkActions.processGameStatusUpdate(gameState, message);
     }
 }

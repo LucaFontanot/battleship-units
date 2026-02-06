@@ -29,11 +29,11 @@ public class GameDataMapper{
      * Converts a list of ShipDTOs into a list of Ship domain objects.
      * Useful when receiving the opponent's fleet configuration or grid updates.
      *
-     * @param dtos The list of DTOs received from the network. Can be null.
-     * @return A list of reconstructed {@link Ship} objects. Returns an empty list if the input is null.
+     * @param dtos The list of DTOs received from the network. Must not be null.
+     * @return A list of reconstructed {@link Ship} objects.
+     * @throws NullPointerException if dtos is null.
      */
     public static List<Ship> toShipList(@NonNull List<ShipDTO> dtos){
-        if (dtos == null) return List.of();
         return dtos.stream().map(GameDataMapper::toShip).collect(Collectors.toList());
     }
 
@@ -92,5 +92,95 @@ public class GameDataMapper{
 
     public static ShotRequestDTO toShotRequestDTO(@NonNull Coordinate coordinate){
         return  new ShotRequestDTO(coordinate);
+    }
+
+    /**
+     * Extracts the coordinate from a ShotRequestDTO.
+     *
+     * @param dto The ShotRequestDTO.
+     * @return The coordinate.
+     */
+    public static Coordinate toCoordinate(@NonNull ShotRequestDTO dto) {
+        return dto.coord();
+    }
+
+    /**
+     * Extracts the GameState from a GameStatusDTO.
+     *
+     * @param dto The GameStatusDTO.
+     * @return The GameState.
+     */
+    public static GameState toGameState(@NonNull GameStatusDTO dto) {
+        return dto.state();
+    }
+
+    /**
+     * Extracts the message from a GameStatusDTO.
+     *
+     * @param dto The GameStatusDTO.
+     * @return The message.
+     */
+    public static String toMessage(GameStatusDTO dto) {
+        return dto == null ? null : dto.message();
+    }
+
+    /**
+     * Extracts the fleet configuration rules from a GameConfigDTO.
+     *
+     * @param dto The GameConfigDTO.
+     * @return A map of ship types and their required counts.
+     */
+    public static Map<ShipType, Integer> toFleetRules(@NonNull GameConfigDTO dto) {
+        return dto.fleetRules();
+    }
+
+    /**
+     * Extracts the number of rows from a GameConfigDTO.
+     *
+     * @param dto The GameConfigDTO.
+     * @return The number of rows.
+     */
+    public static int toRows(@NonNull GameConfigDTO dto) {
+        return dto.rows();
+    }
+
+    /**
+     * Extracts the number of columns from a GameConfigDTO.
+     *
+     * @param dto The GameConfigDTO.
+     * @return The number of columns.
+     */
+    public static int toCols(@NonNull GameConfigDTO dto) {
+        return dto.cols();
+    }
+
+    /**
+     * Extracts the serialized grid string from a GridUpdateDTO.
+     *
+     * @param dto The GridUpdateDTO.
+     * @return The serialized grid.
+     */
+    public static String toGridSerialized(@NonNull GridUpdateDTO dto) {
+        return dto.gridSerialized();
+    }
+
+    /**
+     * Converts the list of ShipDTOs inside a GridUpdateDTO into a list of Ship domain objects.
+     *
+     * @param dto The GridUpdateDTO.
+     * @return A list of {@link Ship} objects.
+     */
+    public static List<Ship> toShipList(@NonNull GridUpdateDTO dto) {
+        return toShipList(dto.fleet());
+    }
+
+    /**
+     * Extracts the shot outcome from a GridUpdateDTO.
+     *
+     * @param dto The GridUpdateDTO.
+     * @return True if the shot was a hit, false otherwise.
+     */
+    public static boolean toShotOutcome(@NonNull GridUpdateDTO dto) {
+        return dto.shotOutcome();
     }
 }
