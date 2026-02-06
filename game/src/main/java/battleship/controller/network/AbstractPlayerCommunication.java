@@ -1,4 +1,4 @@
-package battleship.controller.handlers;
+package battleship.controller.network;
 
 import it.units.battleship.data.socket.GameMessageType;
 import it.units.battleship.data.socket.payloads.GameConfigDTO;

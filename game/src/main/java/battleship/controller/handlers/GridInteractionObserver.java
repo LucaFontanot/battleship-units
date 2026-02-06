@@ -1,4 +1,4 @@
-package battleship.controller;
+package battleship.controller.handlers;
 
 import it.units.battleship.Coordinate;
 

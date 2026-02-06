@@ -1,12 +1,10 @@
 package battleship.view.setup;
 
-import battleship.controller.GridInteractionObserver;
+import battleship.controller.handlers.GridInteractionObserver;
 import battleship.view.grid.GridUI;
-import it.units.battleship.Logger;
 import it.units.battleship.Orientation;
 import it.units.battleship.ShipType;
 import lombok.Getter;
-import lombok.extern.java.Log;
 
 import javax.swing.*;
 import java.awt.*;

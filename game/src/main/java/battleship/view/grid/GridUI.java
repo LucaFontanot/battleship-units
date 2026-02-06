@@ -1,13 +1,12 @@
 package battleship.view.grid;
 
-import battleship.controller.GridInteractionObserver;
+import battleship.controller.handlers.GridInteractionObserver;
 import battleship.model.CellState;
 import battleship.model.Ship;
 import battleship.view.setup.PlacementContext;
 import battleship.view.utils.TextureLoader;
 import it.units.battleship.Coordinate;
 import it.units.battleship.Logger;
-import it.units.battleship.Orientation;
 import it.units.battleship.ShipType;
 import lombok.Getter;
 import lombok.NonNull;

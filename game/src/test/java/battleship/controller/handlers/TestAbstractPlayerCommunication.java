@@ -1,5 +1,7 @@
 package battleship.controller.handlers;
 
+import battleship.controller.network.AbstractPlayerCommunication;
+import battleship.controller.network.CommunicationEvents;
 import it.units.battleship.GameState;
 import it.units.battleship.data.socket.GameMessageType;
 import it.units.battleship.data.socket.payloads.GameConfigDTO;
@@ -9,7 +11,6 @@ import it.units.battleship.data.socket.payloads.ShotRequestDTO;
 import it.units.battleship.Coordinate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import java.util.List;
 import java.util.Map;

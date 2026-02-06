@@ -1,4 +1,4 @@
-package battleship.controller.handlers;
+package battleship.controller.network;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;

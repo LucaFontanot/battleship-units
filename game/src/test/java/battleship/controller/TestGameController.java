@@ -1,6 +1,6 @@
 package battleship.controller;
 
-import battleship.controller.handlers.AbstractPlayerCommunication;
+import battleship.controller.network.AbstractPlayerCommunication;
 import battleship.model.FleetManager;
 import battleship.model.Grid;
 import battleship.model.Ship;

@@ -1,7 +1,6 @@
 package battleship.view;
 
-import battleship.controller.GridInteractionObserver;
-import battleship.model.FleetManager;
+import battleship.controller.handlers.GridInteractionObserver;
 import battleship.model.Ship;
 import battleship.view.grid.GridUI;
 import it.units.battleship.Coordinate;
@@ -14,7 +13,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import battleship.view.setup.SetupPanel;
 
-import javax.swing.*;
 import java.awt.*;
 import java.util.Map;
 
