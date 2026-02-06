@@ -1,5 +1,6 @@
 package battleship.controller;
 
+import battleship.controller.handlers.network.NetworkInputHandler;
 import battleship.controller.network.AbstractPlayerCommunication;
 import battleship.model.FleetManager;
 import battleship.model.Grid;
@@ -39,9 +40,12 @@ public class TestGameController {
 
     private GameController gameController;
 
+    private NetworkInputHandler networkInputHandler;
+
     @BeforeEach
     void setup() {
         gameController = new GameController(mockGrid, mockFleetManager, mockCommunication, mockView);
+        networkInputHandler = new NetworkInputHandler(gameController);
     }
 
     @Test
@@ -53,7 +57,7 @@ public class TestGameController {
     @Test
     void testOnOpponentGridUpdate() {
         GridUpdateDTO dto = new GridUpdateDTO(false, "0".repeat(100), List.of());
-        gameController.onOpponentGridUpdate(dto);
+        networkInputHandler.onOpponentGridUpdate(dto);
         verify(mockView).updateOpponentGrid(anyString(), anyList());
     }
 
@@ -68,7 +72,7 @@ public class TestGameController {
         when(mockFleetManager.getFleet()).thenReturn(List.of());
 
         // Act
-        gameController.onShotReceived(shotRequest);
+        networkInputHandler.onShotReceived(shotRequest);
 
         // Assert
         verify(mockFleetManager).handleIncomingShot(coord);
@@ -96,11 +100,20 @@ public class TestGameController {
         when(mockGrid.gridSerialization()).thenReturn("grid");
 
         // Act
-        gameController.onShotReceived(shotRequest);
+        networkInputHandler.onShotReceived(shotRequest);
 
         // Assert
         ArgumentCaptor<GridUpdateDTO> captor = ArgumentCaptor.forClass(GridUpdateDTO.class);
         verify(mockCommunication).sendMessage(eq(GameMessageType.GRID_UPDATE), captor.capture());
         assertEquals(1, captor.getValue().fleet().size());
+    }
+
+    @Test
+    void testProcessGameStatusUpdate() {
+        it.units.battleship.data.socket.payloads.GameStatusDTO statusDTO = new it.units.battleship.data.socket.payloads.GameStatusDTO(it.units.battleship.GameState.GAME_OVER, "Game Over");
+        networkInputHandler.onGameStatusReceived(statusDTO);
+        
+        assertEquals(it.units.battleship.GameState.GAME_OVER, gameController.getGameState());
+        verify(mockView).showEndGamePhase("Game Over");
     }
 }

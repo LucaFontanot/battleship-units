@@ -1,6 +1,6 @@
 package battleship.view.grid;
 
-import battleship.controller.handlers.GridInteractionObserver;
+import battleship.controller.actions.GridInteractionObserver;
 import battleship.model.CellState;
 import battleship.model.Ship;
 import battleship.view.setup.PlacementContext;

@@ -1,9 +1,10 @@
 package battleship.controller;
 
-import battleship.controller.actions.OpponentGridHandler;
-import battleship.controller.actions.PlayerGridHandler;
-import battleship.controller.handlers.GameInteractionFacade;
-import battleship.controller.handlers.GridInteractionObserver;
+import battleship.controller.actions.GameNetworkActions;
+import battleship.controller.handlers.ui.OpponentGridHandler;
+import battleship.controller.handlers.ui.PlayerGridHandler;
+import battleship.controller.actions.GameInteractionFacade;
+import battleship.controller.actions.GridInteractionObserver;
 import battleship.controller.network.AbstractPlayerCommunication;
 import battleship.controller.network.CommunicationEvents;
 import battleship.model.*;
@@ -27,7 +28,7 @@ import java.util.stream.Collectors;
  * Orchestrates the game logic and coordinates communication between the game model,
  * the UI view, and the network communication layer.
  */
-public class GameController implements CommunicationEvents, GameInteractionFacade {
+public class GameController implements GameNetworkActions, GameInteractionFacade {
 
     private final Grid grid;
     private final FleetManager fleetManager;
@@ -46,6 +47,20 @@ public class GameController implements CommunicationEvents, GameInteractionFacad
      */
     GridInteractionObserver playerHandler;
     GridInteractionObserver opponentHandler;
+
+    public GameController(@NonNull Grid grid,@NonNull FleetManager fleetManager,@NonNull AbstractPlayerCommunication communication,@NonNull GameView view) {
+        this.grid = grid;
+        this.communication = communication;
+        this.fleetManager = fleetManager;
+        this.view = view;
+        this.gameState = GameState.SETUP;
+
+        this.opponentHandler = new OpponentGridHandler(this);
+        this.playerHandler = new PlayerGridHandler(this);
+
+        view.setOpponentGridListener(opponentHandler);
+        view.setPlayerGridListener(playerHandler);
+    }
 
     @Override
     public void requestShipPlacement(Coordinate coordinate) {
@@ -131,20 +146,6 @@ public class GameController implements CommunicationEvents, GameInteractionFacad
         }
     }
 
-    public GameController(@NonNull Grid grid,@NonNull FleetManager fleetManager,@NonNull AbstractPlayerCommunication communication,@NonNull GameView view) {
-        this.grid = grid;
-        this.communication = communication;
-        this.fleetManager = fleetManager;
-        this.view = view;
-        this.gameState = GameState.SETUP;
-
-        this.opponentHandler = new OpponentGridHandler(this);
-        this.playerHandler = new PlayerGridHandler(this);
-
-        view.setOpponentGridListener(opponentHandler);
-        view.setPlayerGridListener(playerHandler);
-    }
-
     public void startGame(){
         List<Ship> currentFleet = fleetManager.getFleet();
         Map<ShipType, Integer> shipCounts = currentFleet.stream()
@@ -170,26 +171,7 @@ public class GameController implements CommunicationEvents, GameInteractionFacad
     }
 
     @Override
-    public void onPlayerMessage(String playerName, String message) {
-
-    }
-
-    @Override
-    public void onOpponentGridUpdate(GridUpdateDTO gridUpdateDTO) {
-        Logger.log("Grid update");
-
-        List<ShipDTO> fleetDTO = gridUpdateDTO.fleet();
-
-        List<Ship> fleet = GameDataMapper.toShipList(fleetDTO);
-
-        view.updateOpponentGrid(gridUpdateDTO.gridSerialized(), fleet);
-    }
-
-    @Override
-    public void onShotReceived(ShotRequestDTO shotRequestDTO) {
-        Logger.log("Shot received");
-
-        Coordinate shotCoord = shotRequestDTO.coord();
+    public void processIncomingShot(Coordinate shotCoord) {
         boolean shotOutcome = fleetManager.handleIncomingShot(shotCoord);
         List<Ship> fleet = fleetManager.getFleet();
 
@@ -216,14 +198,14 @@ public class GameController implements CommunicationEvents, GameInteractionFacad
     }
 
     @Override
-    public void onGameSetupReceived(GameConfigDTO gameConfigDTO) {
+    public void processOpponentGridUpdate(String grid, List<Ship> revealedFleet) {
+        view.updateOpponentGrid(grid, revealedFleet);
     }
 
     @Override
-    public void onGameStatusReceived(GameStatusDTO gameStatusDTO) {
-        gameState = gameStatusDTO.state();
-        String message = gameStatusDTO.message();
-        switch (gameState){
+    public void processGameStatusUpdate(GameState newState, String message) {
+        this.gameState = newState;
+        switch (newState){
             case GAME_OVER -> {
                 view.showEndGamePhase(message);
                 view.setPlayerTurn(false);

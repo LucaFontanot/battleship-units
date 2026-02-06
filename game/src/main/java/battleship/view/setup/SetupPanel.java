@@ -1,6 +1,6 @@
 package battleship.view.setup;
 
-import battleship.controller.handlers.GridInteractionObserver;
+import battleship.controller.actions.GridInteractionObserver;
 import battleship.view.grid.GridUI;
 import it.units.battleship.Orientation;
 import it.units.battleship.ShipType;

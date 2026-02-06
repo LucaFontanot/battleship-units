@@ -1,6 +1,6 @@
 package battleship.view;
 
-import battleship.controller.handlers.GridInteractionObserver;
+import battleship.controller.actions.GridInteractionObserver;
 import battleship.model.Ship;
 import battleship.view.grid.GridUI;
 import it.units.battleship.Coordinate;
