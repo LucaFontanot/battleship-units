@@ -1,18 +1,15 @@
 package battleship.controller;
 
-import battleship.controller.actions.GameNetworkActions;
+import battleship.controller.actions.NetworkInputActions;
+import battleship.controller.actions.NetworkOutputActions;
 import battleship.controller.handlers.ui.OpponentGridHandler;
 import battleship.controller.handlers.ui.PlayerGridHandler;
 import battleship.controller.actions.GameInteractionFacade;
 import battleship.controller.actions.GridInteractionObserver;
-import battleship.controller.network.AbstractPlayerCommunication;
-import battleship.controller.network.CommunicationEvents;
 import battleship.model.*;
-import battleship.model.converter.GameDataMapper;
 import battleship.view.GameView;
 import it.units.battleship.*;
 import battleship.model.Ship;
-import it.units.battleship.data.socket.GameMessageType;
 import it.units.battleship.data.socket.payloads.*;
 import lombok.Getter;
 import lombok.NonNull;
@@ -28,7 +25,7 @@ import java.util.stream.Collectors;
  * Orchestrates the game logic and coordinates communication between the game model,
  * the UI view, and the network communication layer.
  */
-public class GameController implements GameNetworkActions, GameInteractionFacade {
+public class GameController implements NetworkInputActions, GameInteractionFacade {
 
     private final Grid grid;
     private final FleetManager fleetManager;
@@ -37,7 +34,7 @@ public class GameController implements GameNetworkActions, GameInteractionFacade
     private GameState gameState;
     private final GameView view;
 
-    private final AbstractPlayerCommunication communication;
+    private final NetworkOutputActions networkOutput;
     /**
      * Handles player interaction events on the game grid during the game lifecycle.
      *
@@ -48,9 +45,9 @@ public class GameController implements GameNetworkActions, GameInteractionFacade
     GridInteractionObserver playerHandler;
     GridInteractionObserver opponentHandler;
 
-    public GameController(@NonNull Grid grid,@NonNull FleetManager fleetManager,@NonNull AbstractPlayerCommunication communication,@NonNull GameView view) {
+    public GameController(@NonNull Grid grid,@NonNull FleetManager fleetManager, NetworkOutputActions networkOutput,@NonNull GameView view) {
         this.grid = grid;
-        this.communication = communication;
+        this.networkOutput = networkOutput;
         this.fleetManager = fleetManager;
         this.view = view;
         this.gameState = GameState.SETUP;
@@ -135,8 +132,7 @@ public class GameController implements GameNetworkActions, GameInteractionFacade
         gameState = GameState.WAITING_FOR_OPPONENT;
 
         view.setPlayerTurn(false);
-        ShotRequestDTO shotRequest = new ShotRequestDTO(coordinate);
-        communication.sendMessage(GameMessageType.SHOT_REQUEST, shotRequest);
+        networkOutput.sendShotRequest(coordinate);
     }
 
     @Override
@@ -175,8 +171,7 @@ public class GameController implements GameNetworkActions, GameInteractionFacade
         boolean shotOutcome = fleetManager.handleIncomingShot(shotCoord);
         List<Ship> fleet = fleetManager.getFleet();
 
-        GridUpdateDTO gridUpdateDTO = GameDataMapper.toGridUpdateDTO(shotOutcome, grid, fleet);
-        communication.sendMessage(GameMessageType.GRID_UPDATE, gridUpdateDTO);
+        networkOutput.sendGridUpdate(grid, fleet, shotOutcome);
 
         String gridSerialized = grid.gridSerialization();
         updatePlayerGrid(gridSerialized, fleetManager.getFleet());
@@ -191,8 +186,8 @@ public class GameController implements GameNetworkActions, GameInteractionFacade
 
     private void handleGameOver() {
         gameState = GameState.GAME_OVER;
-        GameStatusDTO gameStatusDTO = new GameStatusDTO(GameState.GAME_OVER, "You win!");
-        communication.sendMessage(GameMessageType.GAME_OVER, gameStatusDTO);
+        String message = "You win!";
+        networkOutput.sendGameStatus(gameState, message);
         view.showEndGamePhase("You lost! All your ships are sunk.");
         view.setPlayerTurn(false);
     }

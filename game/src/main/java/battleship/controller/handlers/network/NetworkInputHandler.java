@@ -1,6 +1,6 @@
 package battleship.controller.handlers.network;
 
-import battleship.controller.actions.GameNetworkActions;
+import battleship.controller.actions.NetworkInputActions;
 import battleship.controller.network.CommunicationEvents;
 import battleship.model.Ship;
 import battleship.model.converter.GameDataMapper;
@@ -13,9 +13,9 @@ import java.util.List;
 
 public class NetworkInputHandler implements CommunicationEvents {
 
-    private final GameNetworkActions networkActions;
+    private final NetworkInputActions networkActions;
 
-    public NetworkInputHandler(GameNetworkActions networkActions) {
+    public NetworkInputHandler(NetworkInputActions networkActions) {
         this.networkActions = networkActions;
     }
 

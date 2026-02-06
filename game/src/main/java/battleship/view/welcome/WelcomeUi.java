@@ -70,15 +70,7 @@ public class WelcomeUi implements WelcomeUiActions {
 
         GameFrame gameFrame = new GameFrame();
 
-        AbstractPlayerCommunication dummyComm = new AbstractPlayerCommunication() {
-                @Override
-                public void sendMessage(it.units.battleship.data.socket.GameMessageType type, Object payload) {
-                                 // Do nothing in single player
-                                 it.units.battleship.Logger.debug("DummyComm: " + type);
-                }
-        };
-
-        GameController controller = new GameController(playerGrid, fleetManager, dummyComm, gameFrame);
+        GameController controller = new GameController(playerGrid, fleetManager, null, gameFrame);
         gameFrame.open();
         controller.startGame();
     }

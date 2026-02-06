@@ -1,6 +1,8 @@
 package battleship.controller;
 
+import battleship.controller.actions.NetworkOutputActions;
 import battleship.controller.handlers.network.NetworkInputHandler;
+import battleship.controller.handlers.network.NetworkOutputHandler;
 import battleship.controller.network.AbstractPlayerCommunication;
 import battleship.model.FleetManager;
 import battleship.model.Grid;
@@ -42,9 +44,12 @@ public class TestGameController {
 
     private NetworkInputHandler networkInputHandler;
 
+    private NetworkOutputActions networkOutputHandler;
+
     @BeforeEach
     void setup() {
-        gameController = new GameController(mockGrid, mockFleetManager, mockCommunication, mockView);
+        networkOutputHandler = new NetworkOutputHandler(mockCommunication);
+        gameController = new GameController(mockGrid, mockFleetManager, networkOutputHandler, mockView);
         networkInputHandler = new NetworkInputHandler(gameController);
     }
 

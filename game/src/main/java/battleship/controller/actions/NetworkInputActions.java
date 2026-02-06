@@ -6,7 +6,7 @@ import it.units.battleship.GameState;
 
 import java.util.List;
 
-public interface GameNetworkActions {
+public interface NetworkInputActions {
     void processIncomingShot(Coordinate coordinate);
     void processOpponentGridUpdate(String grid, List<Ship> revealedFleet);
     void processGameStatusUpdate(GameState newState, String message);
