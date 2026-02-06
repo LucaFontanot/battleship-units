@@ -35,15 +35,6 @@ public class GameController implements NetworkInputActions, GameInteractionFacad
     private final GameView view;
 
     private final NetworkOutputActions networkOutput;
-    /**
-     * Handles player interaction events on the game grid during the game lifecycle.
-     *
-     * Responsibilities include:
-     * - Responding to hover events on the player's grid during the setup phase.
-     * - Handling click events to place ships during the setup phase.
-     */
-    GridInteractionObserver playerHandler;
-    GridInteractionObserver opponentHandler;
 
     public GameController(@NonNull Grid grid,@NonNull FleetManager fleetManager, NetworkOutputActions networkOutput,@NonNull GameView view) {
         this.grid = grid;
@@ -52,11 +43,8 @@ public class GameController implements NetworkInputActions, GameInteractionFacad
         this.view = view;
         this.gameState = GameState.SETUP;
 
-        this.opponentHandler = new OpponentGridHandler(this);
-        this.playerHandler = new PlayerGridHandler(this);
-
-        view.setOpponentGridListener(opponentHandler);
-        view.setPlayerGridListener(playerHandler);
+        view.setOpponentGridListener(new OpponentGridHandler(this));
+        view.setPlayerGridListener(new PlayerGridHandler(this));
     }
 
     @Override
