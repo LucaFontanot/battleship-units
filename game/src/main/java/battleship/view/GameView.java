@@ -163,4 +163,6 @@ public interface GameView {
      * @param coord the coordinate of the cell targeted by the shot
      */
     void showShotPreview(Coordinate coord);
+
+    void playerErrorSound();
 }

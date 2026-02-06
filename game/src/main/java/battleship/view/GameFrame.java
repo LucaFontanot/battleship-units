@@ -146,6 +146,11 @@ public class GameFrame extends JFrame implements GameView{
 
     }
 
+    @Override
+    public void playerErrorSound() {
+        Toolkit.getDefaultToolkit().beep();
+    }
+
     private void switchPanel(JPanel panel) {
         getContentPane().removeAll();
         add(systemMessage, BorderLayout.NORTH);

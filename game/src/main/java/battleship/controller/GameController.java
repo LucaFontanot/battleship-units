@@ -86,11 +86,11 @@ public class GameController implements NetworkInputActions, GameInteractionFacad
 
                 view.refreshFleetSelection(shipCounts, fleetConfiguration);
             } else {
-                Toolkit.getDefaultToolkit().beep();
+                view.playerErrorSound();
                 view.showPlacementPreview(ship.getCoordinates(), false, ship);
             }
         } catch (IllegalArgumentException ex) {
-            Toolkit.getDefaultToolkit().beep();
+            view.playerErrorSound();
 
             LinkedHashSet<Coordinate> coords = selectedShipType.getShipCoordinates(coordinate,selectedOrientation);
             view.showPlacementPreview(coords, false, null);
