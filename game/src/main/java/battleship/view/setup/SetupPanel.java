@@ -27,7 +27,6 @@ public class SetupPanel extends JPanel implements PlacementContext {
 
     @Getter
     private Orientation selectedOrientation = Orientation.HORIZONTAL_RIGHT;
-    private static final Dimension BUTTON_SIZE = new Dimension(120, 30);
 
     private final Map<ShipType, JButton> shipButtons = new EnumMap<>(ShipType.class);
 
@@ -35,19 +34,21 @@ public class SetupPanel extends JPanel implements PlacementContext {
 
         setLayout(new BorderLayout());
         gridUI = new GridUI(10,10,null, this);
-        shipPalette = new JPanel();
-        shipPalette.setLayout(new BoxLayout(shipPalette, BoxLayout.Y_AXIS));
+        shipPalette = new JPanel(new GridBagLayout());
         shipPalette.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
-        shipPalette.setPreferredSize(new Dimension(160, 0));
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0;
+        gbc.insets = new Insets(0, 0, 10, 0);
 
         for (ShipType type : ShipType.values()) {
             JButton shipButton = new JButton(type.getName());
 
-            shipButton.setPreferredSize(BUTTON_SIZE);
-            shipButton.setMaximumSize(BUTTON_SIZE);
-            shipButton.setMinimumSize(BUTTON_SIZE);
-            shipButton.setAlignmentX(Component.CENTER_ALIGNMENT);
             shipButton.setFocusPainted(false);
+            shipButton.setMargin(new Insets(8, 15, 8, 15));
 
             shipButton.addActionListener(e -> {
                 selectedShipType = type;
@@ -57,17 +58,14 @@ public class SetupPanel extends JPanel implements PlacementContext {
 
             shipButtons.put(type, shipButton);
 
-            shipPalette.add(shipButton);
-            shipPalette.add(Box.createVerticalStrut(10));
+            shipPalette.add(shipButton, gbc);
+            gbc.gridy++;
         }
 
         JButton rotateButton = new JButton("Rotate");
 
-        rotateButton.setPreferredSize(BUTTON_SIZE);
-        rotateButton.setMaximumSize(BUTTON_SIZE);
-        rotateButton.setMinimumSize(BUTTON_SIZE);
-        rotateButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         rotateButton.setFocusPainted(false);
+        rotateButton.setMargin(new Insets(8, 15, 8, 15));
 
         rotateButton.addActionListener(e -> {
             Orientation[] values = Orientation.values();
@@ -75,8 +73,14 @@ public class SetupPanel extends JPanel implements PlacementContext {
             selectedOrientation = values[(index + 1) % values.length];
         });
 
-        shipPalette.add(Box.createVerticalStrut(20));
-        shipPalette.add(rotateButton);
+        gbc.insets = new Insets(10, 0, 0, 0);
+        shipPalette.add(rotateButton, gbc);
+
+        // spacer to push buttons to the top
+        gbc.gridy++;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
+        shipPalette.add(Box.createGlue(), gbc);
 
         add(shipPalette, BorderLayout.WEST);
         JPanel gridWrapper = new JPanel(new GridBagLayout());
@@ -125,13 +129,13 @@ public class SetupPanel extends JPanel implements PlacementContext {
             int total = fleetConfiguration.getOrDefault(type, 0);
             int remaining = total - placed;
 
+            button.setText(type.getName() + " (" + remaining + "/" + total + ")");
+            button.setEnabled(remaining > 0);
+
             if (placed < total){
                 isFleetComplete = false;
                 continue;
             }
-
-            button.setText(type.getName() + " (" + remaining + "/" + total + ")");
-            button.setEnabled(remaining > 0);
 
             if (selectedShipType == type && remaining <= 0) {
                 clearShipSelection();

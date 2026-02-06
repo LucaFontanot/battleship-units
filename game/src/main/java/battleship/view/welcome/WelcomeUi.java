@@ -48,7 +48,6 @@ public class WelcomeUi implements WelcomeUiActions {
         frame.setContentPane(this.$$$getRootComponent$$$());
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.pack();
-        frame.setSize(600, 400);
         frame.setVisible(true);
         frame.setLocationRelativeTo(null);
     }

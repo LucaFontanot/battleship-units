@@ -59,7 +59,6 @@ public class GameFrame extends JFrame implements GameView{
         currentPanel = setupPanel;
 
         pack();
-        setSize(650, 550);
         setLocationRelativeTo(null);
     }
 
