@@ -37,7 +37,9 @@ public interface TurnState {
     default void handleIncomingShot(TurnManager manager, Coordinate coordinate){}
 
     /**Handle update for the opponent's grid.*/
-    default void handleOpponentGridUpdate(TurnManager manager, String grid, List<Ship> fleet){}
+    default void handleOpponentGridUpdate(TurnManager manager, String grid, List<Ship> fleet){
+        manager.getView().updateOpponentGrid(grid, fleet);
+    }
 
     /**Return the name of the state.*/
     String getStateName();
