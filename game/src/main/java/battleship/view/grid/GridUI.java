@@ -36,20 +36,14 @@ public class GridUI extends JPanel implements CellInteractionListener {
     final int rows;
     private CellPanel[][] cells;
 
-    private final PlacementContext placementContext;
-
     @Setter
     private GridInteractionObserver observer;
 
     public GridUI(int rows,
-                  int cols,
-                  GridInteractionObserver observer,
-                  PlacementContext placementContext) {
+                  int cols) {
         this.cols = cols;
         this.rows = rows;
 
-        this.observer = observer;
-        this.placementContext = placementContext;
         setLayout(new GridLayout(rows, cols, 0, 0));
         cells = new CellPanel[rows][cols];
         for (int r = 0; r < rows; r++) {
@@ -145,14 +139,10 @@ public class GridUI extends JPanel implements CellInteractionListener {
         clearPlacementPreview();
     }
 
+
     @Override
     public void onCellClicked(Coordinate coordinate) {
-        ShipType selectedShipType = placementContext.getSelectedShipType();
-
-        if (selectedShipType == null) {
-            Toolkit.getDefaultToolkit().beep();
-            return;
-        }
+        Logger.debug("GridUI::onCellClicked - Coordinate: " + coordinate);
         if (observer == null) return;
         observer.onGridClick(coordinate);
     }

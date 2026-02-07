@@ -26,35 +26,29 @@ import java.util.Map;
  *  - Delegates specific rendering tasks to specialized components.
  *  - Manages the high-level layout of the application.
  */
-public class GameFrame extends JFrame implements GameView{
+public class GameFrame extends JFrame implements GameView {
     @Getter
     private final GridUI playerGridUI;
     @Getter
     private final GridUI opponentGridUI;
 
-    private SetupPanel setupPanel;
     private JPanel currentPanel;
     private GridInteractionObserver observer;
 
     private final JLabel systemMessage = new JLabel(" ");
 
     public GameFrame() {
-        this.playerGridUI = new GridUI(10,10,null,null);
-        this.opponentGridUI = new GridUI(10,10,null,null);
+        this.playerGridUI = new GridUI(10,10);
+        this.opponentGridUI = new GridUI(10,10);
 
         setTitle("Battleship");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        setupPanel = new SetupPanel();
-
         systemMessage.setBorder(BorderFactory.createEmptyBorder(20, 20, 0, 0));
         systemMessage.setVerticalAlignment(SwingConstants.CENTER);
 
         add(systemMessage, BorderLayout.NORTH);
-        add(setupPanel, BorderLayout.CENTER);
-
-        currentPanel = setupPanel;
 
         pack();
         setLocationRelativeTo(null);
@@ -62,9 +56,6 @@ public class GameFrame extends JFrame implements GameView{
 
     @Override
     public void updatePlayerGrid(String gridSerialized, List<Ship> fleetToRender) {
-        if (currentPanel instanceof SetupPanel setup) {
-            setup.getGridUI().displayData(gridSerialized, fleetToRender);
-        }
         this.playerGridUI.displayData(gridSerialized, fleetToRender);
     }
 
@@ -81,7 +72,6 @@ public class GameFrame extends JFrame implements GameView{
     @Override
     public void setPlayerGridListener(GridInteractionObserver observer) {
         playerGridUI.setObserver(observer);
-        setupPanel.getGridUI().setObserver(observer);
     }
 
     @Override
@@ -91,28 +81,12 @@ public class GameFrame extends JFrame implements GameView{
 
     @Override
     public void refreshFleetSelection(Map<ShipType, Integer> shipCounts, Map<ShipType, Integer> fleetConfiguration) {
-        setupPanel.updateShipButtons(shipCounts, fleetConfiguration);
-    }
 
-    @Override
-    public Orientation getSelectedOrientation() {
-        return setupPanel.getSelectedOrientation();
-    }
-
-    @Override
-    public ShipType getSelectedShipType() {
-        return setupPanel.getSelectedShipType();
     }
 
     @Override
     public void open() {
         setVisible(true);
-    }
-
-    @Override
-    public void showSetupPhase() {
-        switchPanel(setupPanel);
-        systemMessage.setText("Setup phase: place your ships.");
     }
 
     @Override
@@ -132,13 +106,6 @@ public class GameFrame extends JFrame implements GameView{
 
     @Override
     public void setPlayerTurn(boolean isPlayerTurn) {
-    }
-
-    @Override
-    public void showPlacementPreview(LinkedHashSet<Coordinate> coord, boolean validShip, Ship ship) {
-        if (currentPanel instanceof SetupPanel setup) {
-            setup.getGridUI().showPlacementPreview(coord, validShip, ship);
-        }
     }
 
     @Override

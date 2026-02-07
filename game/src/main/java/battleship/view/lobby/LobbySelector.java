@@ -1,6 +1,7 @@
 package battleship.view.lobby;
 
 import battleship.controller.lobby.LobbyController;
+import battleship.controller.network.NetworkClient;
 import com.google.gson.Gson;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
@@ -20,6 +21,7 @@ import java.util.Locale;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 public class LobbySelector {
     private JFrame frame;
@@ -32,7 +34,7 @@ public class LobbySelector {
 
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
-    public LobbySelector(LobbyController controller) {
+    public LobbySelector(LobbyController controller, Consumer<NetworkClient> onLobbyJoin) {
         this.controller = controller;
 
         createLobbyButton.addActionListener(e -> {

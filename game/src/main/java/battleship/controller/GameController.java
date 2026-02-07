@@ -1,13 +1,16 @@
 package battleship.controller;
 
 import battleship.controller.actions.NetworkInputActions;
-import battleship.controller.actions.NetworkOutputActions;
 import battleship.controller.handlers.ui.OpponentGridHandler;
 import battleship.controller.handlers.ui.PlayerGridHandler;
 import battleship.controller.actions.GameInteractionFacade;
-import battleship.controller.actions.GridInteractionObserver;
+import battleship.controller.network.AbstractPlayerCommunication;
+import battleship.controller.network.CommunicationEvents;
+import battleship.controller.setup.SetupController;
 import battleship.model.*;
+import battleship.view.GameFrame;
 import battleship.view.GameView;
+import battleship.view.setup.SetupPanel;
 import it.units.battleship.*;
 import battleship.model.Ship;
 import it.units.battleship.data.socket.payloads.*;
@@ -27,110 +30,54 @@ import java.util.stream.Collectors;
  */
 public class GameController implements NetworkInputActions, GameInteractionFacade {
 
+    @Getter
     private final Grid grid;
+    @Getter
     private final FleetManager fleetManager;
 
     @Getter
     private GameState gameState;
-    private final GameView view;
+    private final GameView view = new GameFrame();
+    private final AbstractPlayerCommunication communication;
 
-    private final NetworkOutputActions networkOutput;
+    public GameController(@NonNull Grid grid, @NonNull FleetManager fleetManager, AbstractPlayerCommunication communication) {
 
-    public GameController(@NonNull Grid grid,@NonNull FleetManager fleetManager, NetworkOutputActions networkOutput,@NonNull GameView view) {
         this.grid = grid;
-        this.networkOutput = networkOutput;
         this.fleetManager = fleetManager;
-        this.view = view;
-        this.gameState = GameState.SETUP;
+        this.communication = communication;
+        this.gameState = GameState.WAITING_FOR_SETUP;
 
         view.setOpponentGridListener(new OpponentGridHandler(this));
         view.setPlayerGridListener(new PlayerGridHandler(this));
     }
 
     @Override
-    public void requestShipPlacement(Coordinate coordinate) {
-        if (gameState == GameState.SETUP){
-            handleSetupClick(coordinate);
-        }
-    }
-
-    private void handleSetupClick(Coordinate coordinate){
-        Orientation selectedOrientation = view.getSelectedOrientation();
-        ShipType selectedShipType = view.getSelectedShipType();
-
-        if (selectedShipType == null) return;
-
-        try {
-            Ship ship = Ship.createShip(coordinate, selectedOrientation, selectedShipType, fleetManager.getGrid());
-            boolean placed = fleetManager.addShip(ship);
-
-            if (placed) {
-                List<Ship> currentFleet = fleetManager.getFleet();
-
-                view.updatePlayerGrid(GridMapper.serialize(grid.getGrid()), currentFleet);
-
-                Map<ShipType, Integer> shipCounts = fleetManager.getPlacedCounts();
-                Map<ShipType, Integer> fleetConfiguration = fleetManager.getRequiredFleetConfiguration();
-
-                view.refreshFleetSelection(shipCounts, fleetConfiguration);
-            } else {
-                view.playerErrorSound();
-                view.showPlacementPreview(ship.getCoordinates(), false, ship);
-            }
-        } catch (IllegalArgumentException ex) {
-            view.playerErrorSound();
-
-            LinkedHashSet<Coordinate> coords = selectedShipType.getShipCoordinates(coordinate,selectedOrientation);
-            view.showPlacementPreview(coords, false, null);
-        }
-    }
-
-    @Override
-    public void requestPlacementPreview(Coordinate coordinate) {
-        if (gameState == GameState.SETUP){
-            handleSetupHover(coordinate);
-        }
-    }
-
-    private void handleSetupHover(Coordinate coordinate){
-        Orientation selectedOrientation = view.getSelectedOrientation();
-        ShipType selectedShipType = view.getSelectedShipType();
-
-        if (selectedShipType == null) return;
-        try {
-            Ship ship = Ship.createShip(coordinate, selectedOrientation, selectedShipType, fleetManager.getGrid());
-            boolean valid = fleetManager.canPlaceShip(ship);
-
-            view.showPlacementPreview(ship.getCoordinates(), valid, ship);
-
-        } catch (IllegalArgumentException ex) {
-            LinkedHashSet<Coordinate> coords = selectedShipType.getShipCoordinates(coordinate, selectedOrientation);
-            view.showPlacementPreview(coords, false, null);
-        }
-    }
-
-    @Override
     public void requestShot(Coordinate coordinate) {
-        if(gameState == GameState.ACTIVE_TURN){
+        if (gameState == GameState.ACTIVE_TURN) {
             handleOpponentGridClick(coordinate);
         }
     }
 
-    private void handleOpponentGridClick(Coordinate coordinate){
+    private void handleOpponentGridClick(Coordinate coordinate) {
         gameState = GameState.WAITING_FOR_OPPONENT;
 
         view.setPlayerTurn(false);
-        networkOutput.sendShotRequest(coordinate);
+        communication.sendShotRequest(coordinate);
     }
 
     @Override
     public void previewShot(Coordinate coordinate) {
-        if (gameState == GameState.ACTIVE_TURN){
+        if (gameState == GameState.ACTIVE_TURN) {
             view.showShotPreview(coordinate);
         }
     }
 
-    public void startGame(){
+    public void setupGame(){
+        SetupController setupController = new SetupController(this);
+        setupController.startSetup();
+    }
+
+    public void startGame() {
         List<Ship> currentFleet = fleetManager.getFleet();
         Map<ShipType, Integer> shipCounts = currentFleet.stream()
                 .collect(Collectors.groupingBy(
@@ -147,8 +94,8 @@ public class GameController implements NetworkInputActions, GameInteractionFacad
      *
      * @param gridSerialized A serialized string representation of the grid containing the current state
      *                       (e.g., hits, misses, empty cells).
-     * @param shipFleet The list of ships composing the player's fleet, which will be rendered on the grid
-     *                  along with their statuses (e.g., sunk, damaged).
+     * @param shipFleet      The list of ships composing the player's fleet, which will be rendered on the grid
+     *                       along with their statuses (e.g., sunk, damaged).
      */
     public void updatePlayerGrid(String gridSerialized, List<Ship> shipFleet) {
         view.updatePlayerGrid(gridSerialized, shipFleet);
@@ -159,7 +106,7 @@ public class GameController implements NetworkInputActions, GameInteractionFacad
         boolean shotOutcome = fleetManager.handleIncomingShot(shotCoord);
         List<Ship> fleet = fleetManager.getFleet();
 
-        networkOutput.sendGridUpdate(grid, fleet, shotOutcome);
+        communication.sendGridUpdate(grid, fleet, shotOutcome);
 
         String gridSerialized = GridMapper.serialize(grid.getGrid());
         updatePlayerGrid(gridSerialized, fleetManager.getFleet());
@@ -175,7 +122,7 @@ public class GameController implements NetworkInputActions, GameInteractionFacad
     private void handleGameOver() {
         gameState = GameState.GAME_OVER;
         String message = "You win!";
-        networkOutput.sendGameStatus(gameState, message);
+        communication.sendGameStatus(gameState, message);
         view.showEndGamePhase("You lost! All your ships are sunk.");
         view.setPlayerTurn(false);
     }
@@ -188,7 +135,7 @@ public class GameController implements NetworkInputActions, GameInteractionFacad
     @Override
     public void processGameStatusUpdate(GameState newState, String message) {
         this.gameState = newState;
-        switch (newState){
+        switch (newState) {
             case GAME_OVER -> {
                 view.showEndGamePhase(message);
                 view.setPlayerTurn(false);

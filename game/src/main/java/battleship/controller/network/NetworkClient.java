@@ -66,7 +66,8 @@ public class NetworkClient extends AbstractPlayerCommunication{
 
             @Override
             public void onMessage(@NonNull WebSocket webSocket, @NonNull ByteString bytes) {
-                    Logger.warn("Received unexpected binary message: " + bytes.hex());
+                Logger.warn("Received unexpected binary message: " + bytes.hex());
+                handleIncomingMessage(bytes.utf8());
             }
 
             @Override

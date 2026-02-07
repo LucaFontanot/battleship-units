@@ -1,10 +1,17 @@
 package battleship.controller.network;
 
+import battleship.controller.actions.NetworkOutputActions;
+import battleship.model.Grid;
+import battleship.model.Ship;
+import battleship.model.converter.GameDataMapper;
+import it.units.battleship.Coordinate;
+import it.units.battleship.GameState;
 import it.units.battleship.data.socket.GameMessageType;
 import it.units.battleship.data.socket.payloads.GameConfigDTO;
 import it.units.battleship.data.socket.payloads.GameStatusDTO;
 import it.units.battleship.data.socket.payloads.GridUpdateDTO;
 import it.units.battleship.data.socket.payloads.ShotRequestDTO;
+import lombok.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +19,7 @@ import java.util.List;
 /**
  * Abstract class for player communication handling.
  */
-public abstract class AbstractPlayerCommunication implements CommunicationEvents{
+public abstract class AbstractPlayerCommunication implements CommunicationEvents, NetworkOutputActions {
     final List<CommunicationEvents> communicationEventsListeners = new ArrayList<>();
 
     /**
@@ -67,4 +74,22 @@ public abstract class AbstractPlayerCommunication implements CommunicationEvents
     }
 
     public abstract <T> void sendMessage(GameMessageType type, T payload);
+
+    @Override
+    public void sendGameStatus(@NonNull GameState gameState, String message) {
+        GameStatusDTO gameStatusDTO = GameDataMapper.toGameStatusDTO(gameState, message);
+        sendMessage(GameMessageType.TURN_CHANGE, gameStatusDTO);
+    }
+
+    @Override
+    public void sendShotRequest(Coordinate coordinate) {
+        ShotRequestDTO shotRequestDTO = GameDataMapper.toShotRequestDTO(coordinate);
+        sendMessage(GameMessageType.SHOT_REQUEST, shotRequestDTO);
+    }
+
+    @Override
+    public void sendGridUpdate(Grid grid, List<Ship> fleet, boolean shotOutcome) {
+        GridUpdateDTO gridUpdateDTO = GameDataMapper.toGridUpdateDTO(shotOutcome, grid, fleet);
+        sendMessage(GameMessageType.GRID_UPDATE, gridUpdateDTO);
+    }
 }

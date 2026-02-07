@@ -1,7 +1,11 @@
 package battleship.view.setup;
 
+import battleship.controller.GameController;
 import battleship.controller.actions.GridInteractionObserver;
+import battleship.model.Ship;
 import battleship.view.grid.GridUI;
+import it.units.battleship.Coordinate;
+import it.units.battleship.Logger;
 import it.units.battleship.Orientation;
 import it.units.battleship.ShipType;
 import lombok.Getter;
@@ -9,9 +13,11 @@ import lombok.Getter;
 import javax.swing.*;
 import java.awt.*;
 import java.util.EnumMap;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 
-public class SetupPanel extends JPanel implements PlacementContext {
+public class SetupPanel extends JPanel implements PlacementContext, SetupView {
 
     @Getter
     private final GridUI gridUI;
@@ -20,7 +26,7 @@ public class SetupPanel extends JPanel implements PlacementContext {
 
     @Getter
     private ShipType selectedShipType = null;
-    private JButton selectedShipButton = null;
+
     private JButton nextButton;
 
     @Getter
@@ -28,10 +34,10 @@ public class SetupPanel extends JPanel implements PlacementContext {
 
     private final Map<ShipType, JButton> shipButtons = new EnumMap<>(ShipType.class);
 
-    public SetupPanel() {
+    public SetupPanel(GameController controller) {
 
         setLayout(new BorderLayout());
-        gridUI = new GridUI(10,10,null, this);
+        gridUI = new GridUI(controller.getGrid().getRow(), controller.getGrid().getCol());
         shipPalette = new JPanel(new GridBagLayout());
         shipPalette.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
 
@@ -50,7 +56,6 @@ public class SetupPanel extends JPanel implements PlacementContext {
 
             shipButton.addActionListener(e -> {
                 selectedShipType = type;
-                selectedShipButton = shipButton;
                 highlightSelectedShipButton(shipButton);
             });
 
@@ -100,6 +105,38 @@ public class SetupPanel extends JPanel implements PlacementContext {
         add(bottomBar, BorderLayout.SOUTH);
     }
 
+    @Override
+    public void showPlacementPreview(LinkedHashSet<Coordinate> coord, boolean validShip, Ship ship) {
+        getGridUI().showPlacementPreview(coord, validShip, ship);
+    }
+
+    @Override
+    public void playerErrorSound() {
+        Toolkit.getDefaultToolkit().beep();
+    }
+
+    @Override
+    public void open() {
+        JFrame frame = new JFrame("Battleship Setup");
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setContentPane(this);
+        frame.pack();
+        frame.setSize(new Dimension(800, 600));
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+    }
+
+    @Override
+    public void updateSetupGrid(String gridSerialized, List<Ship> fleetToRender) {
+        getGridUI().displayData(gridSerialized, fleetToRender);
+    }
+
+    @Override
+    public void setObserver(GridInteractionObserver observer) {
+        Logger.debug("SetupPanel::setObserver");
+        getGridUI().setObserver(observer);
+    }
+
     public void setGridInputListener(GridInteractionObserver observer){
         if (gridUI != null){
             gridUI.setObserver(observer);
@@ -114,6 +151,8 @@ public class SetupPanel extends JPanel implements PlacementContext {
         }
         selected.setBorder(BorderFactory.createLineBorder(Color.GREEN, 2));
     }
+
+
 
     public void updateShipButtons(Map<ShipType, Integer> placedShip,
                                   Map<ShipType, Integer> fleetConfiguration) {
@@ -149,7 +188,6 @@ public class SetupPanel extends JPanel implements PlacementContext {
 
     private void clearShipSelection() {
         selectedShipType = null;
-        selectedShipButton = null;
         for (JButton btn : shipButtons.values()) {
             btn.setBorder(UIManager.getBorder("Button.border"));
         }

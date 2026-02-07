@@ -2,23 +2,21 @@ package battleship.view.welcome;
 
 import battleship.controller.GameController;
 import battleship.controller.lobby.LobbyController;
-import battleship.controller.network.AbstractPlayerCommunication;
 import battleship.model.FleetManager;
 import battleship.model.Grid;
 
 import battleship.view.lobby.LobbySelector;
 import battleship.view.utils.ImageLoader;
 import battleship.view.utils.ThemeSelector;
-import battleship.view.GameFrame;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
 import it.units.battleship.Logger;
-import it.units.battleship.ShipType;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Map;
+
+import static it.units.battleship.Defaults.*;
 
 public class WelcomeUi implements WelcomeUiActions {
     final JFrame frame = new JFrame("Battleship - Welcome");
@@ -62,23 +60,12 @@ public class WelcomeUi implements WelcomeUiActions {
     @Override
     public void onSinglePlayerSelected() {
         dispose();
-        Grid playerGrid = new Grid(10, 10);
+        Grid playerGrid = new Grid(GRID_ROWS, GRID_COLS);
+        FleetManager fleetManager = new FleetManager(playerGrid, FLEET_CONFIGURATION);
 
-        Map<ShipType, Integer> fleetConfiguration = Map.of(
-                ShipType.DESTROYER, 2,
-                ShipType.FRIGATE, 2,
-                ShipType.CRUISER, 1,
-                ShipType.BATTLESHIP, 1,
-                ShipType.CARRIER, 1
-        );
-
-        FleetManager fleetManager = new FleetManager(playerGrid, fleetConfiguration);
-
-        GameFrame gameFrame = new GameFrame();
-
-        GameController controller = new GameController(playerGrid, fleetManager, null, gameFrame);
-        gameFrame.open();
-        controller.startGame();
+        // Todo, instead of null, we should put the single player abstract communication handler
+        GameController controller = new GameController(playerGrid, fleetManager, null);
+        controller.setupGame();
     }
 
 
@@ -90,7 +77,13 @@ public class WelcomeUi implements WelcomeUiActions {
     @Override
     public void onOnlineMultiplayerSelected() {
         dispose();
-        LobbySelector lobbySelector = new LobbySelector(new LobbyController());
+        LobbySelector lobbySelector = new LobbySelector(new LobbyController(), (client) -> {
+            Logger.debug("WelcomeUI::LobbySelected - Client ready for online multiplayer");
+            Grid playerGrid = new Grid(GRID_ROWS, GRID_COLS);
+            FleetManager fleetManager = new FleetManager(playerGrid, FLEET_CONFIGURATION);
+            GameController controller = new GameController(playerGrid, fleetManager, client);
+            controller.setupGame();
+        });
         lobbySelector.show();
     }
 

@@ -2,14 +2,13 @@ package battleship.controller;
 
 import battleship.controller.actions.NetworkOutputActions;
 import battleship.controller.handlers.network.NetworkInputHandler;
-import battleship.controller.handlers.network.NetworkOutputHandler;
 import battleship.controller.network.AbstractPlayerCommunication;
 import battleship.model.FleetManager;
 import battleship.model.Grid;
 import battleship.model.Ship;
 import battleship.view.GameView;
 import it.units.battleship.Coordinate;
-import it.units.battleship.GridMapper;
+import it.units.battleship.GameState;
 import it.units.battleship.data.socket.GameMessageType;
 import it.units.battleship.data.socket.payloads.GridUpdateDTO;
 import it.units.battleship.data.socket.payloads.ShotRequestDTO;
@@ -49,15 +48,15 @@ public class TestGameController {
 
     @BeforeEach
     void setup() {
-        networkOutputHandler = new NetworkOutputHandler(mockCommunication);
-        gameController = new GameController(mockGrid, mockFleetManager, networkOutputHandler, mockView);
+        //networkOutputHandler = new NetworkOutputHandler(mockCommunication);
+        //gameController = new GameController(mockGrid, mockFleetManager, networkOutputHandler, mockView);
         networkInputHandler = new NetworkInputHandler(gameController);
     }
 
     @Test
     void testInitialization() {
         assertNotNull(gameController, "Game controller was not initialized correctly.");
-        assertEquals(it.units.battleship.GameState.SETUP, gameController.getGameState());
+        assertEquals(GameState.WAITING_FOR_SETUP, gameController.getGameState());
     }
 
     @Test
