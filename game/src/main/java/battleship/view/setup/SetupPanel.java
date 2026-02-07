@@ -2,8 +2,11 @@ package battleship.view.setup;
 
 import battleship.controller.GameController;
 import battleship.controller.actions.GridInteractionObserver;
+import battleship.controller.setup.SetupGridHandler;
+import battleship.controller.setup.SetupInteractionFacade;
 import battleship.model.Ship;
 import battleship.view.grid.GridUI;
+import battleship.view.utils.DimensionsUtils;
 import it.units.battleship.Coordinate;
 import it.units.battleship.Logger;
 import it.units.battleship.Orientation;
@@ -19,6 +22,8 @@ import java.util.Map;
 
 public class SetupPanel extends JPanel implements PlacementContext, SetupView {
 
+    JFrame mainFrame;
+
     @Getter
     private final GridUI gridUI;
 
@@ -33,6 +38,8 @@ public class SetupPanel extends JPanel implements PlacementContext, SetupView {
     private Orientation selectedOrientation = Orientation.HORIZONTAL_RIGHT;
 
     private final Map<ShipType, JButton> shipButtons = new EnumMap<>(ShipType.class);
+
+    private SetupGridHandler observer;
 
     public SetupPanel(GameController controller) {
 
@@ -98,7 +105,8 @@ public class SetupPanel extends JPanel implements PlacementContext, SetupView {
         nextButton.setFocusPainted(false);
 
         nextButton.addActionListener(e -> {
-            // TODO
+            observer.requestSetupCompletion();
+            dispose();
         });
 
         bottomBar.add(nextButton);
@@ -117,13 +125,19 @@ public class SetupPanel extends JPanel implements PlacementContext, SetupView {
 
     @Override
     public void open() {
-        JFrame frame = new JFrame("Battleship Setup");
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setContentPane(this);
-        frame.pack();
-        frame.setSize(new Dimension(800, 600));
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
+        mainFrame = new JFrame("Battleship Setup");
+        mainFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        mainFrame.setContentPane(this);
+        mainFrame.pack();
+        mainFrame.setSize(DimensionsUtils.getScaledDimensions(800, 600));
+        mainFrame.setLocationRelativeTo(null);
+        mainFrame.setVisible(true);
+    }
+
+    void dispose() {
+        if (mainFrame != null) {
+            mainFrame.dispose();
+        }
     }
 
     @Override
@@ -132,15 +146,10 @@ public class SetupPanel extends JPanel implements PlacementContext, SetupView {
     }
 
     @Override
-    public void setObserver(GridInteractionObserver observer) {
+    public void setObserver(SetupGridHandler observer) {
         Logger.debug("SetupPanel::setObserver");
         getGridUI().setObserver(observer);
-    }
-
-    public void setGridInputListener(GridInteractionObserver observer){
-        if (gridUI != null){
-            gridUI.setObserver(observer);
-        }
+        this.observer = observer;
     }
 
     private void highlightSelectedShipButton(JButton selected) {
@@ -152,10 +161,8 @@ public class SetupPanel extends JPanel implements PlacementContext, SetupView {
         selected.setBorder(BorderFactory.createLineBorder(Color.GREEN, 2));
     }
 
-
-
-    public void updateShipButtons(Map<ShipType, Integer> placedShip,
-                                  Map<ShipType, Integer> fleetConfiguration) {
+    @Override
+    public void updateShipButtons(Map<ShipType, Integer> placedShip, Map<ShipType, Integer> fleetConfiguration) {
 
         boolean isFleetComplete = true;
         for (ShipType type : ShipType.values()) {
@@ -169,7 +176,7 @@ public class SetupPanel extends JPanel implements PlacementContext, SetupView {
             button.setText(type.getName() + " (" + remaining + "/" + total + ")");
             button.setEnabled(remaining > 0);
 
-            if (placed < total){
+            if (placed < total) {
                 isFleetComplete = false;
                 continue;
             }

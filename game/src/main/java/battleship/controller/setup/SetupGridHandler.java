@@ -22,4 +22,9 @@ public class SetupGridHandler implements GridInteractionObserver {
     public void onGridClick(Coordinate coordinate) {
         actions.requestShipPlacement(coordinate);
     }
+
+    public void requestSetupCompletion(){
+        actions.requestSetupCompletion();
+    }
+
 }

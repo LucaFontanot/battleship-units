@@ -1,6 +1,7 @@
 package battleship.view.setup;
 
 import battleship.controller.actions.GridInteractionObserver;
+import battleship.controller.setup.SetupGridHandler;
 import battleship.model.Ship;
 import it.units.battleship.Coordinate;
 import it.units.battleship.Orientation;
@@ -50,7 +51,7 @@ public interface SetupView {
 
     void open();
 
-    void setObserver(GridInteractionObserver observer);
+    void setObserver(SetupGridHandler observer);
 
     void updateShipButtons(Map<ShipType, Integer> placedShip,
                            Map<ShipType, Integer> fleetConfiguration);

@@ -16,12 +16,14 @@ public class SetupController implements SetupInteractionFacade {
     private final GameController gameController;
     private final SetupView view;
     private final FleetManager fleetManager;
+    private final Consumer<FleetManager> onSetupComplete;
 
 
     public SetupController(GameController gameController, Consumer<FleetManager> onSetupComplete) {
         this.gameController = gameController;
         this.view = new SetupPanel(gameController);
         this.fleetManager = gameController.getFleetManager();
+        this.onSetupComplete = onSetupComplete;
 
         view.setObserver(new SetupGridHandler(this));
     }
@@ -39,6 +41,11 @@ public class SetupController implements SetupInteractionFacade {
     @Override
     public void requestPlacementPreview(Coordinate coordinate) {
         handleSetupHover(coordinate);
+    }
+
+    @Override
+    public void requestSetupCompletion() {
+        onSetupComplete.accept(fleetManager);
     }
 
     /**

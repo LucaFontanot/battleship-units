@@ -6,6 +6,7 @@ import battleship.model.FleetManager;
 import battleship.model.Grid;
 
 import battleship.view.lobby.LobbySelector;
+import battleship.view.utils.DimensionsUtils;
 import battleship.view.utils.ImageLoader;
 import battleship.view.utils.ThemeSelector;
 import com.intellij.uiDesigner.core.GridConstraints;
@@ -48,6 +49,7 @@ public class WelcomeUi implements WelcomeUiActions {
         frame.setContentPane(this.$$$getRootComponent$$$());
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.pack();
+        frame.setSize(DimensionsUtils.getScaledDimensions(500, 450));
         frame.setVisible(true);
         frame.setLocationRelativeTo(null);
     }
