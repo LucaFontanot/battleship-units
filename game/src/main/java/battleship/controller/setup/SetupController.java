@@ -1,8 +1,8 @@
 package battleship.controller.setup;
 
-import battleship.controller.GameController;
-import battleship.model.FleetManager;
-import battleship.model.Ship;
+import battleship.controller.game.GameController;
+import battleship.model.game.FleetManager;
+import battleship.model.game.Ship;
 import battleship.view.setup.SetupPanel;
 import battleship.view.setup.SetupView;
 import it.units.battleship.*;

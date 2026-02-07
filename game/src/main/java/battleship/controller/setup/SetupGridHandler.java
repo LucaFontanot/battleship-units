@@ -1,7 +1,6 @@
 package battleship.controller.setup;
 
-import battleship.controller.actions.GameInteractionFacade;
-import battleship.controller.actions.GridInteractionObserver;
+import battleship.controller.game.actions.GridInteractionObserver;
 import it.units.battleship.Coordinate;
 import lombok.NonNull;
 

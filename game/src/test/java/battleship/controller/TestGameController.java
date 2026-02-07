@@ -1,12 +1,13 @@
 package battleship.controller;
 
-import battleship.controller.actions.NetworkOutputActions;
-import battleship.controller.handlers.network.NetworkInputHandler;
-import battleship.controller.network.AbstractPlayerCommunication;
-import battleship.model.FleetManager;
-import battleship.model.Grid;
-import battleship.model.Ship;
-import battleship.view.GameView;
+import battleship.controller.game.actions.NetworkOutputActions;
+import battleship.controller.game.GameController;
+import battleship.controller.game.handlers.NetworkInputHandler;
+import battleship.controller.game.AbstractPlayerCommunication;
+import battleship.model.game.FleetManager;
+import battleship.model.game.Grid;
+import battleship.model.game.Ship;
+import battleship.view.game.GameView;
 import it.units.battleship.Coordinate;
 import it.units.battleship.GameState;
 import it.units.battleship.data.socket.GameMessageType;

@@ -1,7 +1,7 @@
 package battleship.view.lobby;
 
 import battleship.controller.lobby.LobbyController;
-import battleship.controller.network.NetworkClient;
+import battleship.controller.game.NetworkClient;
 import com.google.gson.Gson;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;

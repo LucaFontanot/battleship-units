@@ -1,14 +1,14 @@
 package battleship.view.welcome;
 
-import battleship.controller.GameController;
+import battleship.controller.game.GameController;
 import battleship.controller.lobby.LobbyController;
-import battleship.model.FleetManager;
-import battleship.model.Grid;
+import battleship.model.game.FleetManager;
+import battleship.model.game.Grid;
 
 import battleship.view.lobby.LobbySelector;
-import battleship.view.utils.DimensionsUtils;
-import battleship.view.utils.ImageLoader;
-import battleship.view.utils.ThemeSelector;
+import battleship.utils.DimensionsUtils;
+import battleship.utils.ImageLoader;
+import battleship.utils.ThemeSelector;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;

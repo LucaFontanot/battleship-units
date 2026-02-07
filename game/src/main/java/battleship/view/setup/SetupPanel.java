@@ -1,12 +1,10 @@
 package battleship.view.setup;
 
-import battleship.controller.GameController;
-import battleship.controller.actions.GridInteractionObserver;
+import battleship.controller.game.GameController;
 import battleship.controller.setup.SetupGridHandler;
-import battleship.controller.setup.SetupInteractionFacade;
-import battleship.model.Ship;
+import battleship.model.game.Ship;
 import battleship.view.grid.GridUI;
-import battleship.view.utils.DimensionsUtils;
+import battleship.utils.DimensionsUtils;
 import it.units.battleship.Coordinate;
 import it.units.battleship.Logger;
 import it.units.battleship.Orientation;

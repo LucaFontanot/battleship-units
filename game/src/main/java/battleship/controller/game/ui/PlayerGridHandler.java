@@ -1,0 +1,25 @@
+package battleship.controller.game.ui;
+
+import battleship.controller.game.actions.GameInteractionFacade;
+import battleship.controller.game.actions.GridInteractionObserver;
+import it.units.battleship.Coordinate;
+import lombok.NonNull;
+
+public class PlayerGridHandler implements GridInteractionObserver {
+
+    private final GameInteractionFacade actions;
+
+    public PlayerGridHandler(@NonNull GameInteractionFacade actions) {
+        this.actions = actions;
+    }
+
+    @Override
+    public void onGridHover(Coordinate coordinate) {
+
+    }
+
+    @Override
+    public void onGridClick(Coordinate coordinate) {
+
+    }
+}

@@ -1,24 +1,19 @@
 package battleship.controller.lobby;
 
-import battleship.controller.http.JsonHttpController;
-import battleship.controller.http.JsonHttpException;
-import battleship.controller.network.NetworkClient;
+import battleship.client.http.JsonHttpClient;
+import battleship.client.http.JsonHttpException;
+import battleship.controller.game.NetworkClient;
 import it.units.battleship.Defaults;
 import it.units.battleship.Logger;
 import it.units.battleship.data.LobbiesResponseData;
 import it.units.battleship.data.LobbyCreateRequestData;
 import it.units.battleship.data.LobbyData;
 import it.units.battleship.data.PingResponseData;
-import it.units.battleship.data.socket.WebSocketAuthenticationRequest;
-import it.units.battleship.data.socket.WebSocketMessage;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.WebSocket;
 
 public class LobbyController {
-    final JsonHttpController<PingResponseData, Void> pingResponse = new JsonHttpController<>(PingResponseData.class, Void.class);
-    final JsonHttpController<LobbiesResponseData, Void> lobbiesController = new JsonHttpController<>(LobbiesResponseData.class, Void.class);
-    final JsonHttpController<LobbyData, Void> lobbyCreateController = new JsonHttpController<>(LobbyData.class, Void.class);
+    final JsonHttpClient<PingResponseData, Void> pingResponse = new JsonHttpClient<>(PingResponseData.class, Void.class);
+    final JsonHttpClient<LobbiesResponseData, Void> lobbiesController = new JsonHttpClient<>(LobbiesResponseData.class, Void.class);
+    final JsonHttpClient<LobbyData, Void> lobbyCreateController = new JsonHttpClient<>(LobbyData.class, Void.class);
 
     /**
      * Pings the server to check if it's alive and retrieves the ping response data.
