@@ -1,6 +1,8 @@
 package battleship.model;
 
+import it.units.battleship.CellState;
 import it.units.battleship.Coordinate;
+import it.units.battleship.GridMapper;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -22,6 +24,7 @@ public class Grid {
     @Getter
     private final int col;
     
+    @Getter
     private final CellState[][] grid;
 
     public Grid(int row, int col){
@@ -75,25 +78,5 @@ public class Grid {
         }
 
         return grid[coordinate.row()][coordinate.col()];
-    }
-
-    /**
-     * Serializes the current state of the grid into a string representation, where each cell
-     * is represented by a specific character based on its state:
-     * - '0' for CellStates.EMPTY
-     * - 'X' for CellStates.HIT
-     * - 'M' for CellStates.MISS
-     * - 'K' for CellStates.SUNK
-     *
-     * @return a string representation of the grid's current state
-     */
-    public String gridSerialization(){
-        StringBuilder flattedGrid = new StringBuilder();
-        for (int i = 0; i < row; i++) {
-            for (int j = 0; j < col; j++) {
-                flattedGrid.append(grid[i][j].representation);
-            }
-        }
-        return flattedGrid.toString();
     }
 }

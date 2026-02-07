@@ -1,6 +1,6 @@
 package battleship.view.grid;
 
-import battleship.model.CellState;
+import it.units.battleship.CellState;
 import it.units.battleship.Coordinate;
 import lombok.Getter;
 import lombok.Setter;

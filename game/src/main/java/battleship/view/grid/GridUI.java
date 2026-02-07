@@ -1,11 +1,12 @@
 package battleship.view.grid;
 
 import battleship.controller.actions.GridInteractionObserver;
-import battleship.model.CellState;
 import battleship.model.Ship;
 import battleship.view.setup.PlacementContext;
 import battleship.view.utils.TextureLoader;
+import it.units.battleship.CellState;
 import it.units.battleship.Coordinate;
+import it.units.battleship.GridMapper;
 import it.units.battleship.Logger;
 import it.units.battleship.ShipType;
 import lombok.Getter;
@@ -70,13 +71,10 @@ public class GridUI extends JPanel implements CellInteractionListener {
             }
         }
 
-        int index = 0;
+        CellState[][] states = GridMapper.deserialize(gridSerialized, rows, cols);
         for(int r=0; r<rows ; r++){
             for(int c=0; c<cols; c++){
-                char code = gridSerialized.charAt(index);
-                CellState state = decodeCharToState(code);
-                cells[r][c].updateState(state);
-                index = index + 1;
+                cells[r][c].updateState(states[r][c]);
             }
         }
 
@@ -106,15 +104,6 @@ public class GridUI extends JPanel implements CellInteractionListener {
                 cell.clearOverlayTexture();
             }
         }
-    }
-
-    private CellState decodeCharToState(char code){
-        return switch (code){
-            case 'X' -> CellState.HIT;
-            case 'K' -> CellState.SUNK;
-            case 'M' -> CellState.MISS;
-            default -> CellState.EMPTY;
-        };
     }
 
     public CellPanel getCellAt(int row, int col) {

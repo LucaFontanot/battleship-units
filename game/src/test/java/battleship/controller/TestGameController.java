@@ -9,6 +9,7 @@ import battleship.model.Grid;
 import battleship.model.Ship;
 import battleship.view.GameView;
 import it.units.battleship.Coordinate;
+import it.units.battleship.GridMapper;
 import it.units.battleship.data.socket.GameMessageType;
 import it.units.battleship.data.socket.payloads.GridUpdateDTO;
 import it.units.battleship.data.socket.payloads.ShotRequestDTO;
@@ -73,7 +74,13 @@ public class TestGameController {
         ShotRequestDTO shotRequest = new ShotRequestDTO(coord);
         
         when(mockFleetManager.handleIncomingShot(coord)).thenReturn(true);
-        when(mockGrid.gridSerialization()).thenReturn("grid_serialized");
+        it.units.battleship.CellState[][] gridArray = new it.units.battleship.CellState[10][10];
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
+                gridArray[i][j] = it.units.battleship.CellState.EMPTY;
+            }
+        }
+        when(mockGrid.getGrid()).thenReturn(gridArray);
         when(mockFleetManager.getFleet()).thenReturn(List.of());
 
         // Act
@@ -86,7 +93,7 @@ public class TestGameController {
         verify(mockCommunication).sendMessage(eq(GameMessageType.GRID_UPDATE), captor.capture());
         assertTrue(captor.getValue().shotOutcome());
 
-        verify(mockView).updatePlayerGrid(eq("grid_serialized"), anyList());
+        verify(mockView).updatePlayerGrid(eq("0".repeat(100)), anyList());
     }
 
     @Test
@@ -102,7 +109,13 @@ public class TestGameController {
         when(sunkShip.isSunk()).thenReturn(true);
         
         when(mockFleetManager.getFleet()).thenReturn(List.of(aliveShip, sunkShip));
-        when(mockGrid.gridSerialization()).thenReturn("grid");
+        it.units.battleship.CellState[][] gridArray = new it.units.battleship.CellState[10][10];
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
+                gridArray[i][j] = it.units.battleship.CellState.EMPTY;
+            }
+        }
+        when(mockGrid.getGrid()).thenReturn(gridArray);
 
         // Act
         networkInputHandler.onShotReceived(shotRequest);

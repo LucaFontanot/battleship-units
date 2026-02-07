@@ -1,6 +1,6 @@
 package battleship.ui;
 
-import battleship.model.CellState;
+import it.units.battleship.CellState;
 import battleship.model.Grid;
 import battleship.model.Ship;
 import battleship.view.grid.GridUI;

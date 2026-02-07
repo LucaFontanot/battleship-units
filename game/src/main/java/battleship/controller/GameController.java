@@ -67,7 +67,7 @@ public class GameController implements NetworkInputActions, GameInteractionFacad
             if (placed) {
                 List<Ship> currentFleet = fleetManager.getFleet();
 
-                view.updatePlayerGrid(grid.gridSerialization(), currentFleet);
+                view.updatePlayerGrid(GridMapper.serialize(grid.getGrid()), currentFleet);
 
                 Map<ShipType, Integer> shipCounts = fleetManager.getPlacedCounts();
                 Map<ShipType, Integer> fleetConfiguration = fleetManager.getRequiredFleetConfiguration();
@@ -161,7 +161,7 @@ public class GameController implements NetworkInputActions, GameInteractionFacad
 
         networkOutput.sendGridUpdate(grid, fleet, shotOutcome);
 
-        String gridSerialized = grid.gridSerialization();
+        String gridSerialized = GridMapper.serialize(grid.getGrid());
         updatePlayerGrid(gridSerialized, fleetManager.getFleet());
 
         gameState = GameState.ACTIVE_TURN;

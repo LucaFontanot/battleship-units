@@ -1,6 +1,6 @@
 package battleship.ui;
 
-import battleship.model.CellState;
+import it.units.battleship.CellState;
 import battleship.view.grid.CellPanel;
 import it.units.battleship.Coordinate;
 import org.junit.jupiter.api.Assertions;

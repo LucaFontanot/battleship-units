@@ -1,6 +1,9 @@
 package battleship.model;
 
+import it.units.battleship.CellState;
+import it.units.battleship.CellState;
 import it.units.battleship.Coordinate;
+import it.units.battleship.GridMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -88,13 +91,13 @@ public class TestGrid {
 
         String expected = "00000000000000X0M000000KX";
 
-        assertEquals(expected, grid.gridSerialization(), "The grid is not serialized correctly.");
+        assertEquals(expected, GridMapper.serialize(grid.getGrid()), "The grid is not serialized correctly.");
     }
 
     @Test
     public void testEmptyGridSerialization() {
         String expectedSerialization = "0000000000000000000000000";
-        assertEquals(expectedSerialization, grid.gridSerialization(), "Empty grid serialization failed.");
+        assertEquals(expectedSerialization, GridMapper.serialize(grid.getGrid()), "Empty grid serialization failed.");
     }
 
     @Test
@@ -105,7 +108,7 @@ public class TestGrid {
         grid.changeState(new Coordinate(1, 0), CellState.MISS);
         grid.changeState(new Coordinate(1, 1), CellState.HIT);
         String expectedSerialization = "XKMX";
-        assertEquals(expectedSerialization, grid.gridSerialization(), "Full grid serialization failed.");
+        assertEquals(expectedSerialization, GridMapper.serialize(grid.getGrid()), "Full grid serialization failed.");
     }
 
     @Test
@@ -114,6 +117,6 @@ public class TestGrid {
         grid.changeState(new Coordinate(0, 1), CellState.HIT);
         grid.changeState(new Coordinate(0, 0), CellState.EMPTY);
         String expectedSerialization = "0X00000000000000000000000";
-        assertEquals(expectedSerialization, grid.gridSerialization(), "Serialization with a reverted cell state failed.");
+        assertEquals(expectedSerialization, GridMapper.serialize(grid.getGrid()), "Serialization with a reverted cell state failed.");
     }
 }

@@ -4,6 +4,7 @@ import battleship.model.Grid;
 import battleship.model.Ship;
 import it.units.battleship.Coordinate;
 import it.units.battleship.GameState;
+import it.units.battleship.GridMapper;
 import it.units.battleship.ShipType;
 import it.units.battleship.data.socket.payloads.*;
 import lombok.NonNull;
@@ -77,7 +78,7 @@ public class GameDataMapper{
                 .filter(Ship::isSunk)
                 .toList();
         List<ShipDTO> sunkShipsDTO = toShipDTO(sunkShips);
-        String gridSerialized = grid.gridSerialization();
+        String gridSerialized = GridMapper.serialize(grid.getGrid());
 
         return new GridUpdateDTO(shotOutcome, gridSerialized, sunkShipsDTO);
     }

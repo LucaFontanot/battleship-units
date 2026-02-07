@@ -1,6 +1,8 @@
 package battleship.model;
 
+import it.units.battleship.CellState;
 import it.units.battleship.Coordinate;
+import it.units.battleship.GridMapper;
 import it.units.battleship.Orientation;
 import it.units.battleship.ShipType;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,7 +34,7 @@ public class TestFleetManager {
 
         ship2.getCoordinates().forEach(coord -> fleetManager.handleIncomingShot(coord));
 
-        assertEquals("KK0K000K00000000",grid.gridSerialization());
+        assertEquals("KK0K000K00000000", GridMapper.serialize(grid.getGrid()));
     }
 
     @BeforeEach
