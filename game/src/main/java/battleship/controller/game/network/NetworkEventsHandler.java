@@ -1,6 +1,7 @@
-package battleship.controller.game.handlers;
+package battleship.controller.game.network;
 
 import battleship.controller.game.actions.NetworkInputActions;
+import battleship.controller.game.events.CommunicationEvents;
 import battleship.model.game.Ship;
 import battleship.serializer.GameDataMapper;
 import it.units.battleship.Coordinate;
@@ -10,11 +11,11 @@ import it.units.battleship.data.socket.payloads.*;
 
 import java.util.List;
 
-public class NetworkInputHandler implements CommunicationEvents {
+public class NetworkEventsHandler implements CommunicationEvents {
 
     private final NetworkInputActions networkActions;
 
-    public NetworkInputHandler(NetworkInputActions networkActions) {
+    public NetworkEventsHandler(NetworkInputActions networkActions) {
         this.networkActions = networkActions;
     }
 

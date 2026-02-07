@@ -2,8 +2,8 @@ package battleship.controller;
 
 import battleship.controller.game.actions.NetworkOutputActions;
 import battleship.controller.game.GameController;
-import battleship.controller.game.handlers.NetworkInputHandler;
-import battleship.controller.game.AbstractPlayerCommunication;
+import battleship.controller.game.network.NetworkEventsHandler;
+import battleship.controller.game.network.AbstractPlayerCommunication;
 import battleship.model.game.FleetManager;
 import battleship.model.game.Grid;
 import battleship.model.game.Ship;
@@ -43,7 +43,7 @@ public class TestGameController {
 
     private GameController gameController;
 
-    private NetworkInputHandler networkInputHandler;
+    private NetworkEventsHandler networkEventsHandler;
 
     private NetworkOutputActions networkOutputHandler;
 
@@ -51,7 +51,7 @@ public class TestGameController {
     void setup() {
         //networkOutputHandler = new NetworkOutputHandler(mockCommunication);
         //gameController = new GameController(mockGrid, mockFleetManager, networkOutputHandler, mockView);
-        networkInputHandler = new NetworkInputHandler(gameController);
+        networkEventsHandler = new NetworkEventsHandler(gameController);
     }
 
     @Test
@@ -63,7 +63,7 @@ public class TestGameController {
     @Test
     void testOnOpponentGridUpdate() {
         GridUpdateDTO dto = new GridUpdateDTO(false, "0".repeat(100), List.of());
-        networkInputHandler.onOpponentGridUpdate(dto);
+        networkEventsHandler.onOpponentGridUpdate(dto);
         verify(mockView).updateOpponentGrid(anyString(), anyList());
     }
 
@@ -84,7 +84,7 @@ public class TestGameController {
         when(mockFleetManager.getFleet()).thenReturn(List.of());
 
         // Act
-        networkInputHandler.onShotReceived(shotRequest);
+        networkEventsHandler.onShotReceived(shotRequest);
 
         // Assert
         verify(mockFleetManager).handleIncomingShot(coord);
@@ -118,7 +118,7 @@ public class TestGameController {
         when(mockGrid.getGrid()).thenReturn(gridArray);
 
         // Act
-        networkInputHandler.onShotReceived(shotRequest);
+        networkEventsHandler.onShotReceived(shotRequest);
 
         // Assert
         ArgumentCaptor<GridUpdateDTO> captor = ArgumentCaptor.forClass(GridUpdateDTO.class);
@@ -129,7 +129,7 @@ public class TestGameController {
     @Test
     void testProcessGameStatusUpdate() {
         it.units.battleship.data.socket.payloads.GameStatusDTO statusDTO = new it.units.battleship.data.socket.payloads.GameStatusDTO(it.units.battleship.GameState.GAME_OVER, "Game Over");
-        networkInputHandler.onGameStatusReceived(statusDTO);
+        networkEventsHandler.onGameStatusReceived(statusDTO);
         
         assertEquals(it.units.battleship.GameState.GAME_OVER, gameController.getGameState());
         verify(mockView).showEndGamePhase("Game Over");

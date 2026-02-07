@@ -2,7 +2,7 @@ package battleship.controller.lobby;
 
 import battleship.client.http.JsonHttpClient;
 import battleship.client.http.JsonHttpException;
-import battleship.controller.game.NetworkClient;
+import battleship.controller.game.network.NetworkClient;
 import it.units.battleship.Defaults;
 import it.units.battleship.Logger;
 import it.units.battleship.data.LobbiesResponseData;

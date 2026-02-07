@@ -1,4 +1,4 @@
-package battleship.controller.game.handlers;
+package battleship.controller.game.events;
 import it.units.battleship.data.socket.payloads.GameConfigDTO;
 import it.units.battleship.data.socket.payloads.GameStatusDTO;
 import it.units.battleship.data.socket.payloads.GridUpdateDTO;

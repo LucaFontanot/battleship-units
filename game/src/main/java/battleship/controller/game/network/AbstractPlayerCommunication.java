@@ -1,7 +1,7 @@
-package battleship.controller.game;
+package battleship.controller.game.network;
 
 import battleship.controller.game.actions.NetworkOutputActions;
-import battleship.controller.game.handlers.CommunicationEvents;
+import battleship.controller.game.events.CommunicationEvents;
 import battleship.model.game.Grid;
 import battleship.model.game.Ship;
 import battleship.serializer.GameDataMapper;

@@ -1,4 +1,4 @@
-package battleship.controller.game;
+package battleship.controller.game.network;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
@@ -25,7 +25,7 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 @Slf4j
-public class NetworkClient extends AbstractPlayerCommunication{
+public class NetworkClient extends AbstractPlayerCommunication {
 
     private final WebSocket client;
     private final Gson gson = new Gson();

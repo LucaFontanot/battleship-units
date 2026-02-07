@@ -1,6 +1,7 @@
 package battleship.controller.game;
 
 import battleship.controller.game.actions.NetworkInputActions;
+import battleship.controller.game.network.AbstractPlayerCommunication;
 import battleship.controller.game.ui.OpponentGridHandler;
 import battleship.controller.game.ui.PlayerGridHandler;
 import battleship.controller.game.actions.GameInteractionFacade;
