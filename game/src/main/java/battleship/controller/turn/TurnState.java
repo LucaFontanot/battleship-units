@@ -2,6 +2,7 @@ package battleship.controller.turn;
 
 import battleship.model.Ship;
 import it.units.battleship.Coordinate;
+import it.units.battleship.Logger;
 
 import java.util.List;
 
@@ -11,28 +12,32 @@ import java.util.List;
  */
 public interface TurnState {
     /**Called when the state is entered.*/
-    void onEnter(TurnManager turnManager);
+    default void onEnter(TurnManager manager){
+        Logger.debug("Entering state: " + getStateName());
+    }
 
     /**Called when the state is exited.*/
-    default void onExit(){}
+    default void onExit(TurnManager manager){
+        Logger.debug("Exiting state: " + getStateName());
+    }
 
     /**Handle the click on the opponent's grid.*/
-    default void handleOpponentGridClick(TurnManager turnManager, Coordinate coordinate){}
+    default void handleOpponentGridClick(TurnManager manager, Coordinate coordinate){}
 
     /**Handle the click on the player's grid.*/
-    default void handlePlayerGridClick(TurnManager turnManager, Coordinate coordinate){}
+    default void handlePlayerGridClick(TurnManager manager, Coordinate coordinate){}
 
     /**Handle the hover on the opponent's grid.*/
-    default void handleOpponentGridHover(TurnManager turnManager, Coordinate coordinate){}
+    default void handleOpponentGridHover(TurnManager manager, Coordinate coordinate){}
 
     /**Handle the hover on the player's grid.*/
-    default void handlePlayerGridHover(TurnManager turnManager, Coordinate coordinate){}
+    default void handlePlayerGridHover(TurnManager manager, Coordinate coordinate){}
 
     /**Handle incoming shots.*/
-    default void handleIncomingShot(TurnManager turnManager, Coordinate coordinate){}
+    default void handleIncomingShot(TurnManager manager, Coordinate coordinate){}
 
     /**Handle update for the opponent's grid.*/
-    default void handleOpponentGridUpdate(TurnManager turnManager, String grid, List<Ship> fleet){}
+    default void handleOpponentGridUpdate(TurnManager manager, String grid, List<Ship> fleet){}
 
     /**Return the name of the state.*/
     String getStateName();
