@@ -1,6 +1,7 @@
 package it.units.battleship.routes.ping;
 
 import io.javalin.http.Context;
+import it.units.battleship.Defaults;
 import it.units.battleship.WebServerApp;
 import it.units.battleship.data.PingResponseData;
 import it.units.battleship.impl.AbstractRoute;
@@ -35,7 +36,7 @@ public class PingController extends AbstractRoute<PingService> {
      * @return the route path as a String
      */
     public String getRoutePath() {
-        return "/api/ping";
+        return Defaults.HTTP_PING_PATH;
     }
 
     /**

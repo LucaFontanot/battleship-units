@@ -3,6 +3,7 @@ package it.units.battleship.routes.lobbies;
 import io.javalin.http.Context;
 import io.javalin.websocket.WsConfig;
 import io.javalin.websocket.WsContext;
+import it.units.battleship.Defaults;
 import it.units.battleship.WebServerApp;
 import it.units.battleship.data.LobbiesResponseData;
 import it.units.battleship.data.LobbyCreateRequestData;
@@ -30,7 +31,7 @@ public class LobbiesController extends AbstractRoute<LobbiesService> {
 
     @Override
     public String getRoutePath() {
-        return "/api/lobbies";
+        return Defaults.HTTP_LOBBY_PATH;
     }
 
     @Override
