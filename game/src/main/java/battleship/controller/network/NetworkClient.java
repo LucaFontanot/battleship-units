@@ -5,15 +5,14 @@ import com.google.gson.reflect.TypeToken;
 import it.units.battleship.Defaults;
 import it.units.battleship.Logger;
 import it.units.battleship.data.LobbyData;
+import it.units.battleship.data.socket.WebSocketAuthenticationRequest;
 import it.units.battleship.data.socket.WebSocketMessage;
 import it.units.battleship.data.socket.payloads.GameConfigDTO;
 import it.units.battleship.data.socket.payloads.GameStatusDTO;
 import it.units.battleship.data.socket.payloads.GridUpdateDTO;
 import it.units.battleship.data.socket.payloads.ShotRequestDTO;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-
-import java.net.URI;
-import java.net.URISyntaxException;
 
 /**
  * Handles network communication with the battleship server using WebSockets.
@@ -30,7 +29,10 @@ public class NetworkClient extends AbstractPlayerCommunication{
 
     private final WebSocket client;
     private final Gson gson = new Gson();
+    @Getter
     private boolean isConnected = false;
+    @Getter
+    private boolean isAuthenticated = false;
     private final String playerName;
     private final LobbyData lobbyData;
 
@@ -77,13 +79,16 @@ public class NetworkClient extends AbstractPlayerCommunication{
         this.lobbyData = data;
     }
 
-    public boolean isClientConnected() {
-        return isConnected;
+    void beginAuthentication() {
+        WebSocketAuthenticationRequest webSocketAuthenticationRequest = new WebSocketAuthenticationRequest(lobbyData.getLobbyID(), playerName);
+        WebSocketMessage<WebSocketAuthenticationRequest> authMessage = new WebSocketMessage<>("authenticate", webSocketAuthenticationRequest);
+        String authMessageJson = gson.toJson(authMessage);
+        client.send(authMessageJson);
     }
 
     @Override
     public <T> void sendMessage(GameMessageType type, T payload) {
-        if (client != null && isClientConnected()){
+        if (client != null && isConnected()){
             WebSocketMessage<T> message = new WebSocketMessage<>(type.getType(), payload);
             String json = gson.toJson(message);
             client.send(json);
@@ -98,6 +103,17 @@ public class NetworkClient extends AbstractPlayerCommunication{
             if (jsonObject == null || !jsonObject.has("type")) return;
 
             String typeString = jsonObject.get("type").getAsString();
+
+            if (typeString.equals("authenticate")){
+                if (jsonObject.get("data").getAsBoolean()){
+                    isAuthenticated = true;
+                    Logger.log("Authentication successful for player: " + playerName);
+                } else {
+                    Logger.error("Authentication failed for player: " + playerName);
+                    client.close(1000, "Authentication failed");
+                }
+                return;
+            }
 
             GameMessageType type = java.util.Arrays.stream(GameMessageType.values())
                     .filter(t -> t.getType().equals(typeString))
