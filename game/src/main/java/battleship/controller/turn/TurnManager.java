@@ -20,6 +20,7 @@ public class TurnManager {
     private final FleetManager  fleetManager;
     @Getter
     private final GameView view;
+    private SetupCompleteCallback setupCompleteCallback;
 
     public TurnManager(@NonNull Grid grid,
                        @NonNull FleetManager fleetManager,
@@ -29,5 +30,16 @@ public class TurnManager {
         this.view = view;
 
         this.currentState = new SetupState();
+    }
+
+    public void onSetupComplete(){
+        if(setupCompleteCallback != null){
+            setupCompleteCallback.onSetupComplete();
+        }
+    }
+
+    @FunctionalInterface
+    public interface SetupCompleteCallback{
+        void onSetupComplete();
     }
 }
