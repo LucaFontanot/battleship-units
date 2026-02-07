@@ -10,6 +10,7 @@ import it.units.battleship.*;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class SetupController implements SetupInteractionFacade {
     private final GameController gameController;
@@ -17,7 +18,7 @@ public class SetupController implements SetupInteractionFacade {
     private final FleetManager fleetManager;
 
 
-    public SetupController(GameController gameController) {
+    public SetupController(GameController gameController, Consumer<FleetManager> onSetupComplete) {
         this.gameController = gameController;
         this.view = new SetupPanel(gameController);
         this.fleetManager = gameController.getFleetManager();

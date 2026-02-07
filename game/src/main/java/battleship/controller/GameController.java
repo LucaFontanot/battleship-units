@@ -73,8 +73,14 @@ public class GameController implements NetworkInputActions, GameInteractionFacad
     }
 
     public void setupGame(){
-        SetupController setupController = new SetupController(this);
+        SetupController setupController = new SetupController(this, fleetManager -> {
+            checkOrWaitForOpponentSetup();
+        });
         setupController.startSetup();
+    }
+
+    public void checkOrWaitForOpponentSetup() {
+        //
     }
 
     public void startGame() {
