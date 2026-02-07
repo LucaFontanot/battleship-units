@@ -13,6 +13,12 @@ import java.util.List;
  * Defines how to communicate with the opponent
  */
 public interface GameModeStrategy {
+
+    /**
+     * Initialize the game mode.
+     * For local multiplayer: enable the connection
+     * For single player: initialize the game
+     */
     void initialize(GameModeCallback callback);
 
     /**
