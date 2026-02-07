@@ -24,6 +24,8 @@ import okio.ByteString;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import static it.units.battleship.data.socket.GameMessageType.*;
+
 @Slf4j
 public class NetworkClient extends AbstractPlayerCommunication {
 
@@ -133,7 +135,7 @@ public class NetworkClient extends AbstractPlayerCommunication {
         }
     }
 
-    private void dispatchMessage(GameMessageType type, String json){
+    void dispatchMessage(GameMessageType type, String json){
         switch (type){
             case GRID_UPDATE -> {
                 WebSocketMessage<GridUpdateDTO> msg = gson.fromJson(

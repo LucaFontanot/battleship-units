@@ -1,6 +1,7 @@
 package battleship.view.welcome;
 
 import battleship.controller.game.GameController;
+import battleship.controller.game.network.SinglePlayerClient;
 import battleship.controller.lobby.LobbyController;
 import battleship.model.game.FleetManager;
 import battleship.model.game.Grid;
@@ -13,6 +14,7 @@ import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
 import it.units.battleship.Logger;
+import it.units.battleship.data.LobbyData;
 
 import javax.swing.*;
 import java.awt.*;
@@ -66,7 +68,9 @@ public class WelcomeUi implements WelcomeUiActions {
         FleetManager fleetManager = new FleetManager(playerGrid, FLEET_CONFIGURATION);
 
         // Todo, instead of null, we should put the single player abstract communication handler
-        GameController controller = new GameController(playerGrid, fleetManager, null);
+        GameController controller = new GameController(playerGrid, fleetManager, new SinglePlayerClient(
+                LobbyData.builder().build(), "Player1"
+        ));
         controller.setupGame();
     }
 

@@ -38,6 +38,15 @@ public class Grid {
         this.initializeGrid();
     }
 
+    public Grid(CellState[][] grid){
+        if (grid == null || grid.length == 0 || grid[0].length == 0) {
+            throw new IllegalArgumentException("Grid cannot be null or empty");
+        }
+        this.row = grid.length;
+        this.col = grid[0].length;
+        this.grid = grid;
+    }
+
     /**
      * Initializes the grid by setting each cell to the default state of CellStates.EMPTY.
      */
