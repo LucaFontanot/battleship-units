@@ -5,8 +5,14 @@ import battleship.controller.http.JsonHttpException;
 import it.units.battleship.Defaults;
 import it.units.battleship.Logger;
 import it.units.battleship.data.LobbiesResponseData;
+import it.units.battleship.data.LobbyCreateRequestData;
 import it.units.battleship.data.LobbyData;
 import it.units.battleship.data.PingResponseData;
+import it.units.battleship.data.socket.WebSocketAuthenticationRequest;
+import it.units.battleship.data.socket.WebSocketMessage;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.WebSocket;
 
 public class LobbyController {
     final JsonHttpController<PingResponseData, Void> pingResponse = new JsonHttpController<>(PingResponseData.class, Void.class);
@@ -45,13 +51,13 @@ public class LobbyController {
      * Creates a new lobby on the server with the given name and player.
      * @param name the name of the lobby to be created
      * @param player the name of the player creating the lobby
-     * @return the LobbyData of the newly created lobby, or null if an error occurs
+     * @return the LobbyData of the created lobby, or null if an error occurs
      */
     public LobbyData createLobby(String name, String player) {
         try {
-            LobbyData requestData = LobbyData.builder()
-                    .lobbyName(name)
-                    .playerOne(player)
+            LobbyCreateRequestData requestData = LobbyCreateRequestData.builder()
+                    .name(name)
+                    .player(player)
                     .build();
             return lobbyCreateController.postSync(Defaults.HTTP_LOBBY_ENDPOINT, requestData);
         } catch (JsonHttpException e) {
@@ -61,4 +67,12 @@ public class LobbyController {
         }
     }
 
+    public void connectLobbyWebsocket(String lobbyID, String playerName) {
+        Request request = new Request.Builder()
+                .url(Defaults.WEBSOCKET_LOBBY_ENDPOINT)
+                .build();
+        WebSocket webSocket = new OkHttpClient().newWebSocket(request, socket);
+        WebSocketAuthenticationRequest webSocketAuthenticationRequest = new WebSocketAuthenticationRequest(lobbyID, playerName);
+        WebSocketMessage<WebSocketAuthenticationRequest> authMessage = new WebSocketMessage<>("authenticate", webSocketAuthenticationRequest);
+    }
 }

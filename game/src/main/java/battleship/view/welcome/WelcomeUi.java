@@ -1,10 +1,12 @@
 package battleship.view.welcome;
 
 import battleship.controller.GameController;
+import battleship.controller.lobby.LobbyController;
 import battleship.controller.network.AbstractPlayerCommunication;
 import battleship.model.FleetManager;
 import battleship.model.Grid;
 
+import battleship.view.lobby.LobbySelector;
 import battleship.view.utils.ImageLoader;
 import battleship.view.utils.ThemeSelector;
 import battleship.view.GameFrame;
@@ -52,10 +54,14 @@ public class WelcomeUi implements WelcomeUiActions {
         frame.setLocationRelativeTo(null);
     }
 
+    public void dispose() {
+        Logger.debug("WelcomeUI::Dispose");
+        frame.dispose();
+    }
+
     @Override
     public void onSinglePlayerSelected() {
-        frame.dispose();
-
+        dispose();
         Grid playerGrid = new Grid(10, 10);
 
         Map<ShipType, Integer> fleetConfiguration = Map.of(
@@ -83,7 +89,9 @@ public class WelcomeUi implements WelcomeUiActions {
 
     @Override
     public void onOnlineMultiplayerSelected() {
-
+        dispose();
+        LobbySelector lobbySelector = new LobbySelector(new LobbyController());
+        lobbySelector.show();
     }
 
     @Override
