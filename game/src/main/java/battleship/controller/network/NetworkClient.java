@@ -2,15 +2,15 @@ package battleship.controller.network;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
+import it.units.battleship.Defaults;
 import it.units.battleship.Logger;
+import it.units.battleship.data.LobbyData;
 import it.units.battleship.data.socket.WebSocketMessage;
 import it.units.battleship.data.socket.payloads.GameConfigDTO;
 import it.units.battleship.data.socket.payloads.GameStatusDTO;
 import it.units.battleship.data.socket.payloads.GridUpdateDTO;
 import it.units.battleship.data.socket.payloads.ShotRequestDTO;
 import lombok.extern.slf4j.Slf4j;
-import org.java_websocket.client.WebSocketClient;
-import org.java_websocket.handshake.ServerHandshake;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -20,45 +20,70 @@ import java.net.URISyntaxException;
  * It manages connection lifecycle and serializes/deserializes game messages.
  */
 import it.units.battleship.data.socket.GameMessageType;
+import okhttp3.*;
+import okio.ByteString;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 @Slf4j
 public class NetworkClient extends AbstractPlayerCommunication{
 
-    private final WebSocketClient client;
+    private final WebSocket client;
     private final Gson gson = new Gson();
+    private boolean isConnected = false;
+    private final String playerName;
+    private final LobbyData lobbyData;
 
-    public NetworkClient(String serverUri) throws URISyntaxException {
-        this.client = new WebSocketClient(new URI(serverUri)) {
+    public NetworkClient(LobbyData data, String playerName) {
+        Request request = new Request.Builder()
+                .url(Defaults.WEBSOCKET_LOBBY_ENDPOINT)
+                .build();
+        this.client = new OkHttpClient().newWebSocket(request, new WebSocketListener() {
             @Override
-            public void onOpen(ServerHandshake serverHandshake) {
-                Logger.log("Server connected: " + getURI());
+            public void onClosed(@NonNull WebSocket webSocket, int code, @NonNull String reason) {
+                Logger.log("WebSocket closed: " + reason);
+                isConnected = false;
             }
 
             @Override
-            public void onMessage(String message) {
-                Logger.log("Message received: " + message);
-                handleIncomingMessage(message);
+            public void onClosing(@NonNull WebSocket webSocket, int code, @NonNull String reason) {
+                Logger.log("WebSocket closing: " + reason);
+                isConnected = false;
             }
 
             @Override
-            public void onClose(int i, String reason, boolean b) {
-                Logger.log("Connection closed: " + reason);
+            public void onFailure(@NonNull WebSocket webSocket, @NonNull Throwable t, @Nullable Response response) {
+                Logger.error("WebSocket error: " + t.getMessage());
             }
 
             @Override
-            public void onError(Exception e) {
-                Logger.log("Websocket error: " + e.getMessage());
+            public void onMessage(@NonNull WebSocket webSocket, @NonNull String text) {
+                Logger.log("Message received: " + text);
+                handleIncomingMessage(text);
             }
-        };
+
+            @Override
+            public void onMessage(@NonNull WebSocket webSocket, @NonNull ByteString bytes) {
+                    Logger.warn("Received unexpected binary message: " + bytes.hex());
+            }
+
+            @Override
+            public void onOpen(@NonNull WebSocket webSocket, @NonNull Response response) {
+                Logger.log("WebSocket connection opened: " + webSocket.request().url());
+                isConnected = true;
+            }
+        });
+        this.playerName = playerName;
+        this.lobbyData = data;
     }
 
-    public void connect() throws InterruptedException {
-        client.connectBlocking();
+    public boolean isClientConnected() {
+        return isConnected;
     }
 
     @Override
     public <T> void sendMessage(GameMessageType type, T payload) {
-        if (client != null && client.isOpen()){
+        if (client != null && isClientConnected()){
             WebSocketMessage<T> message = new WebSocketMessage<>(type.getType(), payload);
             String json = gson.toJson(message);
             client.send(json);

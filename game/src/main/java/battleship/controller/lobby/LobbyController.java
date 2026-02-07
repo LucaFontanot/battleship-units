@@ -2,6 +2,7 @@ package battleship.controller.lobby;
 
 import battleship.controller.http.JsonHttpController;
 import battleship.controller.http.JsonHttpException;
+import battleship.controller.network.NetworkClient;
 import it.units.battleship.Defaults;
 import it.units.battleship.Logger;
 import it.units.battleship.data.LobbiesResponseData;
@@ -67,12 +68,7 @@ public class LobbyController {
         }
     }
 
-    public void connectLobbyWebsocket(String lobbyID, String playerName) {
-        Request request = new Request.Builder()
-                .url(Defaults.WEBSOCKET_LOBBY_ENDPOINT)
-                .build();
-        WebSocket webSocket = new OkHttpClient().newWebSocket(request, socket);
-        WebSocketAuthenticationRequest webSocketAuthenticationRequest = new WebSocketAuthenticationRequest(lobbyID, playerName);
-        WebSocketMessage<WebSocketAuthenticationRequest> authMessage = new WebSocketMessage<>("authenticate", webSocketAuthenticationRequest);
+    public NetworkClient connectLobbyWebsocket(LobbyData data, String playerName) {
+        return new NetworkClient(data, playerName);
     }
 }
