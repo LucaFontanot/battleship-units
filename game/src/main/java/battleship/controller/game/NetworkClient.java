@@ -74,6 +74,7 @@ public class NetworkClient extends AbstractPlayerCommunication{
             public void onOpen(@NonNull WebSocket webSocket, @NonNull Response response) {
                 Logger.log("WebSocket connection opened: " + webSocket.request().url());
                 isConnected = true;
+                beginAuthentication();
             }
         });
         this.playerName = playerName;

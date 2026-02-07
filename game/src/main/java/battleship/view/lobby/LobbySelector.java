@@ -34,7 +34,7 @@ public class LobbySelector {
 
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
-    public LobbySelector(LobbyController controller, Consumer<NetworkClient> onLobbyJoin) {
+    public LobbySelector(LobbyController controller) {
         this.controller = controller;
 
         createLobbyButton.addActionListener(e -> {
@@ -58,7 +58,11 @@ public class LobbySelector {
     }
 
     public void handleLobbyJoin(LobbyData lobby, String name) {
-        // Handle lobby selection logic here
+        if(controller.connectLobbyWebsocket(lobby, name)){
+            frame.dispose();
+        } else {
+            JOptionPane.showMessageDialog(frame, "Failed to join lobby", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     public void show() {
@@ -97,11 +101,18 @@ public class LobbySelector {
         lobbyName.setText(lobby.getLobbyName());
         descriptionPanel.add(lobbyName, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         JLabel player1Name = new JLabel();
-        player1Name.setText(lobby.getPlayerOne());
+        player1Name.setText("Player1: " + lobby.getPlayerOne());
         descriptionPanel.add(player1Name, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         JButton joinButton = new JButton();
         joinButton.setText("JOIN");
-        joinButton.addActionListener(e -> handleLobbyJoin(lobby, promptForName()));
+        joinButton.addActionListener(e -> {
+            String name = promptForName();
+            if (name.equalsIgnoreCase(lobby.getPlayerOne())) {
+                JOptionPane.showMessageDialog(frame, "Name already taken in this lobby, please choose another name", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            handleLobbyJoin(lobby, name);
+        });
         panel.add(joinButton, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         return panel;
     }

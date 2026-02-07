@@ -79,13 +79,13 @@ public class WelcomeUi implements WelcomeUiActions {
     @Override
     public void onOnlineMultiplayerSelected() {
         dispose();
-        LobbySelector lobbySelector = new LobbySelector(new LobbyController(), (client) -> {
+        LobbySelector lobbySelector = new LobbySelector(new LobbyController((client) -> {
             Logger.debug("WelcomeUI::LobbySelected - Client ready for online multiplayer");
             Grid playerGrid = new Grid(GRID_ROWS, GRID_COLS);
             FleetManager fleetManager = new FleetManager(playerGrid, FLEET_CONFIGURATION);
             GameController controller = new GameController(playerGrid, fleetManager, client);
             controller.setupGame();
-        });
+        }));
         lobbySelector.show();
     }
 
