@@ -1,4 +1,4 @@
-package battleship.controller.ai;
+package battleship.controller.mode.ai;
 
 import it.units.battleship.Coordinate;
 

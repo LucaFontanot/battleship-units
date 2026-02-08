@@ -1,4 +1,4 @@
-package battleship.controller.ai;
+package battleship.controller.mode.ai;
 
 import battleship.model.FleetManager;
 import battleship.model.Grid;
