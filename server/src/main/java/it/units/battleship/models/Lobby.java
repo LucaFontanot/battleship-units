@@ -12,4 +12,10 @@ import lombok.*;
 public class Lobby extends LobbyData {
     LobbySocketClient playerOneCtx;
     LobbySocketClient playerTwoCtx;
+    private boolean playerOneReady = false;
+    private boolean playerTwoReady = false;
+
+    public boolean areBothReady() {
+        return playerOneReady && playerTwoReady;
+    }
 }

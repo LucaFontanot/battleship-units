@@ -1,3 +1,11 @@
+plugins {
+    id 'application'
+}
+
+application {
+    mainClass = 'it.units.battleship.Main'
+}
+
 dependencies {
     implementation project(':battleship-common')
     implementation 'io.javalin:javalin:6.7.0'

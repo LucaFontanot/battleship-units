@@ -3,13 +3,18 @@ package it.units.battleship.routes.lobbies;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import io.javalin.websocket.*;
+import it.units.battleship.GameState;
 import it.units.battleship.Logger;
 import it.units.battleship.WebServerApp;
+import it.units.battleship.data.socket.GameMessageType;
 import it.units.battleship.data.socket.WebSocketAuthenticationRequest;
 import it.units.battleship.data.socket.WebSocketMessage;
+import it.units.battleship.data.socket.payloads.GameStatusDTO;
 import it.units.battleship.impl.WebSocketConnection;
 import it.units.battleship.models.Lobby;
+import lombok.extern.java.Log;
 
+import java.awt.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class LobbySocketClient implements WebSocketConnection {
@@ -50,9 +55,17 @@ public class LobbySocketClient implements WebSocketConnection {
         }
         Lobby lobby = app.getLobbiesService().getLobbyByID(authMessage.getData().getId());
         if (lobby == null) {
-            ctx.send(app.getGson().toJson(new WebSocketMessage<Boolean>("authenticate", false)));
-            ctx.send(app.getGson().toJson(new WebSocketMessage<String>("error", "Lobby not found")) );
-            return;
+            if ("local-lobby".equals(authMessage.getData().getId())) {
+                Logger.log("[SERVER DEBUG] Auto-creating local-lobby for testing.");
+                lobby = new Lobby();
+                lobby.setLobbyID("local-lobby");
+                lobby.setLobbyName("Local Testing Lobby");
+                app.getLobbiesService().addLobby(lobby);
+            } else {
+                ctx.send(app.getGson().toJson(new WebSocketMessage<Boolean>("authenticate", false)));
+                ctx.send(app.getGson().toJson(new WebSocketMessage<String>("error", "Lobby not found")) );
+                return;
+            }
         }
         this.lobby = lobby;
         LobbiesService.PlayerType type = app.getLobbiesService().connectPlayer(lobby.getLobbyID(), this, authMessage.getData().getName());
@@ -80,14 +93,56 @@ public class LobbySocketClient implements WebSocketConnection {
     @Override
     public void onMessage(WsMessageContext ctx) {
         String message = ctx.message();
+        Logger.log("[SERVER DEBUG] Raw message received: " + message);
+
         JsonObject fromJson = app.getGson().fromJson(message, JsonObject.class);
+        if (fromJson == null || !fromJson.has("type")) {
+            Logger.log("[SERVER DEBUG] Message has no type: " + message);
+            return;
+        }
+
+        String messageType = fromJson.get("type").getAsString();
+
         if (!isAuthenticated.get()){
-            if (fromJson.get("type").getAsString().equals("authenticate")){
+            if (messageType.equals("authenticate")){
                 authenticate(app.getGson().fromJson(ctx.message(), new TypeToken<WebSocketMessage<WebSocketAuthenticationRequest>>(){}.getType()));
+            } else {
+                Logger.log("[SERVER DEBUG] Ignoring message from unauthenticated client (Type: " + messageType + ")");
             }
         }else{
-            switch (fromJson.get("type").getAsString()){
+            switch (messageType){
                 case "lobby" -> updateLobbyData();
+                case "turn_change" -> {
+                    WebSocketMessage<GameStatusDTO> statusMsg = app.getGson().fromJson(
+                            ctx.message(),
+                            new TypeToken<WebSocketMessage<GameStatusDTO>>(){}.getType()
+                    );
+
+                    GameStatusDTO data = statusMsg.getData();
+
+                    if (data != null && data.state() == GameState.WAITING_SETUP){
+                        if (playerType == LobbiesService.PlayerType.PLAYER_ONE){
+                            lobby.setPlayerOneReady(true);
+                            Logger.log("Player One is ready");
+                        }else if (playerType == LobbiesService.PlayerType.PLAYER_TWO){
+                            lobby.setPlayerTwoReady(true);
+                            Logger.log("Player Two is ready");
+                        }
+
+                        if (lobby.areBothReady()){
+                            Logger.log("Both players ready! Starting game...");
+
+                            GameStatusDTO activeTurn = new GameStatusDTO(GameState.ACTIVE_TURN, null);
+                            WebSocketMessage<GameStatusDTO> response = new WebSocketMessage<>("turn_change", activeTurn);
+                            String jsonResponse = app.getGson().toJson(response);
+
+                            lobby.getPlayerOneCtx().send(jsonResponse);
+                            lobby.getPlayerTwoCtx().send(jsonResponse);
+                        }
+                    }else {
+                        forwardMessage(message);
+                    }
+                }
                 default -> forwardMessage(message);
             }
         }
