@@ -52,8 +52,8 @@ public class NetworkClient extends AbstractPlayerCommunication{
         };
     }
 
-    public void connect() throws InterruptedException {
-        client.connectBlocking();
+    public boolean connect() throws InterruptedException {
+        return client.connectBlocking();
     }
 
     @Override
