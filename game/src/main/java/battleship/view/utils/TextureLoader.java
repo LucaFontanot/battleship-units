@@ -39,7 +39,7 @@ public class TextureLoader {
     }
 
     public static BufferedImage getTexture(int col, int row, int rotationAngle, boolean horizontalMirror) {
-        Logger.debug("Getting texture at row " + row + ", col " + col + " with rotation " + rotationAngle);
+        //Logger.debug("Getting texture at row " + row + ", col " + col + " with rotation " + rotationAngle);
         if (row < 0 || row >= textures.length || col < 0 || col >= textures[0].length) {
             throw new IndexOutOfBoundsException("Texture indices out of bounds");
         }

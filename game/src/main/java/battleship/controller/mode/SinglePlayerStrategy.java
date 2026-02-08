@@ -86,6 +86,7 @@ public class SinglePlayerStrategy implements GameModeStrategy{
     @Override
     public void notifySetupComplete() {
         Logger.log("SinglePlayerStrategy: Player setup complete, starting game");
+        callback.onGameStatusReceived(GameState.ACTIVE_TURN, "Ready to play");
     }
 
     @Override
