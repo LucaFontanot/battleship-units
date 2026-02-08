@@ -1,5 +1,6 @@
 package battleship.controller.turn;
 
+import battleship.controller.actions.GameInteractionFacade;
 import battleship.controller.mode.GameModeStrategy;
 import battleship.controller.turn.states.SetupState;
 import battleship.model.FleetManager;
@@ -7,6 +8,7 @@ import battleship.model.Grid;
 import battleship.model.Ship;
 import battleship.view.GameView;
 import it.units.battleship.Coordinate;
+import it.units.battleship.GameState;
 import it.units.battleship.Logger;
 import lombok.Getter;
 import lombok.NonNull;
@@ -18,7 +20,7 @@ import java.util.List;
  * Manages the turn flow using the State pattern.
  * Context role in the pattern and coord the transactions between states.
  */
-public class TurnManager {
+public class TurnManager implements GameInteractionFacade {
     @Getter
     private TurnState currentState;
     @Getter
@@ -96,6 +98,10 @@ public class TurnManager {
         currentState.handleOpponentGridUpdate(this, grid, fleet);
     }
 
+    public void handleGameStatusReceived(GameState state) {
+        currentState.handleGameStatusReceived(this, state);
+    }
+
     public void handleGameOver(String message) {
         transitionTo(new battleship.controller.turn.states.GameOverState(true, message));
     }
@@ -112,6 +118,26 @@ public class TurnManager {
 
     public String getCurrentStateName() {
         return currentState.getStateName();
+    }
+
+    @Override
+    public void requestShot(Coordinate coordinate) {
+        handleOpponentGridClick(coordinate);
+    }
+
+    @Override
+    public void requestShipPlacement(Coordinate coordinate) {
+        handlePlayerGridClick(coordinate);
+    }
+
+    @Override
+    public void requestPlacementPreview(Coordinate coordinate) {
+        handlePlayerGridHover(coordinate);
+    }
+
+    @Override
+    public void previewShot(Coordinate coordinate) {
+        handleOpponentGridHover(coordinate);
     }
 
     @FunctionalInterface

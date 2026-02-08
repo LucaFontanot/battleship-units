@@ -2,6 +2,7 @@ package battleship.controller.turn;
 
 import battleship.model.Ship;
 import it.units.battleship.Coordinate;
+import it.units.battleship.GameState;
 import it.units.battleship.Logger;
 
 import java.util.List;
@@ -40,6 +41,9 @@ public interface TurnState {
     default void handleOpponentGridUpdate(TurnManager manager, String grid, List<Ship> fleet){
         manager.getView().updateOpponentGrid(grid, fleet);
     }
+
+    /**Handle game status updates from server (e.g., game start signal).*/
+    default void handleGameStatusReceived(TurnManager manager, GameState state){}
 
     /**Return the name of the state.*/
     String getStateName();
