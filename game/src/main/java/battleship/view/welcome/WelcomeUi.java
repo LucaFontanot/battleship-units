@@ -1,7 +1,9 @@
 package battleship.view.welcome;
 
 import battleship.controller.GameController;
-import battleship.controller.network.AbstractPlayerCommunication;
+import battleship.controller.mode.GameModeStrategy;
+import battleship.controller.mode.LocalMultiplayerStrategy;
+import battleship.controller.mode.SinglePlayerStrategy;
 import battleship.model.FleetManager;
 import battleship.model.Grid;
 
@@ -57,7 +59,6 @@ public class WelcomeUi implements WelcomeUiActions {
         frame.dispose();
 
         Grid playerGrid = new Grid(10, 10);
-
         Map<ShipType, Integer> fleetConfiguration = Map.of(
                 ShipType.DESTROYER, 2,
                 ShipType.FRIGATE, 2,
@@ -67,10 +68,17 @@ public class WelcomeUi implements WelcomeUiActions {
         );
 
         FleetManager fleetManager = new FleetManager(playerGrid, fleetConfiguration);
-
         GameFrame gameFrame = new GameFrame();
 
-        GameController controller = new GameController(playerGrid, fleetManager, null, gameFrame);
+        GameModeStrategy gameMode = new SinglePlayerStrategy(fleetConfiguration);
+
+        GameController controller = new GameController(
+                playerGrid,
+                fleetManager,
+                gameMode,
+                gameFrame
+        );
+
         gameFrame.open();
         controller.startGame();
     }
@@ -78,7 +86,49 @@ public class WelcomeUi implements WelcomeUiActions {
 
     @Override
     public void onLocalMultiplayerSelected() {
+        String[] options = {"Host (Player 1)", "Join (Player 2)"};
+        int choice = JOptionPane.showOptionDialog(
+                frame,
+                "Choose your role:",
+                "Local Multiplayer",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                options,
+                options[0]
+        );
 
+        if (choice < 0) return;
+
+        boolean isHost = (choice == 0);
+        int port = isHost ? 8081 : 8081;
+        String serverUri = "ws://localhost:" + port + it.units.battleship.Defaults.HTTP_LOBBY_PATH;
+
+        frame.dispose();
+
+        Grid playerGrid = new Grid(10, 10);
+        Map<ShipType, Integer> fleetConfiguration = Map.of(
+                ShipType.DESTROYER, 2,
+                ShipType.FRIGATE, 2,
+                ShipType.CRUISER, 1,
+                ShipType.BATTLESHIP, 1,
+                ShipType.CARRIER, 1
+        );
+
+        FleetManager fleetManager = new FleetManager(playerGrid, fleetConfiguration);
+        GameFrame gameFrame = new GameFrame();
+
+        GameModeStrategy gameMode = new LocalMultiplayerStrategy(serverUri, isHost);
+
+        GameController controller = new GameController(
+                playerGrid,
+                fleetManager,
+                gameMode,
+                gameFrame
+        );
+
+        gameFrame.open();
+        controller.startGame();
     }
 
     @Override
