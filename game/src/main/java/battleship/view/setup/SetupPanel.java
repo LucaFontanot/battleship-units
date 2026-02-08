@@ -30,7 +30,7 @@ public class SetupPanel extends JPanel implements PlacementContext, SetupView {
     @Getter
     private ShipType selectedShipType = null;
 
-    private JButton nextButton;
+    private JButton readyButton;
 
     @Getter
     private Orientation selectedOrientation = Orientation.HORIZONTAL_RIGHT;
@@ -96,18 +96,19 @@ public class SetupPanel extends JPanel implements PlacementContext, SetupView {
 
         add(gridWrapper, BorderLayout.CENTER);
 
-        // next button
+        // ready button
         JPanel bottomBar = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 12));
-        nextButton = new JButton("Next");
-        nextButton.setEnabled(false);
-        nextButton.setFocusPainted(false);
+        readyButton = new JButton("Ready!");
+        readyButton.setEnabled(false);
+        readyButton.setFocusPainted(false);
 
-        nextButton.addActionListener(e -> {
+        readyButton.addActionListener(e -> {
             observer.requestSetupCompletion();
-            dispose();
+            readyButton.setEnabled(false);
+            readyButton.setText("Waiting...");
         });
 
-        bottomBar.add(nextButton);
+        bottomBar.add(readyButton);
         add(bottomBar, BorderLayout.SOUTH);
     }
 
@@ -186,8 +187,8 @@ public class SetupPanel extends JPanel implements PlacementContext, SetupView {
         shipPalette.revalidate();
         shipPalette.repaint();
 
-        if (nextButton != null) {
-            nextButton.setEnabled(isFleetComplete);
+        if (readyButton != null) {
+            readyButton.setEnabled(isFleetComplete);
         }
     }
 
