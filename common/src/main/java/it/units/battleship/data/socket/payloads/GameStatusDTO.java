@@ -1,5 +1,7 @@
 package it.units.battleship.data.socket.payloads;
 
+import it.units.battleship.GameState;
+
 /**
  * A generic DTO used to exchange simple boolean states between peers.
  * Used for:
@@ -7,6 +9,6 @@ package it.units.battleship.data.socket.payloads;
  * - GAME_OVER: true if the sender lost (notifying the receiver's victory), false otherwise.
  */
 public record GameStatusDTO(
-        boolean value,
+        GameState state,
         String message
 ) {}

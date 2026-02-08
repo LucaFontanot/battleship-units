@@ -1,0 +1,137 @@
+package battleship.controller;
+
+import battleship.controller.game.actions.NetworkOutputActions;
+import battleship.controller.game.GameController;
+import battleship.controller.game.network.NetworkEventsHandler;
+import battleship.controller.game.network.AbstractPlayerCommunication;
+import battleship.model.game.FleetManager;
+import battleship.model.game.Grid;
+import battleship.model.game.Ship;
+import battleship.view.game.GameView;
+import it.units.battleship.Coordinate;
+import it.units.battleship.GameState;
+import it.units.battleship.data.socket.GameMessageType;
+import it.units.battleship.data.socket.payloads.GridUpdateDTO;
+import it.units.battleship.data.socket.payloads.ShotRequestDTO;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+public class TestGameController {
+
+    @Mock
+    private GameView mockView;
+
+    @Mock
+    private Grid mockGrid;
+
+    @Mock
+    private FleetManager mockFleetManager;
+
+    @Mock
+    private AbstractPlayerCommunication mockCommunication;
+
+    private GameController gameController;
+
+    private NetworkEventsHandler networkEventsHandler;
+
+    private NetworkOutputActions networkOutputHandler;
+
+    @BeforeEach
+    void setup() {
+        //networkOutputHandler = new NetworkOutputHandler(mockCommunication);
+        //gameController = new GameController(mockGrid, mockFleetManager, networkOutputHandler, mockView);
+        networkEventsHandler = new NetworkEventsHandler(gameController);
+    }
+
+    @Test
+    void testInitialization() {
+        assertNotNull(gameController, "Game controller was not initialized correctly.");
+        assertEquals(GameState.WAITING_FOR_SETUP, gameController.getGameState());
+    }
+
+    @Test
+    void testOnOpponentGridUpdate() {
+        GridUpdateDTO dto = new GridUpdateDTO(false, "0".repeat(100), List.of());
+        networkEventsHandler.onOpponentGridUpdate(dto);
+        verify(mockView).updateOpponentGrid(anyString(), anyList());
+    }
+
+    @Test
+    void testShotReceivedProcessesHitAndSendsResponse() {
+        // Arrange
+        Coordinate coord = new Coordinate(1, 1);
+        ShotRequestDTO shotRequest = new ShotRequestDTO(coord);
+        
+        when(mockFleetManager.handleIncomingShot(coord)).thenReturn(true);
+        it.units.battleship.CellState[][] gridArray = new it.units.battleship.CellState[10][10];
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
+                gridArray[i][j] = it.units.battleship.CellState.EMPTY;
+            }
+        }
+        when(mockGrid.getGrid()).thenReturn(gridArray);
+        when(mockFleetManager.getFleet()).thenReturn(List.of());
+
+        // Act
+        networkEventsHandler.onShotReceived(shotRequest);
+
+        // Assert
+        verify(mockFleetManager).handleIncomingShot(coord);
+
+        ArgumentCaptor<GridUpdateDTO> captor = ArgumentCaptor.forClass(GridUpdateDTO.class);
+        verify(mockCommunication).sendMessage(eq(GameMessageType.GRID_UPDATE), captor.capture());
+        assertTrue(captor.getValue().shotOutcome());
+
+        verify(mockView).updatePlayerGrid(eq("0".repeat(100)), anyList());
+    }
+
+    @Test
+    void testShotReceivedOnlyRevealsSunkShips() {
+        // Arrange
+        Coordinate coord = new Coordinate(0, 0);
+        ShotRequestDTO shotRequest = new ShotRequestDTO(coord);
+        
+        Ship aliveShip = mock(Ship.class);
+        when(aliveShip.isSunk()).thenReturn(false);
+        
+        Ship sunkShip = mock(Ship.class);
+        when(sunkShip.isSunk()).thenReturn(true);
+        
+        when(mockFleetManager.getFleet()).thenReturn(List.of(aliveShip, sunkShip));
+        it.units.battleship.CellState[][] gridArray = new it.units.battleship.CellState[10][10];
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
+                gridArray[i][j] = it.units.battleship.CellState.EMPTY;
+            }
+        }
+        when(mockGrid.getGrid()).thenReturn(gridArray);
+
+        // Act
+        networkEventsHandler.onShotReceived(shotRequest);
+
+        // Assert
+        ArgumentCaptor<GridUpdateDTO> captor = ArgumentCaptor.forClass(GridUpdateDTO.class);
+        verify(mockCommunication).sendMessage(eq(GameMessageType.GRID_UPDATE), captor.capture());
+        assertEquals(1, captor.getValue().fleet().size());
+    }
+
+    @Test
+    void testProcessGameStatusUpdate() {
+        it.units.battleship.data.socket.payloads.GameStatusDTO statusDTO = new it.units.battleship.data.socket.payloads.GameStatusDTO(it.units.battleship.GameState.GAME_OVER, "Game Over");
+        networkEventsHandler.onGameStatusReceived(statusDTO);
+        
+        assertEquals(it.units.battleship.GameState.GAME_OVER, gameController.getGameState());
+        verify(mockView).showEndGamePhase("Game Over");
+    }
+}

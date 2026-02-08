@@ -1,6 +1,6 @@
 package battleship;
 
-import battleship.view.utils.ThemeSelector;
+import battleship.utils.ThemeSelector;
 import battleship.view.welcome.WelcomeUi;
 import it.units.battleship.BuildConstants;
 import it.units.battleship.Logger;

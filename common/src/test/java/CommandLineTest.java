@@ -1,4 +1,6 @@
+import it.units.battleship.Defaults;
 import it.units.battleship.service.CommandLineService;
+import lombok.Builder;
 import org.apache.commons.cli.ParseException;
 import org.junit.jupiter.api.Test;
 
@@ -15,7 +17,7 @@ public class CommandLineTest {
         CommandLineService commandLineService = new CommandLineService(args);
         assertTrue(commandLineService.isHelpRequested());
         assertFalse(commandLineService.isVersionRequested());
-        assertEquals(443, commandLineService.getServerPort());
+        assertEquals(Defaults.HTTP_SERVER_PORT, commandLineService.getServerPort());
     }
 
     @Test
@@ -27,7 +29,7 @@ public class CommandLineTest {
         CommandLineService commandLineService = new CommandLineService(args);
         assertFalse(commandLineService.isHelpRequested());
         assertTrue(commandLineService.isVersionRequested());
-        assertEquals(443, commandLineService.getServerPort());
+        assertEquals(Defaults.HTTP_SERVER_PORT, commandLineService.getServerPort());
     }
 
     @Test

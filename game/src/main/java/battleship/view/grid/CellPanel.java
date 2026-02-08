@@ -1,12 +1,14 @@
 package battleship.view.grid;
 
-import battleship.model.CellState;
+import it.units.battleship.CellState;
 import it.units.battleship.Coordinate;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.util.function.Consumer;
 
 /**
  * Represents a single interactive cell within the Battleship grid.
@@ -24,15 +26,29 @@ public class CellPanel extends JLabel {
     static final Color MISS_COLOR = new Color(0x0000FF);
     static final Color EMPTY_COLOR = new Color(0xFFFFFF);
     static final Color SUNK_COLOR = new Color(0xFF0303);
+    static final Color PREVIEW_VALID_COLOR = new Color(0xAAFFAA);
+    static final Color PREVIEW_INVALID_COLOR = new Color(0xFFAAAA);
+    static final Color SELECTED_COLOR = new Color(0xFFFF00);
 
     private CellState currentState;
     final Coordinate coordinate;
     private Color baseColor; // colore base della cella
+    private boolean preview = false;
+    private boolean previewValid = true;
+    @Getter
+    private boolean selected = false;
+
+    private BufferedImage overlayTexture = null;
+    private float overlayAlpha = 1.0f;
+
+    @Setter
+    private CellInteractionListener cellListener;
+
 
     public CellPanel(Coordinate coordinate) {
         this.coordinate = coordinate;
         this.currentState = CellState.EMPTY;
-        setOpaque(true);
+        setOpaque(false);
         setHorizontalAlignment(CENTER);
         setVerticalAlignment(CENTER);
         setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
@@ -41,14 +57,26 @@ public class CellPanel extends JLabel {
 
         addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
-            public void mouseEntered(java.awt.event.MouseEvent e) {
-
+            public void mouseEntered(MouseEvent e) {
+                if (cellListener != null) {
+                    cellListener.onCellHover(coordinate);
+                }
             }
+
             @Override
-            public void mouseExited(java.awt.event.MouseEvent e) {
-
+            public void mouseExited(MouseEvent e) {
+                if (cellListener != null) {
+                    cellListener.onCellExit();
+                }
             }
-        });
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (cellListener != null) {
+                    cellListener.onCellClicked(coordinate);
+                }
+            }}
+        );
     }
 
     @Override
@@ -61,13 +89,8 @@ public class CellPanel extends JLabel {
     }
 
     public void addTexture(BufferedImage texture) {
-        int w = getWidth();
-        int h = getHeight();
-        if (w <= 0 || h <= 0) {
-            Dimension preferred = getPreferredSize();
-            w = preferred.width;
-            h = preferred.height;
-        }
+        int w = Math.max(getWidth(), getPreferredSize().width);
+        int h = Math.max(getHeight(), getPreferredSize().height);
         setIcon(new ImageIcon(texture.getScaledInstance(w, h, Image.SCALE_SMOOTH)));
     }
 
@@ -95,4 +118,60 @@ public class CellPanel extends JLabel {
     public CellState getCurrentState() {
         return currentState;
     }
+
+    public void setPreview(boolean preview, boolean valid) {
+        this.preview = preview;
+        this.previewValid = valid;
+        repaint();
+    }
+
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+        repaint();
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        Graphics2D g2 = (Graphics2D) g.create();
+
+        // background
+        g2.setColor(baseColor);
+        g2.fillRect(0, 0, getWidth(), getHeight());
+
+        // ship placed (selected)
+        if (selected) {
+            g2.setColor(SELECTED_COLOR);
+            g2.fillRect(0, 0, getWidth(), getHeight());
+        }
+
+        // preview (green/red)
+        if (preview) {
+            g2.setColor(previewValid ? PREVIEW_VALID_COLOR : PREVIEW_INVALID_COLOR);
+            g2.fillRect(0, 0, getWidth(), getHeight());
+        }
+
+        // overlay texture (hover ship)
+        if (overlayTexture != null) {
+            Composite old = g2.getComposite();
+            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, overlayAlpha));
+            g2.drawImage(overlayTexture, 0, 0, getWidth(), getHeight(), null);
+            g2.setComposite(old);
+        }
+
+        g2.dispose();
+        super.paintComponent(g);
+    }
+
+    public void setOverlayTexture(BufferedImage img, float alpha) {
+        this.overlayTexture = img;
+        this.overlayAlpha = Math.max(0f, Math.min(1f, alpha));
+        repaint();
+    }
+
+    public void clearOverlayTexture() {
+        this.overlayTexture = null;
+        repaint();
+    }
+
 }

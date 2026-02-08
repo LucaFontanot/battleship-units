@@ -14,8 +14,8 @@ import lombok.Getter;
  */
 public enum Orientation {
     HORIZONTAL_RIGHT(0.0),
-    HORIZONTAL_LEFT(Math.PI),
     VERTICAL_UP(Math.PI / 2),
+    HORIZONTAL_LEFT(Math.PI),
     VERTICAL_DOWN(-Math.PI / 2);
 
     @Getter

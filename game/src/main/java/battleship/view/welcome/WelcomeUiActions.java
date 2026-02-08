@@ -11,11 +11,6 @@ public interface WelcomeUiActions {
     void onSinglePlayerSelected();
 
     /**
-     * Called when the user selects the local multiplayer mode.
-     */
-    void onLocalMultiplayerSelected();
-
-    /**
      * Called when the user selects the online multiplayer mode.
      */
     void onOnlineMultiplayerSelected();

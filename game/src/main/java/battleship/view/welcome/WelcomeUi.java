@@ -1,21 +1,31 @@
 package battleship.view.welcome;
 
-import battleship.view.utils.ImageLoader;
-import battleship.view.utils.ThemeSelector;
+import battleship.controller.game.GameController;
+import battleship.controller.game.network.SinglePlayerClient;
+import battleship.controller.lobby.LobbyController;
+import battleship.model.game.FleetManager;
+import battleship.model.game.Grid;
+
+import battleship.view.lobby.LobbySelector;
+import battleship.utils.DimensionsUtils;
+import battleship.utils.ImageLoader;
+import battleship.utils.ThemeSelector;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
 import it.units.battleship.Logger;
+import it.units.battleship.data.LobbyData;
 
 import javax.swing.*;
 import java.awt.*;
+
+import static it.units.battleship.Defaults.*;
 
 public class WelcomeUi implements WelcomeUiActions {
     final JFrame frame = new JFrame("Battleship - Welcome");
     private JLabel logo;
     private JPanel root;
     private JButton singlePlayerButton;
-    private JButton multiplayerLocalButton;
     private JButton multiplayerOnlineButton;
     private JButton themeLight;
     private JButton themeDark;
@@ -30,7 +40,6 @@ public class WelcomeUi implements WelcomeUiActions {
         ImageLoader.loadImageIntoButton("theme-auto.png", themeDarkLight, 32, 32);
         themeLight.addActionListener(e -> onThemeLightSelected());
         singlePlayerButton.addActionListener(e -> onSinglePlayerSelected());
-        multiplayerLocalButton.addActionListener(e -> onLocalMultiplayerSelected());
         multiplayerOnlineButton.addActionListener(e -> onOnlineMultiplayerSelected());
         Logger.debug("WelcomeUI::Initialized");
     }
@@ -40,24 +49,40 @@ public class WelcomeUi implements WelcomeUiActions {
         frame.setContentPane(this.$$$getRootComponent$$$());
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.pack();
-        frame.setSize(600, 400);
+        frame.setSize(DimensionsUtils.getScaledDimensions(500, 450));
         frame.setVisible(true);
         frame.setLocationRelativeTo(null);
     }
 
-    @Override
-    public void onSinglePlayerSelected() {
-
+    public void dispose() {
+        Logger.debug("WelcomeUI::Dispose");
+        frame.dispose();
     }
 
     @Override
-    public void onLocalMultiplayerSelected() {
+    public void onSinglePlayerSelected() {
+        dispose();
+        Grid playerGrid = new Grid(GRID_ROWS, GRID_COLS);
+        FleetManager fleetManager = new FleetManager(playerGrid, FLEET_CONFIGURATION);
 
+        // Todo, instead of null, we should put the single player abstract communication handler
+        GameController controller = new GameController(playerGrid, fleetManager, new SinglePlayerClient(
+                LobbyData.builder().build(), "Player1"
+        ));
+        controller.setupGame();
     }
 
     @Override
     public void onOnlineMultiplayerSelected() {
-
+        dispose();
+        LobbySelector lobbySelector = new LobbySelector(new LobbyController((client) -> {
+            Logger.debug("WelcomeUI::LobbySelected - Client ready for online multiplayer");
+            Grid playerGrid = new Grid(GRID_ROWS, GRID_COLS);
+            FleetManager fleetManager = new FleetManager(playerGrid, FLEET_CONFIGURATION);
+            GameController controller = new GameController(playerGrid, fleetManager, client);
+            controller.setupGame();
+        }));
+        lobbySelector.show();
     }
 
     @Override
@@ -110,17 +135,14 @@ public class WelcomeUi implements WelcomeUiActions {
         final Spacer spacer4 = new Spacer();
         root.add(spacer4, new GridConstraints(1, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         final JPanel panel1 = new JPanel();
-        panel1.setLayout(new GridLayoutManager(3, 1, new Insets(20, 0, 0, 0), -1, -1));
+        panel1.setLayout(new GridLayoutManager(2, 1, new Insets(20, 0, 0, 0), -1, -1));
         root.add(panel1, new GridConstraints(3, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         singlePlayerButton = new JButton();
-        singlePlayerButton.setText("Single player");
+        singlePlayerButton.setText("Singleplayer");
         panel1.add(singlePlayerButton, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(-1, 30), null, 0, false));
-        multiplayerLocalButton = new JButton();
-        multiplayerLocalButton.setText("Multiplayer (local)");
-        panel1.add(multiplayerLocalButton, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(-1, 30), null, 0, false));
         multiplayerOnlineButton = new JButton();
-        multiplayerOnlineButton.setText("Multiplayer (online)");
-        panel1.add(multiplayerOnlineButton, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(-1, 30), null, 0, false));
+        multiplayerOnlineButton.setText("Multiplayer");
+        panel1.add(multiplayerOnlineButton, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(-1, 30), null, 0, false));
         final JPanel panel2 = new JPanel();
         panel2.setLayout(new GridLayoutManager(1, 5, new Insets(0, 0, 0, 0), -1, -1));
         root.add(panel2, new GridConstraints(0, 0, 1, 3, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));

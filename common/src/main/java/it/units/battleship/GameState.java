@@ -1,11 +1,10 @@
 package it.units.battleship;
 
 public enum GameState {
-    SETUP("SETUP"),
-    WAITING("WAITING"),
-    MY_TURN("MY_TURN"),
-    OPPONENT_TURN("OPPONENT_TURN"),
-    GAME_OVER("GAME_OVER");
+    WAITING_FOR_SETUP("Waiting for opponent setup"),
+    ACTIVE_TURN("Your turn"),
+    WAITING_FOR_OPPONENT("Waiting for opponent"),
+    GAME_OVER("Game over");
 
     private final String gameState;
 
