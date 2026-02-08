@@ -89,6 +89,9 @@ public class GameFrame extends JFrame implements GameView {
     @Override
     public void showGamePhase() {
         systemMessage.setText("Game started.");
+        switchPanel(new GameBoardPanel(playerGridUI, opponentGridUI));
+        pack();
+        setLocationRelativeTo(null);
     }
 
     @Override
