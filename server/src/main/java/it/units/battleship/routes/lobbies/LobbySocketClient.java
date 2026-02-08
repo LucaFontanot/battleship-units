@@ -133,11 +133,15 @@ public class LobbySocketClient implements WebSocketConnection {
                             Logger.log("Both players ready! Starting game...");
 
                             GameStatusDTO activeTurn = new GameStatusDTO(GameState.ACTIVE_TURN, null);
-                            WebSocketMessage<GameStatusDTO> response = new WebSocketMessage<>("turn_change", activeTurn);
-                            String jsonResponse = app.getGson().toJson(response);
+                            WebSocketMessage<GameStatusDTO> msgPlayerOne = new WebSocketMessage<>("turn_change", activeTurn);
+                            String responsePlayerOne = app.getGson().toJson(msgPlayerOne);
 
-                            lobby.getPlayerOneCtx().send(jsonResponse);
-                            lobby.getPlayerTwoCtx().send(jsonResponse);
+                            GameStatusDTO waitingTurn = new GameStatusDTO(GameState.WAITING_FOR_OPPONENT, null);
+                            WebSocketMessage<GameStatusDTO> msgPlayerTwo = new WebSocketMessage<>("turn_change", waitingTurn);
+                            String responsePlayerTwo = app.getGson().toJson(msgPlayerTwo);
+
+                            lobby.getPlayerOneCtx().send(responsePlayerOne);
+                            lobby.getPlayerTwoCtx().send(responsePlayerTwo);
                         }
                     }else {
                         forwardMessage(message);
