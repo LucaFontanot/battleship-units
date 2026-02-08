@@ -1,7 +1,7 @@
 package battleship.controller.mode.ai;
 
-import battleship.model.FleetManager;
-import battleship.model.Grid;
+import battleship.model.game.FleetManager;
+import battleship.model.game.Grid;
 import it.units.battleship.Coordinate;
 
 public class SimpleAIOpponent implements AIOpponent{

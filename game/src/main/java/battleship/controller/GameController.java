@@ -1,13 +1,14 @@
 package battleship.controller;
 
-import battleship.controller.handlers.ui.OpponentGridHandler;
-import battleship.controller.handlers.ui.PlayerGridHandler;
+import battleship.controller.game.ui.OpponentGridHandler;
+import battleship.controller.game.ui.PlayerGridHandler;
 import battleship.controller.mode.GameModeStrategy;
 import battleship.controller.turn.TurnManager;
-import battleship.model.*;
-import battleship.view.GameView;
+import battleship.model.game.FleetManager;
+import battleship.model.game.Grid;
+import battleship.model.game.Ship;
+import battleship.view.game.GameView;
 import it.units.battleship.*;
-import battleship.model.Ship;
 import it.units.battleship.data.socket.payloads.*;
 import lombok.NonNull;
 

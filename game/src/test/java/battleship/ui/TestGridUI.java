@@ -1,8 +1,8 @@
 package battleship.ui;
 
 import it.units.battleship.CellState;
-import battleship.model.Grid;
-import battleship.model.Ship;
+import battleship.model.game.Grid;
+import battleship.model.game.Ship;
 import battleship.view.grid.GridUI;
 import it.units.battleship.Coordinate;
 import it.units.battleship.Orientation;
@@ -19,7 +19,7 @@ public class TestGridUI {
 
     @Test
     public void testGridInitialization() {
-        GridUI gridUI = new GridUI(10, 10, null,null);
+        GridUI gridUI = new GridUI(10, 10);
 
         Assertions.assertDoesNotThrow(() -> gridUI.getCellAt(0, 0));
         Assertions.assertDoesNotThrow(() -> gridUI.getCellAt(9, 9));
@@ -28,7 +28,7 @@ public class TestGridUI {
     }
     @Test
     public void testDisplayDataParsing() {
-        GridUI gridUI = new GridUI(2, 2, null,null);
+        GridUI gridUI = new GridUI(2, 2);
 
         String gridData = "X0MK"; 
         gridUI.displayData(gridData, Collections.emptyList());
@@ -47,7 +47,7 @@ public class TestGridUI {
     @EnumSource(ShipType.class)
     public void testShipRenderingRobustness(ShipType type) {
         int size = 15;
-        GridUI gridUI = new GridUI(size, size, null,null);
+        GridUI gridUI = new GridUI(size, size);
         Grid grid = new Grid(size, size);
         String emptyGrid = "0".repeat(size * size);
 

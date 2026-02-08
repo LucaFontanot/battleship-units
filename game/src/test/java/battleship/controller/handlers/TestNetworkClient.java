@@ -1,12 +1,13 @@
 package battleship.controller.handlers;
 
-import battleship.controller.network.CommunicationEvents;
-import battleship.controller.network.NetworkClient;
+import battleship.controller.game.events.CommunicationEvents;
+import battleship.controller.game.network.NetworkClient;
 import com.google.gson.Gson;
 import it.units.battleship.Coordinate;
 import it.units.battleship.GameState;
 import it.units.battleship.Orientation;
 import it.units.battleship.ShipType;
+import it.units.battleship.data.LobbyData;
 import it.units.battleship.data.socket.GameMessageType;
 import it.units.battleship.data.socket.WebSocketMessage;
 import it.units.battleship.data.socket.payloads.*;
@@ -26,25 +27,15 @@ public class TestNetworkClient {
 
     @BeforeEach
     void setUp() throws URISyntaxException {
-        networkClient = new NetworkClient("ws://localhost:8080");
+        networkClient = new NetworkClient(new LobbyData(), "Player1");
         gson = new Gson();
         mockListener = new MockCommunicationEventsListener();
         networkClient.addCommunicationEventsListener(mockListener);
     }
 
     @Test
-    void testConstructor_ValidUri() {
-        assertDoesNotThrow(() -> new NetworkClient("ws://localhost:8080"));
-    }
-
-    @Test
-    void testConstructor_InvalidUri() {
-        assertThrows(URISyntaxException.class, () -> new NetworkClient("invalid uri"));
-    }
-
-    @Test
     void testAddCommunicationEventsListener() {
-        NetworkClient client = assertDoesNotThrow(() -> new NetworkClient("ws://localhost:8080"));
+        NetworkClient client = assertDoesNotThrow(() -> new NetworkClient(new LobbyData(), "Player1"));
         MockCommunicationEventsListener listener = new MockCommunicationEventsListener();
 
         assertDoesNotThrow(() -> client.addCommunicationEventsListener(listener));

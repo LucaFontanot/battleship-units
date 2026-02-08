@@ -1,12 +1,12 @@
 package battleship.controller.turn;
 
-import battleship.controller.actions.GameInteractionFacade;
+import battleship.controller.game.actions.GameInteractionFacade;
 import battleship.controller.mode.GameModeStrategy;
 import battleship.controller.turn.states.SetupState;
-import battleship.model.FleetManager;
-import battleship.model.Grid;
-import battleship.model.Ship;
-import battleship.view.GameView;
+import battleship.model.game.FleetManager;
+import battleship.model.game.Grid;
+import battleship.model.game.Ship;
+import battleship.view.game.GameView;
 import it.units.battleship.Coordinate;
 import it.units.battleship.GameState;
 import it.units.battleship.Logger;

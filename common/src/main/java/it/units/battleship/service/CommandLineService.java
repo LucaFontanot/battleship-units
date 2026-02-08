@@ -1,5 +1,6 @@
 package it.units.battleship.service;
 
+import it.units.battleship.Defaults;
 import org.apache.commons.cli.*;
 import org.apache.commons.cli.help.HelpFormatter;
 
@@ -57,10 +58,10 @@ public class CommandLineService {
             try {
                 return Integer.parseInt(cmd.getOptionValue("p"));
             } catch (NumberFormatException e) {
-                return 443;
+                return Defaults.HTTP_SERVER_PORT;
             }
         } else {
-            return 443;
+            return Defaults.HTTP_SERVER_PORT;
         }
     }
 

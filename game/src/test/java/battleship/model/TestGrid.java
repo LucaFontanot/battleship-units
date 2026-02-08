@@ -1,6 +1,6 @@
 package battleship.model;
 
-import it.units.battleship.CellState;
+import battleship.model.game.Grid;
 import it.units.battleship.CellState;
 import it.units.battleship.Coordinate;
 import it.units.battleship.GridMapper;

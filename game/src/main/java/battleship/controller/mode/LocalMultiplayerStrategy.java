@@ -1,11 +1,10 @@
 package battleship.controller.mode;
 
-import battleship.controller.actions.NetworkInputActions;
-import battleship.controller.handlers.network.NetworkInputHandler;
-import battleship.controller.handlers.network.NetworkOutputHandler;
-import battleship.controller.network.NetworkClient;
-import battleship.model.Grid;
-import battleship.model.Ship;
+import battleship.controller.game.actions.NetworkInputActions;
+import battleship.controller.game.network.NetworkEventsHandler;
+import battleship.controller.game.network.NetworkClient;
+import battleship.model.game.Grid;
+import battleship.model.game.Ship;
 import it.units.battleship.Coordinate;
 import it.units.battleship.GameState;
 import it.units.battleship.Logger;
@@ -21,8 +20,6 @@ public class LocalMultiplayerStrategy implements GameModeStrategy{
 
     private GameModeCallback callback;
     private NetworkClient networkClient;
-    private NetworkOutputHandler outputHandler;
-    private NetworkInputHandler inputHandler;
 
     /**
      * @param serverUri URI del WebSocket server (es. "ws://localhost:8080/game")
@@ -38,27 +35,17 @@ public class LocalMultiplayerStrategy implements GameModeStrategy{
         this.callback = callback;
 
         try {
-            networkClient = new NetworkClient(serverUri);
+            // Updated to use the new NetworkClient constructor that takes URI
+            networkClient = new NetworkClient(new java.net.URI(serverUri), isHost ? "Host" : "Guest");
 
             NetworkInputActions inputActions = new LocalMultiplayerInputHandler(callback);
 
-            outputHandler = new NetworkOutputHandler(networkClient);
+            networkClient.addCommunicationEventsListener(new NetworkEventsHandler(inputActions));
 
-            networkClient.addCommunicationEventsListener(new NetworkInputHandler(inputActions));
-
-            boolean connected = networkClient.connect();
-
-            if (connected){
-                Logger.log("LocalMultiplayerStrategy: Successfully connected to " + serverUri);
-                // Temporary authentication for local multiplayer testing
-                it.units.battleship.data.socket.WebSocketAuthenticationRequest auth = 
-                    new it.units.battleship.data.socket.WebSocketAuthenticationRequest("local-lobby", isHost ? "Host" : "Guest");
-                networkClient.sendMessage(it.units.battleship.data.socket.GameMessageType.AUTHENTICATE, auth); 
-            }else {
-                Logger.log("LocalMultiplayerStrategy: Connected refused to " + serverUri);
-                callback.onConnectionError("Failed to connect" + serverUri);
-            }
-        } catch (InterruptedException | URISyntaxException e) {
+            // Connection is handled asynchronously in the constructor for the new NetworkClient
+            Logger.log("LocalMultiplayerStrategy: Connecting to " + serverUri);
+            
+        } catch (java.net.URISyntaxException e) {
             Logger.error("LocalMultiplayerStrategy: Connection failed - " + e.getMessage());
             callback.onConnectionError("Failed to connect: " + e.getMessage());
         }
@@ -66,22 +53,22 @@ public class LocalMultiplayerStrategy implements GameModeStrategy{
 
     @Override
     public void sendShot(Coordinate coordinate) {
-        outputHandler.sendShotRequest(coordinate);
+        networkClient.sendShotRequest(coordinate);
     }
 
     @Override
     public void sendGridUpdate(Grid grid, List<Ship> fleet, boolean shotOutcome) {
-        outputHandler.sendGridUpdate(grid, fleet, shotOutcome);
+        networkClient.sendGridUpdate(grid, fleet, shotOutcome);
     }
 
     @Override
     public void sendGameOver(String message) {
-        outputHandler.sendGameStatus(GameState.GAME_OVER, message);
+        networkClient.sendGameStatus(GameState.GAME_OVER, message);
     }
 
     @Override
     public void notifySetupComplete() {
-        outputHandler.sendGameStatus(GameState.WAITING_SETUP, "Ready to play");
+        networkClient.sendGameStatus(GameState.WAITING_SETUP, "Ready to play");
     }
 
     @Override
