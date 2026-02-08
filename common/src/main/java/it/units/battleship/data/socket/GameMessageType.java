@@ -30,6 +30,11 @@ public enum GameMessageType {
     TURN_CHANGE("turn_change"),
 
     /**
+     * Sent to authenticate the player with the server.
+     */
+    AUTHENTICATE("authenticate"),
+
+    /**
      * Used for protocol errors or unexpected communication failures.
      */
     ERROR("error");

@@ -9,6 +9,7 @@ public class ActiveTurnState implements TurnState {
     @Override
     public void onEnter(TurnManager manager) {
         TurnState.super.onEnter(manager);
+        manager.getView().showGamePhase();
         manager.getView().setPlayerTurn(true);
     }
 
