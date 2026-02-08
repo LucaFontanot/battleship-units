@@ -198,4 +198,11 @@ public class SetupPanel extends JPanel implements PlacementContext, SetupView {
             btn.setBorder(UIManager.getBorder("Button.border"));
         }
     }
+
+    @Override
+    public void close() {
+        if (mainFrame != null) {
+            mainFrame.dispose();
+        }
+    }
 }

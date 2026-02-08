@@ -102,4 +102,8 @@ public class SetupController implements SetupInteractionFacade {
             view.showPlacementPreview(coords, false, null);
         }
     }
+
+    public void close() {
+        view.close();
+    }
 }
