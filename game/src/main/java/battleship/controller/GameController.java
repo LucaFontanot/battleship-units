@@ -4,9 +4,11 @@ import battleship.controller.game.ui.OpponentGridHandler;
 import battleship.controller.game.ui.PlayerGridHandler;
 import battleship.controller.mode.GameModeStrategy;
 import battleship.controller.turn.TurnManager;
+import battleship.controller.turn.states.WaitingSetupState;
 import battleship.model.game.FleetManager;
 import battleship.model.game.Grid;
 import battleship.model.game.Ship;
+import battleship.view.BattleshipView;
 import battleship.view.game.GameView;
 import it.units.battleship.*;
 import it.units.battleship.data.socket.payloads.*;
@@ -24,12 +26,12 @@ public class GameController implements GameModeStrategy.GameModeCallback {
 
     private final TurnManager turnManager;
     private final GameModeStrategy gameMode;
-    private final GameView view;
+    private final BattleshipView view;
 
     public GameController(@NonNull Grid grid,
                           @NonNull FleetManager fleetManager,
                           @NonNull GameModeStrategy gameMode,
-                          @NonNull GameView view) {
+                          @NonNull BattleshipView view) {
         this.gameMode = gameMode;
         this.view = view;
 
@@ -47,8 +49,8 @@ public class GameController implements GameModeStrategy.GameModeCallback {
      * It starts the game by initializing the game mode and starting the TurnManager.
      */
     public void startGame() {
+        view.open();
         gameMode.initialize(this);
-
         turnManager.start();
     }
 
@@ -58,7 +60,7 @@ public class GameController implements GameModeStrategy.GameModeCallback {
     private void onLocalSetupComplete() {
         Logger.log("GameController: Local setup complete");
 
-        turnManager.transitionTo(new battleship.controller.turn.states.WaitingSetupState());
+        turnManager.transitionTo(new WaitingSetupState());
 
         gameMode.notifySetupComplete();
     }

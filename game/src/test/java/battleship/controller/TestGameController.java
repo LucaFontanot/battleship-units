@@ -1,10 +1,11 @@
 package battleship.controller;
 
 import battleship.controller.mode.GameModeStrategy;
-import battleship.model.FleetManager;
-import battleship.model.Grid;
-import battleship.model.Ship;
-import battleship.view.GameView;
+import battleship.model.game.FleetManager;
+import battleship.model.game.Grid;
+import battleship.model.game.Ship;
+import battleship.view.BattleshipView;
+import it.units.battleship.CellState;
 import it.units.battleship.Coordinate;
 import it.units.battleship.GameState;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,7 +36,7 @@ class TestGameController {
     private GameModeStrategy modeMock;
 
     @Mock
-    private GameView viewMock;
+    private BattleshipView viewMock;
 
     private GameController controller; // reused across tests when possible
 
@@ -46,6 +47,19 @@ class TestGameController {
 
         // Default stub so constructor logging doesn't explode
         when(modeMock.getModeName()).thenReturn("Test Mode");
+
+        // Mock FleetManager methods needed by BaseGameState.onEnter
+        when(fleetMgrMock.getGrid()).thenReturn(gridMock);
+        CellState[][] emptyGrid = new CellState[10][10];
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
+                emptyGrid[i][j] = CellState.EMPTY;
+            }
+        }
+        when(gridMock.getGrid()).thenReturn(emptyGrid);
+        when(fleetMgrMock.getFleet()).thenReturn(java.util.List.of());
+        when(fleetMgrMock.getPlacedCounts()).thenReturn(java.util.Map.of());
+        when(fleetMgrMock.getRequiredFleetConfiguration()).thenReturn(java.util.Map.of());
     }
 
     @Test

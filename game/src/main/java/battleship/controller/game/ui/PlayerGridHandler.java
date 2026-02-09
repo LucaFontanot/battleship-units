@@ -15,11 +15,11 @@ public class PlayerGridHandler implements GridInteractionObserver {
 
     @Override
     public void onGridHover(Coordinate coordinate) {
-
+        actions.requestPlacementPreview(coordinate);
     }
 
     @Override
     public void onGridClick(Coordinate coordinate) {
-
+        actions.requestShipPlacement(coordinate);
     }
 }
