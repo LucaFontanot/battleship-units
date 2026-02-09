@@ -8,14 +8,15 @@ import battleship.model.game.Grid;
 import battleship.model.game.Ship;
 import battleship.view.BattleshipView;
 import battleship.view.game.GameView;
-import it.units.battleship.Coordinate;
-import it.units.battleship.GameState;
-import it.units.battleship.Logger;
+import it.units.battleship.*;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 
 import java.util.List;
+
+import static it.units.battleship.Defaults.GRID_COLS;
+import static it.units.battleship.Defaults.GRID_ROWS;
 
 /**
  * Manages the turn flow using the State pattern.
@@ -26,6 +27,8 @@ public class TurnManager implements GameInteractionFacade {
     private TurnState currentState;
     @Getter
     private final Grid grid;
+    @Getter@Setter
+    private Grid opponentGrid;
     @Getter
     private final FleetManager  fleetManager;
     @Getter
@@ -45,6 +48,9 @@ public class TurnManager implements GameInteractionFacade {
         this.fleetManager = fleetManager;
         this.gameModeStrategy = gameModeStrategy;
         this.view = view;
+        //using grid.getRow and grid.getCol indeed using the default values,
+        //oppoennt grid will scale automatically if diff grid size are implemented
+        this.opponentGrid = new Grid(grid.getRow(), grid.getCol());
 
         this.currentState = new SetupState();
     }
@@ -107,6 +113,9 @@ public class TurnManager implements GameInteractionFacade {
     }
 
     public void handleOpponentGridUpdate(String grid, List<Ship> fleet) {
+        CellState[][] newOpponentGrid = GridMapper.deserialize(grid, opponentGrid.getCol(), opponentGrid.getRow());
+        setOpponentGrid(new Grid(newOpponentGrid));
+
         currentState.handleOpponentGridUpdate(this, grid, fleet);
     }
 

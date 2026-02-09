@@ -84,55 +84,6 @@ public class WelcomeUi implements WelcomeUiActions {
         controller.startGame();
     }
 
-    /*
-    @Override                                                                                                                                        │
-│  89       public void onLocalMultiplayerSelected() {                                                                                                       │
-│  86 -         String[] options = {"Host (Player 1)", "Join (Player 2)"};                                                                                   │
-│  87 -         int choice = JOptionPane.showOptionDialog(                                                                                                   │
-│  88 -                 frame,                                                                                                                               │
-│  89 -                 "Choose your role:",                                                                                                                 │
-│  90 -                 "Local Multiplayer",                                                                                                                 │
-│  91 -                 JOptionPane.DEFAULT_OPTION,                                                                                                          │
-│  92 -                 JOptionPane.QUESTION_MESSAGE,                                                                                                        │
-│  93 -                 null,                                                                                                                                │
-│  94 -                 options,                                                                                                                             │
-│  95 -                 options[0]                                                                                                                           │
-│  96 -         );                                                                                                                                           │
-│  97 -                                                                                                                                                      │
-│  98 -         if (choice < 0) return;                                                                                                                      │
-│  99 -                                                                                                                                                      │
-│ 100 -         boolean isHost = (choice == 0);                                                                                                              │
-│ 101 -         int port = isHost ? 8081 : 8081;                                                                                                             │
-│ 102 -         String serverUri = "ws://localhost:" + port + it.units.battleship.Defaults.HTTP_LOBBY_PATH;                                                  │
-│ 103 -                                                                                                                                                      │
-│ 104 -         frame.dispose();                                                                                                                             │
-│ 105 -                                                                                                                                                      │
-│ 106 -         Grid playerGrid = new Grid(10, 10);                                                                                                          │
-│ 107 -         Map<ShipType, Integer> fleetConfiguration = Map.of(                                                                                          │
-│ 108 -                 ShipType.DESTROYER, 2,                                                                                                               │
-│ 109 -                 ShipType.FRIGATE, 2,                                                                                                                 │
-│ 110 -                 ShipType.CRUISER, 1,                                                                                                                 │
-│ 111 -                 ShipType.BATTLESHIP, 1,                                                                                                              │
-│ 112 -                 ShipType.CARRIER, 1                                                                                                                  │
-│ 113 -         );                                                                                                                                           │
-│ 114 -                                                                                                                                                      │
-│ 115 -         FleetManager fleetManager = new FleetManager(playerGrid, fleetConfiguration);                                                                │
-│ 116 -         GamePanel gameFrame = new GamePanel();                                                                                                       │
-│ 117 -                                                                                                                                                      │
-│ 118 -         GameModeStrategy gameMode = new LocalMultiplayerStrategy(serverUri, isHost);                                                                 │
-│ 119 -                                                                                                                                                      │
-│ 120 -         GameController controller = new GameController(                                                                                              │
-│ 121 -                 playerGrid,                                                                                                                          │
-│ 122 -                 fleetManager,                                                                                                                        │
-│ 123 -                 gameMode,                                                                                                                            │
-│ 124 -                 gameFrame                                                                                                                            │
-│ 125 -         );                                                                                                                                           │
-│ 126 -                                                                                                                                                      │
-│ 127 -         gameFrame.open();                                                                                                                            │
-│ 128 -         controller.startGame();                                                                                                                      │
-│  90 +         // ... (Local multiplayer logic could be updated similarly if needed)                                                                        │
-│  91       }
-    */
     @Override
     public void onOnlineMultiplayerSelected() {
         dispose();

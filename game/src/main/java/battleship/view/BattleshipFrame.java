@@ -143,7 +143,9 @@ public class BattleshipFrame extends JFrame implements BattleshipView {
 
     @Override
     public void showSystemMessage(String message) {
-        gamePanel.showStatusMessage(message);
+        SwingUtilities.invokeLater(() ->
+                JOptionPane.showMessageDialog(this, message, "Warning", JOptionPane.INFORMATION_MESSAGE)
+        );
     }
 
     @Override
