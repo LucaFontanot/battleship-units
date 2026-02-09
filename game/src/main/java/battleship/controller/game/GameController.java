@@ -12,6 +12,7 @@ import battleship.model.game.Grid;
 import battleship.serializer.GameDataMapper;
 import battleship.view.game.GameFrame;
 import battleship.view.game.GameView;
+import battleship.view.welcome.WelcomeUi;
 import it.units.battleship.*;
 import battleship.model.game.Ship;
 import it.units.battleship.data.socket.GameMessageType;
@@ -47,7 +48,6 @@ public class GameController implements NetworkInputActions, GameInteractionFacad
     private boolean gameStarted = false;
 
     public GameController(@NonNull Grid grid, @NonNull FleetManager fleetManager, AbstractPlayerCommunication communication) {
-
         this.grid = grid;
         this.fleetManager = fleetManager;
         this.communication = communication;
@@ -56,6 +56,11 @@ public class GameController implements NetworkInputActions, GameInteractionFacad
         view.setOpponentGridListener(new OpponentGridHandler(this));
         view.setPlayerGridListener(new PlayerGridHandler(this));
         communication.addCommunicationEventsListener(this);
+
+        view.setReturnToMenuAction(() -> {
+            ((JFrame) view).dispose();
+            new WelcomeUi().show();
+        });
     }
 
     @Override

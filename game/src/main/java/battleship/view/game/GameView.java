@@ -130,5 +130,9 @@ public interface GameView {
      */
     void showShotPreview(Coordinate coord);
 
+    void setReturnToMenuAction(Runnable action);
+
+    void setReturnToMenuVisible(boolean visible);
+
     void playerErrorSound();
 }

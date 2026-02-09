@@ -6,6 +6,7 @@ import battleship.view.grid.GridUI;
 import it.units.battleship.Coordinate;
 import it.units.battleship.ShipType;
 import lombok.Getter;
+import lombok.Setter;
 
 import javax.swing.*;
 import java.util.List;
@@ -35,6 +36,12 @@ public class GameFrame extends JFrame implements GameView {
 
     private final JLabel systemMessage = new JLabel(" ");
 
+    private final JButton returnToMenuBtn = new JButton("Return to menu");
+    @Setter
+    private Runnable returnToMenuAction;
+    private final JPanel bottomBar = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+
+
     public GameFrame() {
         this.playerGridUI = new GridUI(10,10);
         this.opponentGridUI = new GridUI(10,10);
@@ -47,6 +54,14 @@ public class GameFrame extends JFrame implements GameView {
         systemMessage.setVerticalAlignment(SwingConstants.CENTER);
 
         add(systemMessage, BorderLayout.NORTH);
+
+        returnToMenuBtn.setVisible(false);
+        returnToMenuBtn.addActionListener(e -> {
+            if (returnToMenuAction != null) returnToMenuAction.run();
+        });
+
+        bottomBar.add(returnToMenuBtn);
+        add(bottomBar, BorderLayout.SOUTH);
 
         pack();
         setLocationRelativeTo(null);
@@ -89,6 +104,7 @@ public class GameFrame extends JFrame implements GameView {
 
     @Override
     public void showGamePhase() {
+        setReturnToMenuVisible(false);
         systemMessage.setText("Game started.");
         switchPanel(new GameBoardPanel(playerGridUI, opponentGridUI));
         pack();
@@ -101,6 +117,7 @@ public class GameFrame extends JFrame implements GameView {
         opponentGridUI.clearPlacementPreview();
 
         showSystemMessage(message != null ? message : "Game Over");
+        setReturnToMenuVisible(true);
     }
 
     @Override
@@ -131,10 +148,18 @@ public class GameFrame extends JFrame implements GameView {
         Toolkit.getDefaultToolkit().beep();
     }
 
+    public void setReturnToMenuVisible(boolean visible) {
+        returnToMenuBtn.setVisible(visible);
+        bottomBar.setVisible(visible);
+    }
+
     private void switchPanel(JPanel panel) {
         getContentPane().removeAll();
+
         add(systemMessage, BorderLayout.NORTH);
         add(panel, BorderLayout.CENTER);
+        add(bottomBar, BorderLayout.SOUTH);
+
         currentPanel = panel;
         revalidate();
         repaint();
