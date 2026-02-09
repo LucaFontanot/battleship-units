@@ -1,26 +1,26 @@
 package battleship.controller.turn.states;
 
 import battleship.controller.turn.TurnManager;
-import battleship.controller.turn.TurnState;
 import battleship.model.game.FleetManager;
 import battleship.model.game.Ship;
-import battleship.view.game.GameView;
+import battleship.view.BattleshipView;
 import it.units.battleship.*;
 
 import java.util.LinkedHashSet;
-import java.util.Map;
 
-public class SetupState implements TurnState {
+/**
+ * Represents the Setup phase where players can place their ships on the grid.
+ */
+public class SetupState extends BaseGameState {
     @Override
     public void onEnter(TurnManager manager) {
-        TurnState.super.onEnter(manager);
+        super.onEnter(manager);
         manager.getView().setPlayerTurn(true);
-        refreshFleetUI(manager);
     }
 
     @Override
     public void handlePlayerGridClick(TurnManager manager, Coordinate coordinate) {
-        GameView view = manager.getView();
+        BattleshipView view = manager.getView();
         FleetManager fleetManager = manager.getFleetManager();
 
         Orientation orientation = view.getSelectedOrientation();
@@ -51,7 +51,7 @@ public class SetupState implements TurnState {
 
     @Override
     public void handlePlayerGridHover(TurnManager manager, Coordinate coordinate) {
-        GameView view = manager.getView();
+        BattleshipView view = manager.getView();
         FleetManager fleetManager = manager.getFleetManager();
 
         Orientation orientation = view.getSelectedOrientation();
@@ -77,24 +77,5 @@ public class SetupState implements TurnState {
     @Override
     public boolean canPlaceShip() {
         return true;
-    }
-
-    private void updateGridAndFleetUI(TurnManager manager){
-        FleetManager fleetManager = manager.getFleetManager();
-        GameView view = manager.getView();
-
-        String gridSerialized = GridMapper.serialize(fleetManager.getGrid().getGrid());
-        view.updatePlayerGrid(gridSerialized, fleetManager.getFleet());
-        refreshFleetUI(manager);
-    }
-
-    private void refreshFleetUI(TurnManager manager){
-        FleetManager fleetManager = manager.getFleetManager();
-        GameView view = manager.getView();
-
-        Map<ShipType, Integer> placedCounts = fleetManager.getPlacedCounts();
-        Map<ShipType, Integer> requiredCounts = fleetManager.getRequiredFleetConfiguration();
-
-        view.refreshFleetSelection(placedCounts, requiredCounts);
     }
 }

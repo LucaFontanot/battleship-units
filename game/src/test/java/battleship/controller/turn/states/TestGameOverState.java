@@ -2,7 +2,8 @@ package battleship.controller.turn.states;
 
 import battleship.controller.mode.GameModeStrategy;
 import battleship.controller.turn.TurnManager;
-import battleship.view.GameView;
+import battleship.view.BattleshipView;
+import it.units.battleship.CellState;
 import it.units.battleship.GameState;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,9 +18,13 @@ class TestGameOverState {
     @Mock
     private TurnManager mockTurnManager;
     @Mock
-    private GameView mockView;
+    private BattleshipView mockView;
     @Mock
     private GameModeStrategy mockGameModeStrategy;
+    @Mock
+    private battleship.model.game.FleetManager mockFleetManager;
+    @Mock
+    private battleship.model.game.Grid mockGrid;
 
     private GameOverState gameOverState;
 
@@ -29,6 +34,18 @@ class TestGameOverState {
 
         when(mockTurnManager.getView()).thenReturn(mockView);
         when(mockTurnManager.getGameModeStrategy()).thenReturn(mockGameModeStrategy);
+        when(mockTurnManager.getFleetManager()).thenReturn(mockFleetManager);
+        when(mockFleetManager.getGrid()).thenReturn(mockGrid);
+        CellState[][] emptyGrid = new CellState[10][10];
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
+                emptyGrid[i][j] = CellState.EMPTY;
+            }
+        }
+        when(mockGrid.getGrid()).thenReturn(emptyGrid);
+        when(mockFleetManager.getFleet()).thenReturn(java.util.List.of());
+        when(mockFleetManager.getPlacedCounts()).thenReturn(java.util.Map.of());
+        when(mockFleetManager.getRequiredFleetConfiguration()).thenReturn(java.util.Map.of());
     }
 
     @Test

@@ -1,15 +1,19 @@
 package battleship.controller.turn.states;
 
 import battleship.controller.turn.TurnManager;
-import battleship.controller.turn.TurnState;
 import it.units.battleship.Coordinate;
 import it.units.battleship.GameState;
 
-public class ActiveTurnState implements TurnState {
+/**
+ * Represents the state where a player's turn is active in the game.
+ * This state allows the player to interact with the game board by firing shots
+ * and previewing potential shots on the opponent's grid.
+ */
+public class ActiveTurnState extends BaseGameState {
+
     @Override
     public void onEnter(TurnManager manager) {
-        TurnState.super.onEnter(manager);
-        manager.getView().showGamePhase();
+        super.onEnter(manager);
         manager.getView().setPlayerTurn(true);
     }
 

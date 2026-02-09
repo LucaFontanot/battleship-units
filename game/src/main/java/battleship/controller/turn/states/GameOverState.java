@@ -5,8 +5,11 @@ import battleship.controller.turn.TurnState;
 import it.units.battleship.GameState;
 import lombok.Getter;
 
+/**
+ * Represents the state of the game when it has ended, either in victory or defeat.
+ */
 @Getter
-public class GameOverState implements TurnState {
+public class GameOverState extends BaseGameState {
 
     private final String message;
     private final boolean won;
@@ -18,7 +21,7 @@ public class GameOverState implements TurnState {
 
     @Override
     public void onEnter(TurnManager manager) {
-        TurnState.super.onEnter(manager);
+        super.onEnter(manager);
         manager.getView().setPlayerTurn(false);
         manager.getView().showEndGamePhase(message);
 

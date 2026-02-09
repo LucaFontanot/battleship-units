@@ -4,10 +4,12 @@ import battleship.controller.mode.GameModeStrategy;
 import battleship.controller.turn.states.ActiveTurnState;
 import battleship.controller.turn.states.GameOverState;
 import battleship.controller.turn.states.SetupState;
-import battleship.model.FleetManager;
-import battleship.model.Grid;
-import battleship.model.Ship;
-import battleship.view.GameView;
+import battleship.model.game.FleetManager;
+import battleship.model.game.Grid;
+import battleship.model.game.Ship;
+import battleship.view.BattleshipView;
+import battleship.view.game.GameView;
+import it.units.battleship.CellState;
 import it.units.battleship.Coordinate;
 import it.units.battleship.GameState;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,7 +34,7 @@ class TestTurnManager {
     @Mock
     private FleetManager fleetManager;
     @Mock
-    private GameView view;
+    private BattleshipView view;
     @Mock
     private GameModeStrategy gameMode;    // slightly different naming style, on purpose
 
@@ -42,6 +44,20 @@ class TestTurnManager {
     void setUp() {
         // MockitoAnnotations.openMocks is old-school but still clear enough
         MockitoAnnotations.openMocks(this);
+
+        // Mock FleetManager and Grid methods needed by BaseGameState.onEnter
+        when(fleetManager.getGrid()).thenReturn(grid);
+        CellState[][] emptyGrid = new CellState[10][10];
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
+                emptyGrid[i][j] = CellState.EMPTY;
+            }
+        }
+        when(grid.getGrid()).thenReturn(emptyGrid);
+        when(fleetManager.getFleet()).thenReturn(java.util.List.of());
+        when(fleetManager.getPlacedCounts()).thenReturn(java.util.Map.of());
+        when(fleetManager.getRequiredFleetConfiguration()).thenReturn(java.util.Map.of());
+
         manager = new TurnManager(grid, fleetManager, view, gameMode);
     }
 

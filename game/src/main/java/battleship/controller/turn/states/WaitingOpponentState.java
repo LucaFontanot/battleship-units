@@ -1,7 +1,6 @@
 package battleship.controller.turn.states;
 
 import battleship.controller.turn.TurnManager;
-import battleship.controller.turn.TurnState;
 import battleship.model.game.FleetManager;
 import battleship.model.game.Ship;
 import it.units.battleship.Coordinate;
@@ -10,17 +9,20 @@ import it.units.battleship.GridMapper;
 
 import java.util.List;
 
-public class WaitingOpponentState implements TurnState {
+/**
+ * Represents the state where the player is waiting for the opponent's next move.
+ * The state handles opponent grid updates, incoming shots.
+ */
+public class WaitingOpponentState extends BaseGameState {
     @Override
     public void onEnter(TurnManager manager) {
-        TurnState.super.onEnter(manager);
-        manager.getView().showGamePhase();
+        super.onEnter(manager);
         manager.getView().setPlayerTurn(false);
     }
 
     @Override
     public void handleOpponentGridUpdate(TurnManager manager, String grid, List<Ship> fleet){
-        TurnState.super.handleOpponentGridUpdate(manager, grid, fleet);
+        super.handleOpponentGridUpdate(manager, grid, fleet);
     }
 
     @Override

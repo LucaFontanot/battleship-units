@@ -6,6 +6,7 @@ import battleship.controller.turn.states.SetupState;
 import battleship.model.game.FleetManager;
 import battleship.model.game.Grid;
 import battleship.model.game.Ship;
+import battleship.view.BattleshipView;
 import battleship.view.game.GameView;
 import it.units.battleship.Coordinate;
 import it.units.battleship.GameState;
@@ -28,15 +29,17 @@ public class TurnManager implements GameInteractionFacade {
     @Getter
     private final FleetManager  fleetManager;
     @Getter
-    private final GameView view;
+    private final BattleshipView view;
     @Getter
     private final GameModeStrategy gameModeStrategy;
     @Setter
     private SetupCompleteCallback setupCompleteCallback;
+    @Setter
+    private PhaseTransitionCallback phaseTransitionCallback;
 
     public TurnManager(@NonNull Grid grid,
                        @NonNull FleetManager fleetManager,
-                       @NonNull GameView view,
+                       @NonNull BattleshipView view,
                        @NonNull GameModeStrategy gameModeStrategy) {
         this.grid = grid;
         this.fleetManager = fleetManager;
@@ -59,6 +62,15 @@ public class TurnManager implements GameInteractionFacade {
     public void onSetupComplete(){
         if(setupCompleteCallback != null){
             setupCompleteCallback.onSetupComplete();
+        }
+    }
+
+    /**
+     * Called when transitioning from setup to game phase
+     */
+    public void onPhaseTransition(GamePhase newPhase){
+        if (phaseTransitionCallback != null) {
+            phaseTransitionCallback.onPhaseTransition(newPhase);
         }
     }
 
@@ -120,6 +132,8 @@ public class TurnManager implements GameInteractionFacade {
         return currentState.getStateName();
     }
 
+    // ==== Game interaction facade =====
+
     @Override
     public void requestShot(Coordinate coordinate) {
         handleOpponentGridClick(coordinate);
@@ -140,8 +154,19 @@ public class TurnManager implements GameInteractionFacade {
         handleOpponentGridHover(coordinate);
     }
 
+    // ===== Callbacks =====
+
+    @FunctionalInterface
+    public interface PhaseTransitionCallback{
+        void onPhaseTransition(GamePhase phase);
+    }
+
     @FunctionalInterface
     public interface SetupCompleteCallback{
         void onSetupComplete();
+    }
+
+    public enum GamePhase{
+        SETUP, WAITING_SETUP, ACTIVE_TURN, GAME_OVER
     }
 }

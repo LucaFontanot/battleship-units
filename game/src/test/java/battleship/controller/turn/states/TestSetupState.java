@@ -2,10 +2,11 @@ package battleship.controller.turn.states;
 
 import battleship.controller.mode.GameModeStrategy;
 import battleship.controller.turn.TurnManager;
-import battleship.model.FleetManager;
-import battleship.model.Grid;
-import battleship.model.Ship;
-import battleship.view.GameView;
+import battleship.model.game.FleetManager;
+import battleship.model.game.Grid;
+import battleship.model.game.Ship;
+import battleship.view.BattleshipView;
+import it.units.battleship.CellState;
 import it.units.battleship.Coordinate;
 import it.units.battleship.GameState;
 import it.units.battleship.Orientation;
@@ -28,7 +29,7 @@ class TestSetupState {
     @Mock
     private TurnManager mockTurnManager;
     @Mock
-    private GameView mockView;
+    private BattleshipView mockView;
     @Mock
     private FleetManager mockFleetManager;
     @Mock
@@ -47,6 +48,19 @@ class TestSetupState {
         when(mockTurnManager.getFleetManager()).thenReturn(mockFleetManager);
         when(mockTurnManager.getGrid()).thenReturn(mockGrid);
         when(mockTurnManager.getGameModeStrategy()).thenReturn(mockGameModeStrategy);
+
+        // Mock methods needed by BaseGameState.onEnter
+        when(mockFleetManager.getGrid()).thenReturn(mockGrid);
+        CellState[][] emptyGrid = new CellState[10][10];
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
+                emptyGrid[i][j] = CellState.EMPTY;
+            }
+        }
+        when(mockGrid.getGrid()).thenReturn(emptyGrid);
+        when(mockFleetManager.getFleet()).thenReturn(java.util.List.of());
+        when(mockFleetManager.getPlacedCounts()).thenReturn(java.util.Map.of());
+        when(mockFleetManager.getRequiredFleetConfiguration()).thenReturn(java.util.Map.of());
     }
 
     @Test

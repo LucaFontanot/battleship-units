@@ -2,10 +2,10 @@ package battleship.controller.turn.states;
 
 import battleship.controller.mode.GameModeStrategy;
 import battleship.controller.turn.TurnManager;
-import battleship.model.FleetManager;
-import battleship.model.Grid;
-import battleship.model.Ship;
-import battleship.view.GameView;
+import battleship.model.game.FleetManager;
+import battleship.model.game.Grid;
+import battleship.model.game.Ship;
+import battleship.view.BattleshipView;
 import it.units.battleship.Coordinate;
 import it.units.battleship.GameState;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,7 +17,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.*;
 
 class TestWaitingOpponentState {
@@ -25,7 +24,7 @@ class TestWaitingOpponentState {
     @Mock
     private TurnManager mockTurnManager;
     @Mock
-    private GameView mockView;
+    private BattleshipView mockView;
     @Mock
     private FleetManager mockFleetManager;
     @Mock

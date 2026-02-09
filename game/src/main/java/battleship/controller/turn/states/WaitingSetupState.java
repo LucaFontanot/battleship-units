@@ -8,11 +8,11 @@ import it.units.battleship.GameState;
  * State when the local player has completed setup but is waiting for the opponent to finish.
  * In this state, the player cannot interact with grids and must wait for a game start signal.
  */
-public class WaitingSetupState implements TurnState {
+public class WaitingSetupState extends BaseGameState {
 
     @Override
     public void onEnter(TurnManager manager) {
-        TurnState.super.onEnter(manager);
+        super.onEnter(manager);
         manager.getView().setPlayerTurn(false);
         manager.getView().showSystemMessage("Waiting for opponent setup...");
     }
@@ -28,8 +28,10 @@ public class WaitingSetupState implements TurnState {
      */
     public void handleGameStatusReceived(TurnManager manager, GameState state) {
         if (state == GameState.ACTIVE_TURN) {
+            manager.getView().transitionToGamePhase();
             manager.transitionTo(new ActiveTurnState());
         } else if (state == GameState.WAITING_FOR_OPPONENT) {
+            manager.getView().transitionToGamePhase();
             manager.transitionTo(new WaitingOpponentState());
         }
     }
