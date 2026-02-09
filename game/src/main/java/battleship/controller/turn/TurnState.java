@@ -3,7 +3,6 @@ package battleship.controller.turn;
 import battleship.model.game.Ship;
 import it.units.battleship.Coordinate;
 import it.units.battleship.GameState;
-import it.units.battleship.Logger;
 
 import java.util.List;
 
@@ -13,44 +12,38 @@ import java.util.List;
  */
 public interface TurnState {
     /**Called when the state is entered.*/
-    default void onEnter(TurnManager manager){
-        Logger.debug("Entering state: " + getStateName());
-    }
+    void onEnter(TurnManager manager);
 
     /**Called when the state is exited.*/
-    default void onExit(TurnManager manager){
-        Logger.debug("Exiting state: " + getStateName());
-    }
+    void onExit(TurnManager manager);
 
     /**Handle the click on the opponent's grid.*/
-    default void handleOpponentGridClick(TurnManager manager, Coordinate coordinate){}
+    void handleOpponentGridClick(TurnManager manager, Coordinate coordinate);
 
     /**Handle the click on the player's grid.*/
-    default void handlePlayerGridClick(TurnManager manager, Coordinate coordinate){}
+    void handlePlayerGridClick(TurnManager manager, Coordinate coordinate);
 
     /**Handle the hover on the opponent's grid.*/
-    default void handleOpponentGridHover(TurnManager manager, Coordinate coordinate){}
+    void handleOpponentGridHover(TurnManager manager, Coordinate coordinate);
 
     /**Handle the hover on the player's grid.*/
-    default void handlePlayerGridHover(TurnManager manager, Coordinate coordinate){}
+    void handlePlayerGridHover(TurnManager manager, Coordinate coordinate);
 
     /**Handle incoming shots.*/
-    default void handleIncomingShot(TurnManager manager, Coordinate coordinate){}
+    void handleIncomingShot(TurnManager manager, Coordinate coordinate);
 
     /**Handle update for the opponent's grid.*/
-    default void handleOpponentGridUpdate(TurnManager manager, String grid, List<Ship> fleet){
-        manager.getView().updateOpponentGrid(grid, fleet);
-    }
+    void handleOpponentGridUpdate(TurnManager manager, String grid, List<Ship> fleet);
 
     /**Handle game status updates from server (e.g., game start signal).*/
-    default void handleGameStatusReceived(TurnManager manager, GameState state){}
+    void handleGameStatusReceived(TurnManager manager, GameState state);
 
     /**Return the name of the state.*/
     String getStateName();
 
     /**Tells if the player can interact with the opponent's grid.*/
-    default boolean canShoot(){return false;}
+    boolean canShoot();
 
     /**Tells if the player can place ships*/
-    default boolean canPlaceShip(){return false;}
+    boolean canPlaceShip();
 }
