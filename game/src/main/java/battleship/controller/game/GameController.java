@@ -89,6 +89,9 @@ public class GameController implements NetworkInputActions, GameInteractionFacad
 
     public void checkOrWaitForOpponentSetup() {
         localReady = true;
+
+        boolean iAmSecondReady = remoteReady;
+
         gameState = GameState.WAITING_FOR_OPPONENT;
 
         GameConfigDTO config = GameDataMapper.toGameConfigDTO(
@@ -100,8 +103,27 @@ public class GameController implements NetworkInputActions, GameInteractionFacad
         communication.sendMessage(GameMessageType.GAME_SETUP, config);
         Logger.log("SENT GAME_SETUP (ready) rows=" + config.rows() + " cols=" + config.cols());
 
-        tryStartGame();
+        if (iAmSecondReady) {
+            ensureGameStarted();
+            decideAndBroadcastFirstTurn();
+        } else {
+            view.showSystemMessage("Waiting for opponent...");
+            view.setPlayerTurn(false);
+        }
     }
+
+    private void decideAndBroadcastFirstTurn() {
+        boolean iStart = new java.util.Random().nextBoolean();
+
+        if (iStart) {
+            processGameStatusUpdate(GameState.ACTIVE_TURN, "Your turn");
+            communication.sendGameStatus(GameState.WAITING_FOR_OPPONENT, "Opponent's turn");
+        } else {
+            processGameStatusUpdate(GameState.WAITING_FOR_OPPONENT, "Opponent's turn");
+            communication.sendGameStatus(GameState.ACTIVE_TURN, "Your turn");
+        }
+    }
+
 
     public void startGame() {
         gameState = GameState.WAITING_FOR_OPPONENT;
@@ -149,6 +171,8 @@ public class GameController implements NetworkInputActions, GameInteractionFacad
         gameState = GameState.ACTIVE_TURN;
         view.setPlayerTurn(true);
 
+        communication.sendGameStatus(GameState.WAITING_FOR_OPPONENT, "Opponent's turn");
+
         if (fleetManager.isGameOver()) {
             handleGameOver();
         }
@@ -194,7 +218,13 @@ public class GameController implements NetworkInputActions, GameInteractionFacad
     @Override
     public void onOpponentGridUpdate(GridUpdateDTO dto) {
         SwingUtilities.invokeLater(() -> {
-            processOpponentGridUpdate(GameDataMapper.toGridSerialized(dto), GameDataMapper.toShipList(dto));
+            processOpponentGridUpdate(
+                    GameDataMapper.toGridSerialized(dto),
+                    GameDataMapper.toShipList(dto)
+            );
+
+            boolean hit = GameDataMapper.toShotOutcome(dto);
+            view.showSystemMessage(hit ? "Hit!" : "Miss!");
         });
     }
 
@@ -210,7 +240,12 @@ public class GameController implements NetworkInputActions, GameInteractionFacad
         SwingUtilities.invokeLater(() -> {
             remoteReady = true;
             Logger.log("RECEIVED GAME_SETUP (opponent ready)");
-            tryStartGame();
+
+            if (localReady) {
+                ensureGameStarted();
+                view.showSystemMessage("Waiting for turn decision...");
+                view.setPlayerTurn(false);
+            }
         });
     }
 
@@ -238,18 +273,9 @@ public class GameController implements NetworkInputActions, GameInteractionFacad
                 GridMapper.serialize(grid.getGrid()),
                 fleetManager.getFleet()
         );
-    }
 
-    private void tryStartGame() {
-        if (gameStarted) return;
-
-        if (localReady && remoteReady) {
-            gameStarted = true;
-
-            SwingUtilities.invokeLater(() -> {
-                if (closeSetupUi != null) closeSetupUi.run();
-                startGame();
-            });
-        }
+        view.setPlayerTurn(false);
+        view.showSystemMessage("Game started. Waiting...");
+        gameState = GameState.WAITING_FOR_OPPONENT;
     }
 }
