@@ -2,9 +2,9 @@ package battleship.controller.turn.states;
 
 import battleship.controller.mode.GameModeStrategy;
 import battleship.controller.turn.TurnManager;
-import battleship.model.game.FleetManager;
-import battleship.model.game.Grid;
-import battleship.view.BattleshipView;
+import battleship.model.FleetManager;
+import battleship.model.Grid;
+import battleship.view.core.BattleshipView;
 import it.units.battleship.CellState;
 import it.units.battleship.Coordinate;
 import it.units.battleship.GameState;

@@ -5,16 +5,11 @@ import battleship.controller.game.ui.PlayerGridHandler;
 import battleship.controller.mode.GameModeStrategy;
 import battleship.controller.turn.TurnManager;
 import battleship.controller.turn.states.WaitingSetupState;
-import battleship.model.game.FleetManager;
-import battleship.model.game.Grid;
-import battleship.model.game.Ship;
-import battleship.view.BattleshipView;
-import battleship.view.game.GameView;
+import battleship.model.*;
+import battleship.view.core.BattleshipView;
 import it.units.battleship.*;
-import it.units.battleship.data.socket.payloads.*;
 import lombok.NonNull;
 
-import java.awt.*;
 import java.util.List;
 
 

@@ -1,13 +1,10 @@
-package battleship.view.game;
+package battleship.view.core.game;
 
 import battleship.controller.game.actions.GridInteractionObserver;
-import battleship.model.game.Ship;
-import battleship.view.setup.SetupView;
+import battleship.model.Ship;
 import it.units.battleship.Coordinate;
-import it.units.battleship.ShipType;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Represents the view interface for the Battleship game.

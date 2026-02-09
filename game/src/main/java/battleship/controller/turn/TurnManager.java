@@ -3,20 +3,14 @@ package battleship.controller.turn;
 import battleship.controller.game.actions.GameInteractionFacade;
 import battleship.controller.mode.GameModeStrategy;
 import battleship.controller.turn.states.SetupState;
-import battleship.model.game.FleetManager;
-import battleship.model.game.Grid;
-import battleship.model.game.Ship;
-import battleship.view.BattleshipView;
-import battleship.view.game.GameView;
+import battleship.model.*;
+import battleship.view.core.BattleshipView;
 import it.units.battleship.*;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 
 import java.util.List;
-
-import static it.units.battleship.Defaults.GRID_COLS;
-import static it.units.battleship.Defaults.GRID_ROWS;
 
 /**
  * Manages the turn flow using the State pattern.

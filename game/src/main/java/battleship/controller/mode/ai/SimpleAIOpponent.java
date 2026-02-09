@@ -1,8 +1,8 @@
 package battleship.controller.mode.ai;
 
-import battleship.model.game.FleetManager;
-import battleship.model.game.Grid;
-import battleship.model.game.Ship;
+import battleship.model.FleetManager;
+import battleship.model.Grid;
+import battleship.model.Ship;
 import it.units.battleship.Coordinate;
 import it.units.battleship.Orientation;
 import it.units.battleship.ShipType;

@@ -1,9 +1,9 @@
 package battleship.controller.turn.states;
 
 import battleship.controller.turn.TurnManager;
-import battleship.model.game.FleetManager;
-import battleship.model.game.Ship;
-import battleship.view.BattleshipView;
+import battleship.model.FleetManager;
+import battleship.model.Ship;
+import battleship.view.core.BattleshipView;
 import it.units.battleship.*;
 
 import java.util.LinkedHashSet;

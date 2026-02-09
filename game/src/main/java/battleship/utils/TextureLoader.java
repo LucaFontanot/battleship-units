@@ -1,9 +1,8 @@
 package battleship.utils;
 
 import it.units.battleship.Orientation;
-import battleship.model.game.Ship;
+import battleship.model.Ship;
 import it.units.battleship.Coordinate;
-import it.units.battleship.Logger;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;

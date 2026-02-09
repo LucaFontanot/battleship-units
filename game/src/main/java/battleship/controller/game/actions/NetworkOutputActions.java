@@ -1,7 +1,7 @@
 package battleship.controller.game.actions;
 
-import battleship.model.game.Grid;
-import battleship.model.game.Ship;
+import battleship.model.Grid;
+import battleship.model.Ship;
 import it.units.battleship.Coordinate;
 import it.units.battleship.GameState;
 

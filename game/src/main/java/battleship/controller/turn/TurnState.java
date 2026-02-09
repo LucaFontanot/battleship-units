@@ -1,6 +1,6 @@
 package battleship.controller.turn;
 
-import battleship.model.game.Ship;
+import battleship.model.Ship;
 import it.units.battleship.Coordinate;
 import it.units.battleship.GameState;
 

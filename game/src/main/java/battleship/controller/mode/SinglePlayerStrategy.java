@@ -2,9 +2,7 @@ package battleship.controller.mode;
 
 import battleship.controller.mode.ai.AIOpponent;
 import battleship.controller.mode.ai.SimpleAIOpponent;
-import battleship.model.game.FleetManager;
-import battleship.model.game.Grid;
-import battleship.model.game.Ship;
+import battleship.model.*;
 import it.units.battleship.*;
 
 import java.util.List;

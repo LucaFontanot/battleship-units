@@ -2,16 +2,13 @@ package battleship.controller.game.network;
 
 import battleship.controller.game.actions.NetworkOutputActions;
 import battleship.controller.game.events.CommunicationEvents;
-import battleship.model.game.Grid;
-import battleship.model.game.Ship;
+import battleship.model.Grid;
+import battleship.model.Ship;
 import battleship.serializer.GameDataMapper;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import it.units.battleship.Coordinate;
 import it.units.battleship.GameState;
-import it.units.battleship.Logger;
 import it.units.battleship.data.socket.GameMessageType;
-import it.units.battleship.data.socket.WebSocketMessage;
 import it.units.battleship.data.socket.payloads.GameConfigDTO;
 import it.units.battleship.data.socket.payloads.GameStatusDTO;
 import it.units.battleship.data.socket.payloads.GridUpdateDTO;

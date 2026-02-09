@@ -1,4 +1,4 @@
-package battleship.model.game;
+package battleship.model;
 
 import it.units.battleship.CellState;
 import it.units.battleship.Coordinate;

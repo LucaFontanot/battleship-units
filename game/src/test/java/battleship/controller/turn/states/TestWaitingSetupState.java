@@ -2,7 +2,9 @@ package battleship.controller.turn.states;
 
 import battleship.controller.mode.GameModeStrategy;
 import battleship.controller.turn.TurnManager;
-import battleship.view.BattleshipView;
+import battleship.model.FleetManager;
+import battleship.model.Grid;
+import battleship.view.core.BattleshipView;
 import it.units.battleship.CellState;
 import it.units.battleship.GameState;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,9 +24,9 @@ class TestWaitingSetupState {
     @Mock
     private GameModeStrategy mockGameModeStrategy;
     @Mock
-    private battleship.model.game.FleetManager mockFleetManager;
+    private FleetManager mockFleetManager;
     @Mock
-    private battleship.model.game.Grid mockGrid;
+    private Grid mockGrid;
 
     private WaitingSetupState waitingSetupState;
 

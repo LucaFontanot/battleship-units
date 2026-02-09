@@ -1,8 +1,8 @@
 package battleship.controller.turn.states;
 
 import battleship.controller.turn.TurnManager;
-import battleship.model.game.FleetManager;
-import battleship.model.game.Ship;
+import battleship.model.FleetManager;
+import battleship.model.Ship;
 import it.units.battleship.Coordinate;
 import it.units.battleship.GameState;
 import it.units.battleship.GridMapper;

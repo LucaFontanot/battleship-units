@@ -5,10 +5,10 @@ import battleship.controller.lobby.LobbyController;
 import battleship.controller.mode.GameModeStrategy;
 import battleship.controller.mode.OnlineMultiplayerStrategy;
 import battleship.controller.mode.SinglePlayerStrategy;
-import battleship.model.game.FleetManager;
-import battleship.model.game.Grid;
-import battleship.view.BattleshipFrame;
-import battleship.view.BattleshipView;
+import battleship.model.FleetManager;
+import battleship.model.Grid;
+import battleship.view.core.BattleshipFrame;
+import battleship.view.core.BattleshipView;
 
 import battleship.view.lobby.LobbySelector;
 import battleship.utils.DimensionsUtils;
@@ -18,7 +18,6 @@ import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
 import it.units.battleship.Logger;
-import it.units.battleship.data.LobbyData;
 
 import javax.swing.*;
 import java.awt.*;

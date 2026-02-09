@@ -2,7 +2,7 @@ package battleship.controller.game.network;
 
 import battleship.controller.game.actions.NetworkInputActions;
 import battleship.controller.game.events.CommunicationEvents;
-import battleship.model.game.Ship;
+import battleship.model.Ship;
 import battleship.serializer.GameDataMapper;
 import it.units.battleship.Coordinate;
 import it.units.battleship.GameState;

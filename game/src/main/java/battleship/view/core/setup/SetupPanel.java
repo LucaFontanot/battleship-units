@@ -1,7 +1,7 @@
-package battleship.view.setup;
+package battleship.view.core.setup;
 
 import battleship.controller.game.actions.GridInteractionObserver;
-import battleship.model.game.Ship;
+import battleship.model.Ship;
 import battleship.view.grid.GridUI;
 import battleship.utils.DimensionsUtils;
 import it.units.battleship.Coordinate;
