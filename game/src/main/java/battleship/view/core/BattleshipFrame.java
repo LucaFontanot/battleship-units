@@ -58,7 +58,7 @@ public class BattleshipFrame extends JFrame implements BattleshipView {
         cardLayout.show(mainPanel, SETUP_CARD);
     }
 
-    // ===== Grid Listeners - Propagati ai pannelli =====
+    // ===== Grid Listeners =====
 
     @Override
     public void setPlayerGridListener(GridInteractionObserver observer) {

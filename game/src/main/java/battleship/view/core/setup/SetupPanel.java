@@ -147,8 +147,6 @@ public class SetupPanel extends JPanel implements PlacementContext, SetupView {
 
     @Override
     public void updateShipButtons(Map<ShipType, Integer> placedShip, Map<ShipType, Integer> fleetConfiguration) {
-
-        boolean isFleetComplete = true;
         for (ShipType type : ShipType.values()) {
             JButton button = shipButtons.get(type);
             if (button == null) continue;
@@ -159,11 +157,7 @@ public class SetupPanel extends JPanel implements PlacementContext, SetupView {
 
             button.setText(type.getName() + " (" + remaining + "/" + total + ")");
             button.setEnabled(remaining > 0);
-
-            if (placed < total) {
-                isFleetComplete = false;
-                continue;
-            }
+            button.setVisible(total > 0);
 
             if (selectedShipType == type && remaining <= 0) {
                 clearShipSelection();
