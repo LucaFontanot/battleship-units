@@ -269,6 +269,9 @@ public class FleetManager {
                 ));
     }
 
+    /**
+     * Retrieves a serialized representation of the current grid state.
+     */
     public String getSerializedGridState(){
         return GridMapper.serialize(grid.getGrid());
     }

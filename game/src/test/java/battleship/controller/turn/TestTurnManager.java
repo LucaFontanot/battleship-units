@@ -19,30 +19,24 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-/**
- * Tests for {@link TurnManager}.
- * Not super fancy tests, but they cover most of the state-related behavior.
- * If something breaks here, chances are the state machine logic changed.
- */
 class TestTurnManager {
 
     @Mock
-    private Grid grid;                    // keeping names short, they're obvious here
+    private Grid grid;
     @Mock
     private FleetManager fleetManager;
     @Mock
     private BattleshipView view;
     @Mock
-    private GameModeStrategy gameMode;    // slightly different naming style, on purpose
+    private GameModeStrategy gameMode;
 
     private TurnManager manager;
 
     @BeforeEach
     void setUp() {
-        // MockitoAnnotations.openMocks is old-school but still clear enough
         MockitoAnnotations.openMocks(this);
 
-        // Mock FleetManager and Grid methods needed by BaseGameState.onEnter
+        // Mock FleetManager and Grid methods needed by onEnter method
         when(fleetManager.getGrid()).thenReturn(grid);
         CellState[][] emptyGrid = new CellState[10][10];
         for (int i = 0; i < 10; i++) {
@@ -51,7 +45,7 @@ class TestTurnManager {
             }
         }
         when(grid.getGrid()).thenReturn(emptyGrid);
-        // TurnManager constructor creates opponentGrid using grid.getRow() and grid.getCol()
+        // TurnManager constructor creates opponentGrid
         when(grid.getRow()).thenReturn(10);
         when(grid.getCol()).thenReturn(10);
         when(fleetManager.getFleet()).thenReturn(java.util.List.of());
@@ -63,7 +57,7 @@ class TestTurnManager {
 
     @Test
     void constructor_startsInSetupState() {
-        // sanity check: manager should always start in setup
+        //Manager should always start in setup
         assertNotNull(manager.getCurrentState());
         assertTrue(manager.getCurrentState() instanceof SetupState);
         assertEquals(GameState.SETUP.name(), manager.getCurrentStateName());
@@ -77,22 +71,10 @@ class TestTurnManager {
 
     @Test
     void transitionTo_replacesCurrentState() {
-        TurnState active = new ActiveTurnState();
+        manager.transitionToActiveTurn();
 
-        manager.transitionTo(active);
-
-        assertEquals(active, manager.getCurrentState());
+        assertTrue(manager.getCurrentState() instanceof ActiveTurnState);
         assertEquals(GameState.ACTIVE_TURN.name(), manager.getCurrentStateName());
-    }
-
-    @Test
-    void transitionTo_callsOnEnterOnNewState() {
-        TurnState fakeState = mock(TurnState.class);
-        when(fakeState.getStateName()).thenReturn("MOCK_STATE"); // state name doesn't really matter here
-
-        manager.transitionTo(fakeState);
-
-        verify(fakeState).onEnter(manager);
     }
 
     @Test
@@ -102,7 +84,7 @@ class TestTurnManager {
 
     @Test
     void canShoot_isTrueDuringActiveTurn() {
-        manager.transitionTo(new ActiveTurnState());
+        manager.transitionToActiveTurn();
         assertTrue(manager.canShoot());
     }
 
@@ -113,7 +95,7 @@ class TestTurnManager {
 
     @Test
     void canPlaceShip_notAllowedInActiveTurn() {
-        manager.transitionTo(new ActiveTurnState());
+        manager.transitionToActiveTurn();
         assertFalse(manager.canPlaceShip());
     }
 

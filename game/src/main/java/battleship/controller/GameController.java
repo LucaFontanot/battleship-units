@@ -55,7 +55,7 @@ public class GameController implements GameModeStrategy.GameModeCallback {
     private void onLocalSetupComplete() {
         Logger.log("GameController: Local setup complete");
 
-        turnManager.transitionTo(new WaitingSetupState());
+        turnManager.transitionToWaitingSetup();
 
         gameMode.notifySetupComplete();
     }

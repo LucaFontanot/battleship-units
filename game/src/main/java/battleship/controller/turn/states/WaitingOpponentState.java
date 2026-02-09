@@ -1,11 +1,9 @@
 package battleship.controller.turn.states;
 
 import battleship.controller.turn.TurnManager;
-import battleship.model.FleetManager;
 import battleship.model.Ship;
 import it.units.battleship.Coordinate;
 import it.units.battleship.GameState;
-import it.units.battleship.GridMapper;
 
 import java.util.List;
 
@@ -17,7 +15,7 @@ public class WaitingOpponentState extends BaseGameState {
     @Override
     public void onEnter(TurnManager manager) {
         super.onEnter(manager);
-        manager.getView().setPlayerTurn(false);
+        manager.setPlayerTurn(false);
     }
 
     @Override
@@ -27,23 +25,12 @@ public class WaitingOpponentState extends BaseGameState {
 
     @Override
     public void handleIncomingShot(TurnManager manager, Coordinate coordinate) {
-        FleetManager fleetManager = manager.getFleetManager();
+        boolean gameOver = manager.processIncomingShot(coordinate);
 
-        boolean hit = fleetManager.handleIncomingShot(coordinate);
-
-        manager.getGameModeStrategy().sendGridUpdate(
-                fleetManager.getGrid(),
-                fleetManager.getFleet(),
-                hit
-        );
-
-        String gridSerialized = GridMapper.serialize(fleetManager.getGrid().getGrid());
-        manager.getView().updatePlayerGrid(gridSerialized, fleetManager.getFleet());
-
-        if (fleetManager.isGameOver()) {
-            manager.transitionTo(new GameOverState(false, "You lost! All your ships are sunk."));
+        if (gameOver) {
+            manager.transitionToGameOver(false, "You lost! All your ships are sunk.");
         } else {
-            manager.transitionTo(new ActiveTurnState());
+            manager.transitionToActiveTurn();
         }
     }
 

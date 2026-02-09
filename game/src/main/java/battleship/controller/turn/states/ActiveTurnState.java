@@ -15,24 +15,24 @@ public class ActiveTurnState extends BaseGameState {
     @Override
     public void onEnter(TurnManager manager) {
         super.onEnter(manager);
-        manager.getView().setPlayerTurn(true);
+        manager.setPlayerTurn(true);
     }
 
     @Override
     public void handleOpponentGridClick(TurnManager manager, Coordinate coordinate) {
-        CellState currentCellState = manager.getOpponentGrid().getState(coordinate);
+        CellState currentCellState = manager.getOpponentCellState(coordinate);
 
         if (currentCellState != CellState.EMPTY){
-            manager.getView().showSystemMessage("You already shot here!");
+            manager.notifyUser("You already shot here!");
             return;
         }
-        manager.getGameModeStrategy().sendShot(coordinate);
-        manager.transitionTo(new WaitingOpponentState());
+        manager.executeShot(coordinate);
+        manager.transitionToWaitingOpponent();
     }
 
     @Override
     public void handleOpponentGridHover(TurnManager manager, Coordinate coordinate) {
-        manager.getView().showShotPreview(coordinate);
+        manager.renderShotPreview(coordinate);
     }
 
     @Override
