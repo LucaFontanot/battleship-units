@@ -21,8 +21,10 @@ import lombok.Getter;
 import lombok.NonNull;
 
 import javax.swing.*;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 
@@ -47,6 +49,8 @@ public class GameController implements NetworkInputActions, GameInteractionFacad
     private boolean remoteReady = false;
     private boolean gameStarted = false;
 
+    private final Set<Coordinate> attemptedShots = new HashSet<>();
+    
     public GameController(@NonNull Grid grid, @NonNull FleetManager fleetManager, AbstractPlayerCommunication communication) {
         this.grid = grid;
         this.fleetManager = fleetManager;
@@ -66,11 +70,18 @@ public class GameController implements NetworkInputActions, GameInteractionFacad
     @Override
     public void requestShot(Coordinate coordinate) {
         if (gameState == GameState.ACTIVE_TURN) {
+            if (attemptedShots.contains(coordinate)) {
+                view.playerErrorSound();
+                view.showSystemMessage("Already shot there!");
+                return;
+            }
+
             handleOpponentGridClick(coordinate);
         }
     }
 
     private void handleOpponentGridClick(Coordinate coordinate) {
+        attemptedShots.add(coordinate);
         gameState = GameState.WAITING_FOR_OPPONENT;
 
         view.setPlayerTurn(false);
@@ -80,6 +91,8 @@ public class GameController implements NetworkInputActions, GameInteractionFacad
     @Override
     public void previewShot(Coordinate coordinate) {
         if (gameState == GameState.ACTIVE_TURN) {
+            if (attemptedShots.contains(coordinate)) return;
+
             view.showShotPreview(coordinate);
         }
     }
@@ -273,6 +286,7 @@ public class GameController implements NetworkInputActions, GameInteractionFacad
     private void ensureGameStarted() {
         if (gameStarted) return;
         gameStarted = true;
+        attemptedShots.clear();
 
         if (closeSetupUi != null) closeSetupUi.run();
 
