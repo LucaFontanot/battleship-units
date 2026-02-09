@@ -63,7 +63,7 @@ public class GameFrame extends JFrame implements GameView {
 
     @Override
     public void showSystemMessage(String message) {
-
+        systemMessage.setText(message != null ? message : " ");
     }
 
     @Override
@@ -106,11 +106,20 @@ public class GameFrame extends JFrame implements GameView {
 
     @Override
     public void setPlayerTurn(boolean isPlayerTurn) {
+        opponentGridUI.setEnabled(isPlayerTurn);
+
+        if (!isPlayerTurn) {
+            opponentGridUI.clearPlacementPreview();
+            showSystemMessage("Waiting for opponent...");
+        } else {
+            showSystemMessage("Your turn!");
+        }
     }
 
     @Override
     public void showShotPreview(Coordinate coord) {
-
+        opponentGridUI.clearPlacementPreview();
+        opponentGridUI.getCellAt(coord.row(), coord.col()).setPreview(true, true);
     }
 
     @Override
