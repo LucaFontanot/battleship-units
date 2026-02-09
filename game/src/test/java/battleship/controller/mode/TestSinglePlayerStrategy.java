@@ -1,7 +1,7 @@
 package battleship.controller.mode;
 
-import battleship.model.Grid;
-import battleship.model.Ship;
+import battleship.model.game.Grid;
+import battleship.model.game.Ship;
 import it.units.battleship.Coordinate;
 import it.units.battleship.GameState;
 import it.units.battleship.ShipType;
@@ -66,16 +66,19 @@ class TestSinglePlayerStrategy {
 
     @Test
     void testSendShotTriggersGameOverWhenNoShipsPlaced() {
-        singlePlayerStrategy.initialize(mockCallback);
+        // Create a strategy with NO ships required
+        SinglePlayerStrategy emptyStrategy = new SinglePlayerStrategy(Map.of());
+        emptyStrategy.initialize(mockCallback);
         Coordinate coord = new Coordinate(0, 0);
 
-        singlePlayerStrategy.sendShot(coord);
+        emptyStrategy.sendShot(coord);
 
         // Since AI has no ships placed, game should end immediately with player winning
         verify(mockCallback, timeout(2000)).onGameStatusReceived(
                 eq(GameState.GAME_OVER),
                 contains("win")
         );
+        emptyStrategy.shutdown();
     }
 
     @Test

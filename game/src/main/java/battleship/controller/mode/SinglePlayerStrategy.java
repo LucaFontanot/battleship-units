@@ -11,7 +11,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
+/**
+ * Represents the single-player strategy for the game.
+ * Handles interactions between the player and an AI opponent.
+ */
 public class SinglePlayerStrategy implements GameModeStrategy{
 
     private GameModeCallback callback;
@@ -53,7 +58,7 @@ public class SinglePlayerStrategy implements GameModeStrategy{
             boolean hit = aiFleetManager.handleIncomingShot(coordinate);
 
             String gridSerialized = GridMapper.serialize(aiGrid.getGrid());
-            List<Ship> aiFleet = aiFleetManager.getFleet();
+            List<Ship> aiFleet = aiFleetManager.getFleet().stream().filter(Ship::isSunk).collect(Collectors.toUnmodifiableList());
 
             callback.onGridUpdateReceived(gridSerialized, aiFleet);
 
