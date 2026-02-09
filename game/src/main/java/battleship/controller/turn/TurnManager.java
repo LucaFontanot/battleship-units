@@ -31,8 +31,6 @@ public class TurnManager implements GameInteractionFacade {
     private final GameModeStrategy gameModeStrategy;
     @Setter
     private SetupCompleteCallback setupCompleteCallback;
-    @Setter
-    private PhaseTransitionCallback phaseTransitionCallback;
 
     public TurnManager(@NonNull Grid grid,
                        @NonNull FleetManager fleetManager,
@@ -62,15 +60,6 @@ public class TurnManager implements GameInteractionFacade {
     public void onSetupComplete(){
         if(setupCompleteCallback != null){
             setupCompleteCallback.onSetupComplete();
-        }
-    }
-
-    /**
-     * Called when transitioning from setup to game phase
-     */
-    public void onPhaseTransition(GamePhase newPhase){
-        if (phaseTransitionCallback != null) {
-            phaseTransitionCallback.onPhaseTransition(newPhase);
         }
     }
 
@@ -107,8 +96,7 @@ public class TurnManager implements GameInteractionFacade {
     }
 
     public void handleOpponentGridUpdate(String grid, List<Ship> fleet) {
-        CellState[][] newOpponentGrid = GridMapper.deserialize(grid, opponentGrid.getCol(), opponentGrid.getRow());
-        setOpponentGrid(new Grid(newOpponentGrid));
+        opponentGrid.updateGridState(grid);
 
         currentState.handleOpponentGridUpdate(this, grid, fleet);
     }
@@ -160,16 +148,7 @@ public class TurnManager implements GameInteractionFacade {
     // ===== Callbacks =====
 
     @FunctionalInterface
-    public interface PhaseTransitionCallback{
-        void onPhaseTransition(GamePhase phase);
-    }
-
-    @FunctionalInterface
     public interface SetupCompleteCallback{
         void onSetupComplete();
-    }
-
-    public enum GamePhase{
-        SETUP, WAITING_SETUP, ACTIVE_TURN, GAME_OVER
     }
 }

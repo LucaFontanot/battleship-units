@@ -2,8 +2,10 @@ package battleship.model;
 
 import it.units.battleship.CellState;
 import it.units.battleship.Coordinate;
+import it.units.battleship.GridMapper;
 import lombok.Getter;
 import lombok.NonNull;
+import org.apache.logging.log4j.core.tools.picocli.CommandLine;
 
 /**
  * Represents a grid for the Battleship game, containing cells that can be in different states (EMPTY, HIT, or MISS).
@@ -24,7 +26,7 @@ public class Grid {
     private final int col;
     
     @Getter
-    private final CellState[][] grid;
+    private CellState[][] grid;
 
     public Grid(int row, int col){
         if (row<=1 || col<=1){
@@ -86,5 +88,14 @@ public class Grid {
         }
 
         return grid[coordinate.row()][coordinate.col()];
+    }
+
+    /**
+     * Updates the entire grid state from a serialized string representation.
+     * This method replaces the current internal grid matrix with a new one
+     * deserialized by the GridMapper.
+     */
+    public void updateGridState(String stringSerialized){
+        this.grid = GridMapper.deserialize(stringSerialized, row, col);
     }
 }
