@@ -133,12 +133,6 @@ public class SetupPanel extends JPanel implements PlacementContext, SetupView {
         mainFrame.setVisible(true);
     }
 
-    void dispose() {
-        if (mainFrame != null) {
-            mainFrame.dispose();
-        }
-    }
-
     @Override
     public void updateSetupGrid(String gridSerialized, List<Ship> fleetToRender) {
         getGridUI().displayData(gridSerialized, fleetToRender);
