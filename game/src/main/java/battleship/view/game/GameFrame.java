@@ -30,10 +30,7 @@ public class GameFrame extends JFrame implements GameView {
     @Getter
     private final GridUI opponentGridUI;
 
-    private JPanel currentPanel;
     private GridInteractionObserver observer;
-    private boolean gameOver = false;
-
     private final JLabel systemMessage = new JLabel(" ");
 
     private final JButton returnToMenuBtn = new JButton("Return to menu");
@@ -113,7 +110,6 @@ public class GameFrame extends JFrame implements GameView {
 
     @Override
     public void showEndGamePhase(String message) {
-        gameOver = true;
         opponentGridUI.clearPlacementPreview();
 
         showSystemMessage(message != null ? message : "Game Over");
@@ -160,7 +156,6 @@ public class GameFrame extends JFrame implements GameView {
         add(panel, BorderLayout.CENTER);
         add(bottomBar, BorderLayout.SOUTH);
 
-        currentPanel = panel;
         revalidate();
         repaint();
     }

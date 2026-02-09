@@ -50,7 +50,7 @@ public class GameController implements NetworkInputActions, GameInteractionFacad
     private boolean gameStarted = false;
 
     private final Set<Coordinate> attemptedShots = new HashSet<>();
-    
+
     public GameController(@NonNull Grid grid, @NonNull FleetManager fleetManager, AbstractPlayerCommunication communication) {
         this.grid = grid;
         this.fleetManager = fleetManager;
