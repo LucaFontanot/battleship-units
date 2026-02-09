@@ -54,6 +54,9 @@ class TestTurnManager {
             }
         }
         when(grid.getGrid()).thenReturn(emptyGrid);
+        // TurnManager constructor creates opponentGrid using grid.getRow() and grid.getCol()
+        when(grid.getRow()).thenReturn(10);
+        when(grid.getCol()).thenReturn(10);
         when(fleetManager.getFleet()).thenReturn(java.util.List.of());
         when(fleetManager.getPlacedCounts()).thenReturn(java.util.Map.of());
         when(fleetManager.getRequiredFleetConfiguration()).thenReturn(java.util.Map.of());

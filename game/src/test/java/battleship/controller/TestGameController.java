@@ -57,6 +57,9 @@ class TestGameController {
             }
         }
         when(gridMock.getGrid()).thenReturn(emptyGrid);
+        // TurnManager constructor creates opponentGrid using grid.getRow() and grid.getCol()
+        when(gridMock.getRow()).thenReturn(10);
+        when(gridMock.getCol()).thenReturn(10);
         when(fleetMgrMock.getFleet()).thenReturn(java.util.List.of());
         when(fleetMgrMock.getPlacedCounts()).thenReturn(java.util.Map.of());
         when(fleetMgrMock.getRequiredFleetConfiguration()).thenReturn(java.util.Map.of());

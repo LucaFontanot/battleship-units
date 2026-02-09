@@ -2,6 +2,8 @@ package battleship.controller.turn.states;
 
 import battleship.controller.mode.GameModeStrategy;
 import battleship.controller.turn.TurnManager;
+import battleship.model.game.FleetManager;
+import battleship.model.game.Grid;
 import battleship.view.BattleshipView;
 import it.units.battleship.CellState;
 import it.units.battleship.Coordinate;
@@ -23,9 +25,11 @@ class TestActiveTurnState {
     @Mock
     private GameModeStrategy mockGameModeStrategy;
     @Mock
-    private battleship.model.game.FleetManager mockFleetManager;
+    private FleetManager mockFleetManager;
     @Mock
-    private battleship.model.game.Grid mockGrid;
+    private Grid mockGrid;
+    @Mock
+    private Grid mockOpponentGrid;
 
     private ActiveTurnState activeTurnState;
 
@@ -37,6 +41,8 @@ class TestActiveTurnState {
         when(mockTurnManager.getView()).thenReturn(mockView);
         when(mockTurnManager.getGameModeStrategy()).thenReturn(mockGameModeStrategy);
         when(mockTurnManager.getFleetManager()).thenReturn(mockFleetManager);
+        when(mockTurnManager.getOpponentGrid()).thenReturn(mockOpponentGrid);
+        when(mockOpponentGrid.getState(any(Coordinate.class))).thenReturn(CellState.EMPTY);
         when(mockFleetManager.getGrid()).thenReturn(mockGrid);
         CellState[][] emptyGrid = new CellState[10][10];
         for (int i = 0; i < 10; i++) {
@@ -45,6 +51,7 @@ class TestActiveTurnState {
             }
         }
         when(mockGrid.getGrid()).thenReturn(emptyGrid);
+        when(mockOpponentGrid.getGrid()).thenReturn(emptyGrid);
         when(mockFleetManager.getFleet()).thenReturn(java.util.List.of());
         when(mockFleetManager.getPlacedCounts()).thenReturn(java.util.Map.of());
         when(mockFleetManager.getRequiredFleetConfiguration()).thenReturn(java.util.Map.of());
@@ -75,10 +82,39 @@ class TestActiveTurnState {
     @Test
     void testHandleOpponentGridClickSendsShotAndTransitions() {
         Coordinate coord = new Coordinate(0, 0);
+        when(mockOpponentGrid.getState(coord)).thenReturn(CellState.EMPTY);
 
         activeTurnState.handleOpponentGridClick(mockTurnManager, coord);
 
         verify(mockGameModeStrategy).sendShot(coord);
+        verify(mockTurnManager).transitionTo(any(WaitingOpponentState.class));
+    }
+
+    @Test
+    void testHandleOpponentGridClickWhenAlreadyShotBlocksShot() {
+        Coordinate coord = new Coordinate(1, 1);
+        when(mockOpponentGrid.getState(coord)).thenReturn(CellState.HIT);
+
+        activeTurnState.handleOpponentGridClick(mockTurnManager, coord);
+
+        // Should NOT send shot
+        verify(mockGameModeStrategy, never()).sendShot(any());
+        // Should NOT transition
+        verify(mockTurnManager, never()).transitionTo(any());
+        // Should show error message
+        verify(mockView).showSystemMessage(contains("already shot"));
+    }
+
+    @Test
+    void testHandleOpponentGridClickWhenEmptyAllowsShot() {
+        Coordinate coord = new Coordinate(2, 2);
+        when(mockOpponentGrid.getState(coord)).thenReturn(CellState.EMPTY);
+
+        activeTurnState.handleOpponentGridClick(mockTurnManager, coord);
+
+        // Should send shot
+        verify(mockGameModeStrategy).sendShot(coord);
+        // Should transition
         verify(mockTurnManager).transitionTo(any(WaitingOpponentState.class));
     }
 
