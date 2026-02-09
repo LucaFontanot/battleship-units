@@ -31,6 +31,7 @@ public class GameFrame extends JFrame implements GameView {
 
     private JPanel currentPanel;
     private GridInteractionObserver observer;
+    private boolean gameOver = false;
 
     private final JLabel systemMessage = new JLabel(" ");
 
@@ -96,7 +97,10 @@ public class GameFrame extends JFrame implements GameView {
 
     @Override
     public void showEndGamePhase(String message) {
+        gameOver = true;
+        opponentGridUI.clearPlacementPreview();
 
+        showSystemMessage(message != null ? message : "Game Over");
     }
 
     @Override

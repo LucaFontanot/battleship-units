@@ -168,22 +168,27 @@ public class GameController implements NetworkInputActions, GameInteractionFacad
         String gridSerialized = GridMapper.serialize(grid.getGrid());
         updatePlayerGrid(gridSerialized, fleetManager.getFleet());
 
+        if (fleetManager.isGameOver()) {
+            handleGameOver();
+            return;
+        }
+
         gameState = GameState.ACTIVE_TURN;
         view.setPlayerTurn(true);
 
         communication.sendGameStatus(GameState.WAITING_FOR_OPPONENT, "Opponent's turn");
-
-        if (fleetManager.isGameOver()) {
-            handleGameOver();
-        }
     }
 
     private void handleGameOver() {
         gameState = GameState.GAME_OVER;
-        String message = "You win!";
-        communication.sendGameStatus(gameState, message);
-        view.showEndGamePhase("You lost! All your ships are sunk.");
         view.setPlayerTurn(false);
+
+        // I have lost
+        view.showSystemMessage("You lost!");
+        view.showEndGamePhase("You lost!");
+
+        // Opponent has won
+        communication.sendGameStatus(GameState.GAME_OVER, "You win!");
     }
 
     @Override
@@ -204,8 +209,8 @@ public class GameController implements NetworkInputActions, GameInteractionFacad
                 view.showSystemMessage(message != null ? message : "Opponent's turn");
             }
             case GAME_OVER -> {
-                view.showEndGamePhase(message);
                 view.setPlayerTurn(false);
+                view.showEndGamePhase(message != null ? message : "Game Over");
             }
         }
     }
