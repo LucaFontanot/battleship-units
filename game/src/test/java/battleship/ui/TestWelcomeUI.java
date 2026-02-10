@@ -1,11 +1,30 @@
 package battleship.ui;
 
 import battleship.view.welcome.WelcomeUi;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import javax.swing.*;
 
-public class WelcomeUI {
+import static org.junit.jupiter.api.Assertions.*;
+
+public class TestWelcomeUI {
+
+    WelcomeUi welcomeUi;
+
+    @BeforeEach
+    public void setUp() {
+        welcomeUi = new WelcomeUi();
+    }
+
+    @AfterEach
+    public void tearDown() {
+        if (welcomeUi != null) {
+            welcomeUi.dispose();
+        }
+    }
+
     @Test
     public void testWelcomeUIInitialization() {
         assertDoesNotThrow(() -> {
@@ -15,18 +34,16 @@ public class WelcomeUI {
 
     @Test
     public void testWelcomeUIActionListeners() {
-        WelcomeUi welcomeUI = new WelcomeUi();
         assertDoesNotThrow(() -> {
-            welcomeUI.onSinglePlayerSelected();
-            welcomeUI.onOnlineMultiplayerSelected();
+            welcomeUi.onSinglePlayerSelected();
+            welcomeUi.onOnlineMultiplayerSelected();
         });
     }
 
     @Test
     public void testWelcomeUIDisplay() {
-        WelcomeUi welcomeUI = new WelcomeUi();
         assertDoesNotThrow(() -> {
-            welcomeUI.show();
+            welcomeUi.show();
             Thread.sleep(1000); // Allow time for the UI to render
         });
     }
@@ -44,4 +61,12 @@ public class WelcomeUI {
             Thread.sleep(1000);
         });
     }
+
+    @Test
+    public void testGetRootComponent() {
+        JComponent rootComponent = welcomeUi.$$$getRootComponent$$$();
+        assertNotNull(rootComponent, "Root component should not be null");
+        assertTrue(rootComponent instanceof JPanel, "Root component should be a JPanel");
+    }
+
 }
