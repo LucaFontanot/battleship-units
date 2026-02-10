@@ -13,16 +13,16 @@ import static battleship.client.http.HttpClient.JSON;
 import static battleship.client.http.HttpClient.client;
 
 public class JsonHttpClient<R, E> {
-    GsonBuilder gsonBuilder = new GsonBuilder();
     final TypeToken<R> responseClass;
     final TypeToken<E> errorClass;
     final HashMap<String, String> headers = new HashMap<>();
+    GsonBuilder gsonBuilder = new GsonBuilder();
 
     /**
      * Constructs a new JSON HTTP request with the specified response and error types.
      *
      * @param responseClass the class of the success response type
-     * @param errorClass the class of the error type
+     * @param errorClass    the class of the error type
      */
     public JsonHttpClient(Class<R> responseClass, Class<E> errorClass) {
         gsonBuilder.serializeNulls();
@@ -34,7 +34,7 @@ public class JsonHttpClient<R, E> {
      * Constructs a new JSON HTTP request with the specified response and error TypeTokens.
      *
      * @param responseClass the TypeToken of the success response type
-     * @param errorClass the TypeToken of the error type
+     * @param errorClass    the TypeToken of the error type
      */
     public JsonHttpClient(TypeToken<R> responseClass, TypeToken<E> errorClass) {
         gsonBuilder.serializeNulls();
@@ -46,7 +46,7 @@ public class JsonHttpClient<R, E> {
      * Constructs a new JSON HTTP request with TypeToken for response and Class for error.
      *
      * @param responseClass the TypeToken of the success response type
-     * @param errorClass the class of the error type
+     * @param errorClass    the class of the error type
      */
     public JsonHttpClient(TypeToken<R> responseClass, Class<E> errorClass) {
         gsonBuilder.serializeNulls();
@@ -57,7 +57,7 @@ public class JsonHttpClient<R, E> {
     /**
      * Registers a custom type adapter for serialization/deserialization of a specific type.
      *
-     * @param classz the class to register the type adapter for
+     * @param classz     the class to register the type adapter for
      * @param serializer the serializer/deserializer object
      */
     public void registerTypeAdapter(Class<?> classz, Object serializer) {
@@ -67,7 +67,7 @@ public class JsonHttpClient<R, E> {
     /**
      * Adds an HTTP header to the request.
      *
-     * @param key the header name
+     * @param key   the header name
      * @param value the header value
      */
     public void addHeader(String key, String value) {
@@ -87,7 +87,7 @@ public class JsonHttpClient<R, E> {
      * Enqueues an asynchronous HTTP request and handles the response via callback.
      *
      * @param callback the callback to invoke upon request completion
-     * @param request the HTTP request to execute
+     * @param request  the HTTP request to execute
      */
     private void enqueue(JsonHttpResponse<R, E> callback, Request request) {
         client.newCall(request).enqueue(new Callback() {
@@ -108,7 +108,7 @@ public class JsonHttpClient<R, E> {
                         R t = getGson().fromJson(responseString, responseClass);
                         callback.onSuccess(response, t);
                     } else {
-                        if (errorClass.equals(TypeToken.get(Void.class))){
+                        if (errorClass.equals(TypeToken.get(Void.class))) {
                             callback.onFailure("API Error", null, response);
                             return;
                         }
@@ -123,7 +123,7 @@ public class JsonHttpClient<R, E> {
     /**
      * Executes an asynchronous HTTP GET request.
      *
-     * @param url the request URL
+     * @param url      the request URL
      * @param callback the callback to invoke upon request completion
      */
     public void get(String url, JsonHttpResponse<R, E> callback) {
@@ -138,9 +138,9 @@ public class JsonHttpClient<R, E> {
     /**
      * Executes an asynchronous HTTP POST request with JSON data in the body.
      *
-     * @param <T> the type of data to send
-     * @param url the request URL
-     * @param data the data to serialize and send in the body
+     * @param <T>      the type of data to send
+     * @param url      the request URL
+     * @param data     the data to serialize and send in the body
      * @param callback the callback to invoke upon request completion
      */
     public <T> void post(String url, T data, JsonHttpResponse<R, E> callback) {
@@ -156,9 +156,9 @@ public class JsonHttpClient<R, E> {
     /**
      * Executes an asynchronous HTTP PUT request with JSON data in the body.
      *
-     * @param <T> the type of data to send
-     * @param url the request URL
-     * @param data the data to serialize and send in the body
+     * @param <T>      the type of data to send
+     * @param url      the request URL
+     * @param data     the data to serialize and send in the body
      * @param callback the callback to invoke upon request completion
      */
     public <T> void put(String url, T data, JsonHttpResponse<R, E> callback) {
@@ -174,7 +174,7 @@ public class JsonHttpClient<R, E> {
     /**
      * Executes an asynchronous HTTP DELETE request.
      *
-     * @param url the request URL
+     * @param url      the request URL
      * @param callback the callback to invoke upon request completion
      */
     public void delete(String url, JsonHttpResponse<R, E> callback) {
@@ -189,7 +189,7 @@ public class JsonHttpClient<R, E> {
     /**
      * Executes an asynchronous HTTP PATCH request.
      *
-     * @param url the request URL
+     * @param url      the request URL
      * @param callback the callback to invoke upon request completion
      */
     public void patch(String url, JsonHttpResponse<R, E> callback) {
@@ -220,7 +220,7 @@ public class JsonHttpClient<R, E> {
     /**
      * Executes a synchronous HTTP POST request with JSON data in the body and returns the deserialized response.
      *
-     * @param url the request URL
+     * @param url  the request URL
      * @param data the data to serialize and send in the body
      * @return the deserialized response
      * @throws JsonHttpException if an error occurs during the request or if the response is an error
@@ -238,7 +238,7 @@ public class JsonHttpClient<R, E> {
     /**
      * Executes a synchronous HTTP PUT request with JSON data in the body and returns the deserialized response.
      *
-     * @param url the request URL
+     * @param url  the request URL
      * @param data the data to serialize and send in the body
      * @return the deserialized response
      * @throws JsonHttpException if an error occurs during the request or if the response is an error
@@ -301,7 +301,7 @@ public class JsonHttpClient<R, E> {
             if (response.isSuccessful()) {
                 return getGson().fromJson(responseString, responseClass);
             } else {
-                if (errorClass.equals(TypeToken.get(Void.class))){
+                if (errorClass.equals(TypeToken.get(Void.class))) {
                     throw new JsonHttpException("API Error", null, response);
                 }
                 E e = getGson().fromJson(responseString, errorClass);

@@ -21,19 +21,19 @@ import java.util.Set;
  * A specialized Swing component responsible for rendering a game grid.
  * It manages a collection of {@link CellPanel} components arranged in a 2D layout
  * and handles the complex logic of overlaying ship textures onto the grid cells.
- *
+ * <p>
  * Key features:
- *  - Decodes serialized grid strings into visual cell states (HIT, MISS, etc.).
- *  - Calculates and applies the correct texture segments for ships based on their
- *     position, orientation, and type using {@link TextureLoader}.
+ * - Decodes serialized grid strings into visual cell states (HIT, MISS, etc.).
+ * - Calculates and applies the correct texture segments for ships based on their
+ * position, orientation, and type using {@link TextureLoader}.
  */
 public class GridUI extends JPanel implements CellInteractionListener {
     @Getter
     final int cols;
     @Getter
     final int rows;
+    CellState[][] previousStates = null;
     private CellPanel[][] cells;
-
     @Setter
     private GridInteractionObserver observer;
 
@@ -46,7 +46,7 @@ public class GridUI extends JPanel implements CellInteractionListener {
         cells = new CellPanel[rows][cols];
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
-                Coordinate coord = new Coordinate(r,c);
+                Coordinate coord = new Coordinate(r, c);
                 cells[r][c] = new CellPanel(coord);
 
                 cells[r][c].setCellListener(this);
@@ -55,8 +55,6 @@ public class GridUI extends JPanel implements CellInteractionListener {
             }
         }
     }
-
-    CellState[][] previousStates = null;
 
     public Ship getShipOnCoordinate(List<Ship> ships, Coordinate coordinate) {
         for (Ship ship : ships) {
@@ -67,7 +65,7 @@ public class GridUI extends JPanel implements CellInteractionListener {
         return null;
     }
 
-    public void displayData(@NonNull String gridSerialized, List<Ship> ships){
+    public void displayData(@NonNull String gridSerialized, List<Ship> ships) {
         CellState[][] states = GridMapper.deserialize(gridSerialized, rows, cols);
 
         for (int r = 0; r < rows; r++) {

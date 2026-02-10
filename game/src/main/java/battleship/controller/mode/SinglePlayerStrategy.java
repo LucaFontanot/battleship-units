@@ -2,7 +2,9 @@ package battleship.controller.mode;
 
 import battleship.controller.mode.ai.AIOpponent;
 import battleship.controller.mode.ai.SimpleAIOpponent;
-import battleship.model.*;
+import battleship.model.FleetManager;
+import battleship.model.Grid;
+import battleship.model.Ship;
 import it.units.battleship.*;
 
 import java.util.List;
@@ -15,15 +17,14 @@ import java.util.stream.Collectors;
  * Represents the single-player strategy for the game.
  * Handles interactions between the player and an AI opponent.
  */
-public class SinglePlayerStrategy implements GameModeStrategy{
+public class SinglePlayerStrategy implements GameModeStrategy {
 
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final Map<ShipType, Integer> requiredFleetConfiguration;
     private GameModeCallback callback;
     private AIOpponent aiOpponent;
     private Grid aiGrid;
     private FleetManager aiFleetManager;
-    private final ExecutorService executor = Executors.newSingleThreadExecutor();
-
-    private final Map<ShipType, Integer> requiredFleetConfiguration;
 
     public SinglePlayerStrategy(Map<ShipType, Integer> requiredFleetConfiguration) {
         this.requiredFleetConfiguration = requiredFleetConfiguration;
@@ -33,7 +34,7 @@ public class SinglePlayerStrategy implements GameModeStrategy{
     public void initialize(GameModeCallback callback) {
         this.callback = callback;
 
-        this.aiGrid = new Grid(10,10);
+        this.aiGrid = new Grid(10, 10);
         this.aiFleetManager = new FleetManager(aiGrid, requiredFleetConfiguration);
         this.aiOpponent = new SimpleAIOpponent(aiGrid, aiFleetManager);
 

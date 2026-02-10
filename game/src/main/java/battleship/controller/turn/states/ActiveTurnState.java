@@ -22,7 +22,7 @@ public class ActiveTurnState extends BaseGameState {
     public void handleOpponentGridClick(TurnManager manager, Coordinate coordinate) {
         CellState currentCellState = manager.getOpponentCellState(coordinate);
 
-        if (currentCellState != CellState.EMPTY){
+        if (currentCellState != CellState.EMPTY) {
             manager.notifyUser("You already shot here!");
             return;
         }

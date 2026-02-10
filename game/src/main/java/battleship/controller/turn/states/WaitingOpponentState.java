@@ -1,11 +1,8 @@
 package battleship.controller.turn.states;
 
 import battleship.controller.turn.TurnManager;
-import battleship.model.Ship;
 import it.units.battleship.Coordinate;
 import it.units.battleship.GameState;
-
-import java.util.List;
 
 /**
  * Represents the state where the player is waiting for the opponent's next move.

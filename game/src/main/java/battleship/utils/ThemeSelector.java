@@ -14,7 +14,7 @@ public class ThemeSelector {
      */
     public static void selectAutomaticTheme() {
         OsThemeDetector detector = OsThemeDetector.getDetector();
-        if (detector.isDark()){
+        if (detector.isDark()) {
             selectDarkTheme();
         } else {
             selectLightTheme();

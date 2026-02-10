@@ -3,7 +3,9 @@ package battleship.controller.turn;
 import battleship.controller.game.actions.GameInteractionFacade;
 import battleship.controller.mode.GameModeStrategy;
 import battleship.controller.turn.states.*;
-import battleship.model.*;
+import battleship.model.FleetManager;
+import battleship.model.Grid;
+import battleship.model.Ship;
 import battleship.view.core.BattleshipView;
 import it.units.battleship.*;
 import lombok.Getter;
@@ -20,15 +22,16 @@ import java.util.Map;
  */
 public class TurnManager implements GameInteractionFacade {
     @Getter
-    private TurnState currentState;
-    @Getter@Setter
-    private Grid opponentGrid;
-    @Getter
-    private final FleetManager  fleetManager;
+    private final FleetManager fleetManager;
     @Getter
     private final BattleshipView view;
     @Getter
     private final GameModeStrategy gameModeStrategy;
+    @Getter
+    private TurnState currentState;
+    @Getter
+    @Setter
+    private Grid opponentGrid;
     @Setter
     private SetupCompleteCallback setupCompleteCallback;
 
@@ -48,15 +51,15 @@ public class TurnManager implements GameInteractionFacade {
     /**
      * Starts the TurnManager, entering in the initial state.
      */
-    public void start(){
+    public void start() {
         currentState.onEnter(this);
     }
 
     /**
      * Called when the game setup is complete.
      */
-    public void onSetupComplete(){
-        if(setupCompleteCallback != null){
+    public void onSetupComplete() {
+        if (setupCompleteCallback != null) {
             setupCompleteCallback.onSetupComplete();
         }
     }
@@ -64,7 +67,7 @@ public class TurnManager implements GameInteractionFacade {
     /**
      * Updates the player grid UI with the current model state.
      */
-    public void refreshUI(){
+    public void refreshUI() {
         String gridSerialized = fleetManager.getSerializedGridState();
         view.updatePlayerGrid(gridSerialized, fleetManager.getFleet());
     }
@@ -72,7 +75,7 @@ public class TurnManager implements GameInteractionFacade {
     /**
      * Updates the fleet selection UI with current placement counts and requirements.
      */
-    public void refreshFleetUI(){
+    public void refreshFleetUI() {
         Map<ShipType, Integer> placedCounts = fleetManager.getPlacedCounts();
         Map<ShipType, Integer> requiredCounts = fleetManager.getRequiredFleetConfiguration();
 
@@ -82,70 +85,70 @@ public class TurnManager implements GameInteractionFacade {
     /**
      * Sets whether it is currently the player's turn.
      */
-    public void setPlayerTurn(boolean isPlayerTurn){
+    public void setPlayerTurn(boolean isPlayerTurn) {
         view.setPlayerTurn(isPlayerTurn);
     }
 
     /**
      * Retrieves the state of a cell in the opponent's grid.
      */
-    public CellState getOpponentCellState(Coordinate coordinate){
+    public CellState getOpponentCellState(Coordinate coordinate) {
         return opponentGrid.getState(coordinate);
     }
 
     /**
      * Notifies the user with a system message in the view.
      */
-    public void notifyUser(String message){
+    public void notifyUser(String message) {
         view.showSystemMessage(message);
     }
 
     /**
      * Commands the current game mode strategy to send a shot to the opponent.
      */
-    public void executeShot(Coordinate coordinate){
+    public void executeShot(Coordinate coordinate) {
         gameModeStrategy.sendShot(coordinate);
     }
 
     /**
      * Renders a preview of a shot on the opponent's grid.
      */
-    public void renderShotPreview(Coordinate coordinate){
+    public void renderShotPreview(Coordinate coordinate) {
         view.showShotPreview(coordinate);
     }
 
     /**
      * Transitions the view to the end game phase display.
      */
-    public void transitionToEndGamePhase(String message){
+    public void transitionToEndGamePhase(String message) {
         view.showEndGamePhase(message);
     }
 
     /**
      * Transitions the view from the setup phase to the game phase.
      */
-    public void transitionToGamePhase(){
+    public void transitionToGamePhase() {
         view.transitionToGamePhase();
     }
 
     /**
      * Notifies the game mode strategy that the game is over.
      */
-    public void sendGameOverStatus(String message){
+    public void sendGameOverStatus(String message) {
         gameModeStrategy.sendGameOver(message);
     }
 
     /**
      * Updates the opponent's grid display with new data.
      */
-    public void updateOpponentGrid(String grid, List<Ship> fleet){
+    public void updateOpponentGrid(String grid, List<Ship> fleet) {
         view.updateOpponentGrid(grid, fleet);
     }
 
     /**
      * Attempts to place a ship at the specified coordinate using the current view selection.
      */
-    public void tryPlaceShip(Coordinate coordinate){
+    public void tryPlaceShip(Coordinate coordinate) {
         Orientation orientation = view.getSelectedOrientation();
         ShipType shipType = view.getSelectedShipType();
 
@@ -176,7 +179,7 @@ public class TurnManager implements GameInteractionFacade {
     /**
      * Shows a placement preview for a ship at the specified coordinate.
      */
-    public void previewPlacement(Coordinate coordinate){
+    public void previewPlacement(Coordinate coordinate) {
         Orientation orientation = view.getSelectedOrientation();
         ShipType shipType = view.getSelectedShipType();
 
@@ -196,7 +199,7 @@ public class TurnManager implements GameInteractionFacade {
      * Processe an incoming shot from the opponent.
      * Updates the local model, notifies the strategy, and refreshes the UI.
      */
-    public boolean processIncomingShot(Coordinate coordinate){
+    public boolean processIncomingShot(Coordinate coordinate) {
         boolean hit = fleetManager.handleIncomingShot(coordinate);
 
         gameModeStrategy.sendGridUpdate(
@@ -213,35 +216,35 @@ public class TurnManager implements GameInteractionFacade {
     /**
      * Transitions the state machine to the WaitingOpponentState.
      */
-    public void transitionToWaitingOpponent(){
+    public void transitionToWaitingOpponent() {
         transitionTo(new WaitingOpponentState());
     }
 
     /**
      * Transitions the state machine to the WaitingSetupState.
      */
-    public void transitionToWaitingSetup(){
+    public void transitionToWaitingSetup() {
         transitionTo(new WaitingSetupState());
     }
 
     /**
      * Transitions the state machine to the GameOverState.
      */
-    public void transitionToGameOver(boolean won, String message){
+    public void transitionToGameOver(boolean won, String message) {
         transitionTo(new GameOverState(won, message));
     }
 
     /**
      * Transitions the state machine to the ActiveTurnState.
      */
-    public void transitionToActiveTurn(){
+    public void transitionToActiveTurn() {
         transitionTo(new ActiveTurnState());
     }
 
     /**
      * Transitions to the given state.
      */
-    void transitionTo(@NonNull TurnState newState){
+    void transitionTo(@NonNull TurnState newState) {
         Logger.log("TurnManager: " + currentState.getStateName() + " -> " + newState.getStateName());
         currentState.onExit(this);
         currentState = newState;
@@ -323,7 +326,7 @@ public class TurnManager implements GameInteractionFacade {
     // ===== Callbacks =====
 
     @FunctionalInterface
-    public interface SetupCompleteCallback{
+    public interface SetupCompleteCallback {
         void onSetupComplete();
     }
 }

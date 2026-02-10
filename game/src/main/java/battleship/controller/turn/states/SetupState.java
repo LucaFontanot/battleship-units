@@ -1,7 +1,8 @@
 package battleship.controller.turn.states;
 
 import battleship.controller.turn.TurnManager;
-import it.units.battleship.*;
+import it.units.battleship.Coordinate;
+import it.units.battleship.GameState;
 
 /**
  * Represents the Setup phase where players can place their ships on the grid.

@@ -6,7 +6,10 @@ import it.units.battleship.ShipType;
 import lombok.Getter;
 import lombok.NonNull;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 /**
  * Represents a ship in a Battleship game. A ship has a type, a set of coordinates indicating
  * its location on the grid, and a set of hit coordinates indicating which parts of the ship
@@ -23,34 +26,8 @@ public class Ship {
     @Getter
     private final Orientation orientation;
 
-    /**
-     * Creates a new ship on the grid with the specified initial coordinate, orientation, and type.
-     * Validates that the ship's coordinates are within the grid boundaries.
-     *
-     * @param initCoordinate the starting coordinate from which the ship will be placed
-     * @param orientation the orientation of the ship (e.g., horizontal or vertical)
-     * @param type the type of the ship, which defines its size and shape
-     * @param grid the grid on which the ship is to be placed
-     * @return a new {@code Ship} instance positioned within the grid
-     * @throws IllegalArgumentException if any part of the ship exceeds the boundaries of the grid
-     */
-    public static Ship createShip(@NonNull Coordinate initCoordinate,
-                                  @NonNull Orientation orientation,
-                                  @NonNull ShipType type,
-                                  @NonNull Grid grid){
-        LinkedHashSet<Coordinate> shipCoordinates = type.getShipCoordinates(initCoordinate, orientation);
-
-        for (Coordinate coordinate : shipCoordinates) {
-            if (coordinate.row() < 0 || coordinate.row() >= grid.getRow() || coordinate.col() < 0 || coordinate.col() >= grid.getCol()){
-                throw new IllegalArgumentException("The ship coordinates must respect the grid dimension");
-            }
-        }
-
-        return new Ship(shipCoordinates, type, orientation);
-    }
-
-    private Ship(@NonNull LinkedHashSet<Coordinate> coordinates, @NonNull ShipType type, @NonNull Orientation orientation){
-        if (coordinates.size() != type.getSize()){
+    private Ship(@NonNull LinkedHashSet<Coordinate> coordinates, @NonNull ShipType type, @NonNull Orientation orientation) {
+        if (coordinates.size() != type.getSize()) {
             throw new IllegalArgumentException("Ship must have the same number of cells as its type specifies: " + type.getName());
         }
         this.shipType = type;
@@ -60,21 +37,47 @@ public class Ship {
     }
 
     /**
-     * Adds a hit to the ship.
-     * @param coordinate the coordinate of the cell that has been hit
-     * @throws IllegalArgumentException if the specified coordinate is not part of the ship
-     * @return true if the hit was successfully added, false otherwise
+     * Creates a new ship on the grid with the specified initial coordinate, orientation, and type.
+     * Validates that the ship's coordinates are within the grid boundaries.
+     *
+     * @param initCoordinate the starting coordinate from which the ship will be placed
+     * @param orientation    the orientation of the ship (e.g., horizontal or vertical)
+     * @param type           the type of the ship, which defines its size and shape
+     * @param grid           the grid on which the ship is to be placed
+     * @return a new {@code Ship} instance positioned within the grid
+     * @throws IllegalArgumentException if any part of the ship exceeds the boundaries of the grid
      */
-    public boolean addHit(@NonNull Coordinate coordinate){
-        if (hitCoordinates.contains(coordinate) || !coordinates.contains(coordinate)){
+    public static Ship createShip(@NonNull Coordinate initCoordinate,
+                                  @NonNull Orientation orientation,
+                                  @NonNull ShipType type,
+                                  @NonNull Grid grid) {
+        LinkedHashSet<Coordinate> shipCoordinates = type.getShipCoordinates(initCoordinate, orientation);
+
+        for (Coordinate coordinate : shipCoordinates) {
+            if (coordinate.row() < 0 || coordinate.row() >= grid.getRow() || coordinate.col() < 0 || coordinate.col() >= grid.getCol()) {
+                throw new IllegalArgumentException("The ship coordinates must respect the grid dimension");
+            }
+        }
+
+        return new Ship(shipCoordinates, type, orientation);
+    }
+
+    public static Ship restoreShip(LinkedHashSet<Coordinate> coordinates, ShipType shipType, Orientation orientation) {
+        return new Ship(coordinates, shipType, orientation);
+    }
+
+    /**
+     * Adds a hit to the ship.
+     *
+     * @param coordinate the coordinate of the cell that has been hit
+     * @return true if the hit was successfully added, false otherwise
+     * @throws IllegalArgumentException if the specified coordinate is not part of the ship
+     */
+    public boolean addHit(@NonNull Coordinate coordinate) {
+        if (hitCoordinates.contains(coordinate) || !coordinates.contains(coordinate)) {
             return false;
         }
         return hitCoordinates.add(coordinate);
-    }
-
-
-    public static Ship restoreShip(LinkedHashSet<Coordinate> coordinates, ShipType shipType, Orientation orientation){
-        return new Ship(coordinates, shipType, orientation);
     }
 
     /**
@@ -83,7 +86,7 @@ public class Ship {
      *
      * @return true if the ship is sunk (all cells have been hit), false otherwise
      */
-    public boolean isSunk(){
+    public boolean isSunk() {
         return getSize() == getHitsCount();
     }
 
@@ -92,7 +95,7 @@ public class Ship {
      *
      * @return the number of cells that compose the ship
      */
-    public int getSize(){
+    public int getSize() {
         return shipType.getSize();
     }
 
@@ -101,7 +104,7 @@ public class Ship {
      *
      * @return the count of cells that have been hit on the ship
      */
-    public int getHitsCount(){
+    public int getHitsCount() {
         return hitCoordinates.size();
     }
 }

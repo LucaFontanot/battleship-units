@@ -1,8 +1,8 @@
 package battleship.controller.mode;
 
+import battleship.controller.game.actions.NetworkActionsReceiver;
 import battleship.controller.game.network.NetworkClient;
 import battleship.controller.game.network.NetworkEventsHandler;
-import battleship.controller.game.actions.NetworkActionsReceiver;
 import battleship.model.Grid;
 import battleship.model.Ship;
 import it.units.battleship.Coordinate;

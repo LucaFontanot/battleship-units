@@ -7,7 +7,7 @@ public class DimensionsUtils {
     /**
      * Uses dimensions from a standard 1920x1080 screen to calculate scaled dimensions for the current screen size.
      *
-     * @param width width based on a 1920x1080 screen
+     * @param width  width based on a 1920x1080 screen
      * @param height height based on a 1920x1080 screen
      */
     public static Dimension getScaledDimensions(int width, int height) {

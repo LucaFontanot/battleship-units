@@ -25,6 +25,7 @@ public abstract class AbstractPlayerCommunication implements CommunicationEvents
 
     /**
      * Adds a listener for communication events.
+     *
      * @param listener the listener to add
      */
     public void addCommunicationEventsListener(CommunicationEvents listener) {
@@ -33,6 +34,7 @@ public abstract class AbstractPlayerCommunication implements CommunicationEvents
 
     /**
      * Removes a listener for communication events.
+     *
      * @param listener the listener to remove
      */
     public void removeCommunicationEventsListener(CommunicationEvents listener) {
@@ -41,34 +43,35 @@ public abstract class AbstractPlayerCommunication implements CommunicationEvents
 
     /**
      * Notifies listeners of a player message.
+     *
      * @param playerName the name of the player
-     * @param message the message sent by the player
+     * @param message    the message sent by the player
      */
-    public void onPlayerMessage(String playerName, String message){
+    public void onPlayerMessage(String playerName, String message) {
         for (CommunicationEvents listener : communicationEventsListeners) {
             listener.onPlayerMessage(playerName, message);
         }
     }
 
-    public void onOpponentGridUpdate(GridUpdateDTO gridUpdateDTO){
+    public void onOpponentGridUpdate(GridUpdateDTO gridUpdateDTO) {
         for (CommunicationEvents listener : communicationEventsListeners) {
             listener.onOpponentGridUpdate(gridUpdateDTO);
         }
     }
 
-    public void onShotReceived(ShotRequestDTO shotRequestDTO){
+    public void onShotReceived(ShotRequestDTO shotRequestDTO) {
         for (CommunicationEvents listener : communicationEventsListeners) {
             listener.onShotReceived(shotRequestDTO);
         }
     }
 
-    public void onGameSetupReceived(GameConfigDTO gameConfigDTO){
+    public void onGameSetupReceived(GameConfigDTO gameConfigDTO) {
         for (CommunicationEvents listener : communicationEventsListeners) {
             listener.onGameSetupReceived(gameConfigDTO);
         }
     }
 
-    public void onGameStatusReceived(GameStatusDTO gameStatusDTO){
+    public void onGameStatusReceived(GameStatusDTO gameStatusDTO) {
         for (CommunicationEvents listener : communicationEventsListeners) {
             listener.onGameStatusReceived(gameStatusDTO);
         }

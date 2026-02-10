@@ -41,11 +41,11 @@ public interface SetupView {
      */
     void showPlacementPreview(LinkedHashSet<Coordinate> coord, boolean validShip, Ship ship);
 
-        /**
-        * Plays an error sound to provide auditory feedback to the player when an invalid action occurs,
-        * such as attempting to place a ship in an invalid location or selecting an unavailable ship type
-        * during the setup phase of the Battleship game.
-        */
+    /**
+     * Plays an error sound to provide auditory feedback to the player when an invalid action occurs,
+     * such as attempting to place a ship in an invalid location or selecting an unavailable ship type
+     * during the setup phase of the Battleship game.
+     */
     void playerErrorSound();
 
     void open();

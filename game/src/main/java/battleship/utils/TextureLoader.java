@@ -1,8 +1,8 @@
 package battleship.utils;
 
-import it.units.battleship.Orientation;
 import battleship.model.Ship;
 import it.units.battleship.Coordinate;
+import it.units.battleship.Orientation;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -13,7 +13,7 @@ import java.util.List;
 
 public class TextureLoader {
 
-    static BufferedImage [][] textures = new BufferedImage[5][6];
+    static BufferedImage[][] textures = new BufferedImage[5][6];
 
     static {
         BufferedImage textureImage = loadTextureImage("texture.png");
@@ -69,7 +69,7 @@ public class TextureLoader {
             return false;
         }
         for (int x = 0; x < img1.getWidth(); x++) {
-            for (int y=0; y<img1.getHeight(); y++){
+            for (int y = 0; y < img1.getHeight(); y++) {
                 if (img1.getRGB(x, y) != img2.getRGB(x, y)) {
                     return false;
                 }
@@ -78,7 +78,7 @@ public class TextureLoader {
         return true;
     }
 
-    public static BufferedImage getTextureForShip(Ship ship, Coordinate coordinate){
+    public static BufferedImage getTextureForShip(Ship ship, Coordinate coordinate) {
         List<Coordinate> shipCoordinates = new ArrayList<>(ship.getCoordinates());
         Orientation orientation = ship.getOrientation();
 
@@ -102,7 +102,7 @@ public class TextureLoader {
             case HORIZONTAL_LEFT -> 90;
         };
 
-        switch (ship.getShipType()){
+        switch (ship.getShipType()) {
             case BATTLESHIP -> {
                 return getTexture(0, foundIndex, rotationAngle);
             }
@@ -116,7 +116,7 @@ public class TextureLoader {
                 return getTexture(3, foundIndex, rotationAngle);
             }
             case CARRIER -> {
-                return getTexture(4 + (foundIndex/4), foundIndex % 4, rotationAngle, true);
+                return getTexture(4 + (foundIndex / 4), foundIndex % 4, rotationAngle, true);
             }
         }
 

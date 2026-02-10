@@ -18,32 +18,45 @@ public interface BattleshipView {
 
     // ===== Lifecycle =====
     void open();
+
     void dispose();
 
     // ===== Grid Listeners =====
     void setPlayerGridListener(GridInteractionObserver observer);
+
     void setOpponentGridListener(GridInteractionObserver observer);
 
     // ===== Setup Phase Methods =====
     ShipType getSelectedShipType();
+
     Orientation getSelectedOrientation();
+
     void showPlacementPreview(Set<Coordinate> coordinates, boolean valid, Ship previewShip);
+
     void refreshFleetSelection(Map<ShipType, Integer> placedCounts, Map<ShipType, Integer> requiredCounts);
+
     void updatePlayerGrid(String gridSerialized, List<Ship> fleet);
 
     // ===== Game Phase Methods =====
     void updateOpponentGrid(String gridSerialized, List<Ship> fleet);
+
     void setPlayerTurn(boolean isPlayerTurn);
+
     void showShotPreview(Coordinate coordinate);
+
     void showEndGamePhase(String message);
+
     void showSystemMessage(String message);
+
     void setReturnToMenuAction(Runnable action);
+
     void setReturnToMenuVisible(boolean visible);
 
     // ===== Audio Feedback =====
     void playerErrorSound();
 
     // ===== Phase Transitions =====
+
     /**
      * Transitions the view from setup phase to game phase.
      * This might swap panels, open a new window, etc.

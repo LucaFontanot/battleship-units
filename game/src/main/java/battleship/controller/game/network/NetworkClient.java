@@ -1,10 +1,12 @@
 package battleship.controller.game.network;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import it.units.battleship.Defaults;
 import it.units.battleship.Logger;
 import it.units.battleship.data.LobbyData;
+import it.units.battleship.data.socket.GameMessageType;
 import it.units.battleship.data.socket.WebSocketAuthenticationRequest;
 import it.units.battleship.data.socket.WebSocketMessage;
 import it.units.battleship.data.socket.payloads.GameConfigDTO;
@@ -13,30 +15,22 @@ import it.units.battleship.data.socket.payloads.GridUpdateDTO;
 import it.units.battleship.data.socket.payloads.ShotRequestDTO;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-
-/**
- * Handles network communication with the battleship server using WebSockets.
- * It manages connection lifecycle and serializes/deserializes game messages.
- */
-import it.units.battleship.data.socket.GameMessageType;
 import okhttp3.*;
 import okio.ByteString;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-import static it.units.battleship.data.socket.GameMessageType.*;
-
 @Slf4j
-public class NetworkClient extends AbstractPlayerCommunication{
+public class NetworkClient extends AbstractPlayerCommunication {
 
     private final WebSocket client;
     private final Gson gson = new Gson();
+    private final String playerName;
+    private final LobbyData lobbyData;
     @Getter
     private boolean isConnected = false;
     @Getter
     private boolean isAuthenticated = false;
-    private final String playerName;
-    private final LobbyData lobbyData;
 
     public NetworkClient(LobbyData data, String playerName) {
         this(java.net.URI.create(Defaults.WEBSOCKET_LOBBY_ENDPOINT), data, playerName);
@@ -100,24 +94,24 @@ public class NetworkClient extends AbstractPlayerCommunication{
 
     @Override
     public <T> void sendMessage(GameMessageType type, T payload) {
-        if (client != null && isConnected()){
+        if (client != null && isConnected()) {
             WebSocketMessage<T> message = new WebSocketMessage<>(type.getType(), payload);
             String json = gson.toJson(message);
             client.send(json);
-        }else {
+        } else {
             Logger.warn("Failed send message: WebSocket not connected.");
         }
     }
 
-    private void handleIncomingMessage(String json){
+    private void handleIncomingMessage(String json) {
         try {
             JsonObject jsonObject = gson.fromJson(json, JsonObject.class);
             if (jsonObject == null || !jsonObject.has("type")) return;
 
             String typeString = jsonObject.get("type").getAsString();
 
-            if (typeString.equals("authenticate")){
-                if (jsonObject.get("data").getAsBoolean()){
+            if (typeString.equals("authenticate")) {
+                if (jsonObject.get("data").getAsBoolean()) {
                     isAuthenticated = true;
                     Logger.log("Authentication successful for player: " + playerName);
                 } else {
@@ -132,7 +126,7 @@ public class NetworkClient extends AbstractPlayerCommunication{
                     .findFirst()
                     .orElse(null);
 
-            if (type == null){
+            if (type == null) {
                 Logger.warn("Received unknown message type: " + typeString);
                 return;
             }
@@ -143,12 +137,13 @@ public class NetworkClient extends AbstractPlayerCommunication{
         }
     }
 
-    void dispatchMessage(GameMessageType type, String json){
-        switch (type){
+    void dispatchMessage(GameMessageType type, String json) {
+        switch (type) {
             case GRID_UPDATE -> {
                 WebSocketMessage<GridUpdateDTO> msg = gson.fromJson(
                         json,
-                        new TypeToken<WebSocketMessage<GridUpdateDTO>>(){}.getType()
+                        new TypeToken<WebSocketMessage<GridUpdateDTO>>() {
+                        }.getType()
                 );
 
                 this.communicationEventsListeners.forEach(l -> l.onOpponentGridUpdate(msg.getData()));
@@ -156,7 +151,8 @@ public class NetworkClient extends AbstractPlayerCommunication{
             case SHOT_REQUEST -> {
                 WebSocketMessage<ShotRequestDTO> msg = gson.fromJson(
                         json,
-                        new TypeToken<WebSocketMessage<ShotRequestDTO>>(){}.getType()
+                        new TypeToken<WebSocketMessage<ShotRequestDTO>>() {
+                        }.getType()
                 );
 
                 this.communicationEventsListeners.forEach(l -> l.onShotReceived(msg.getData()));
@@ -164,7 +160,8 @@ public class NetworkClient extends AbstractPlayerCommunication{
             case GAME_SETUP -> {
                 WebSocketMessage<GameConfigDTO> msg = gson.fromJson(
                         json,
-                        new TypeToken<WebSocketMessage<GameConfigDTO>>(){}.getType()
+                        new TypeToken<WebSocketMessage<GameConfigDTO>>() {
+                        }.getType()
                 );
 
                 this.communicationEventsListeners.forEach(l -> l.onGameSetupReceived(msg.getData()));
@@ -172,7 +169,8 @@ public class NetworkClient extends AbstractPlayerCommunication{
             case TURN_CHANGE -> {
                 WebSocketMessage<GameStatusDTO> msg = gson.fromJson(
                         json,
-                        new TypeToken<WebSocketMessage<GameStatusDTO>>(){}.getType()
+                        new TypeToken<WebSocketMessage<GameStatusDTO>>() {
+                        }.getType()
                 );
 
                 this.communicationEventsListeners.forEach(l -> l.onGameStatusReceived(msg.getData()));

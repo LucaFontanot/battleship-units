@@ -40,12 +40,12 @@ public interface GameView {
 
     /**
      * Displays the game phase of the Battleship game.
-     *
+     * <p>
      * This method is responsible for transitioning the visual or textual representation
      * of the game from the setup phase to the main game phase, where players take turns
      * attempting to sink each other's fleets. Implementing classes should indicate this
      * shift clearly to the user through appropriate updates to the interface.
-     *
+     * <p>
      * The implementation may include rendering both the player's and opponent's grids,
      * setting up the interface for turn-based interactions, and enabling necessary
      * UI elements (e.g., attack buttons could be sufficient hover/click grid cell, turn indicators using setPlayerTurn()).

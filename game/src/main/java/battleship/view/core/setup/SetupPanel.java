@@ -2,8 +2,8 @@ package battleship.view.core.setup;
 
 import battleship.controller.game.actions.GridInteractionObserver;
 import battleship.model.Ship;
-import battleship.view.grid.GridUI;
 import battleship.utils.DimensionsUtils;
+import battleship.view.grid.GridUI;
 import it.units.battleship.Coordinate;
 import it.units.battleship.Logger;
 import it.units.battleship.Orientation;
@@ -19,20 +19,15 @@ import java.util.Map;
 
 public class SetupPanel extends JPanel implements PlacementContext, SetupView {
 
-    JFrame mainFrame;
-
     @Getter
     private final GridUI playerGridUI;
-
     private final JPanel shipPalette;
-
+    private final Map<ShipType, JButton> shipButtons = new EnumMap<>(ShipType.class);
+    JFrame mainFrame;
     @Getter
     private ShipType selectedShipType = null;
-
     @Getter
     private Orientation selectedOrientation = Orientation.HORIZONTAL_RIGHT;
-
-    private final Map<ShipType, JButton> shipButtons = new EnumMap<>(ShipType.class);
 
     public SetupPanel(int rows, int cols) {
 

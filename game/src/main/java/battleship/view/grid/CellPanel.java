@@ -12,7 +12,7 @@ import java.awt.image.BufferedImage;
 
 /**
  * Represents a single interactive cell within the Battleship grid.
- *
+ * <p>
  * Visually, it can display a background color corresponding to its state (Hit, Miss, Empty)
  * and an optional texture overlay (e.g., a part of a ship).
  * Functionally, it acts as an input source, capturing mouse clicks and notifying
@@ -29,21 +29,19 @@ public class CellPanel extends JLabel {
     static final Color PREVIEW_VALID_COLOR = new Color(0xAAFFAA);
     static final Color PREVIEW_INVALID_COLOR = new Color(0xFFAAAA);
     static final Color SELECTED_COLOR = new Color(0xFFFF00);
-
-    private CellState currentState;
     final Coordinate coordinate;
+    @Getter
+    BufferedImage texture = null;
+    private CellState currentState;
     private Color baseColor; // colore base della cella
     private boolean preview = false;
     private boolean previewValid = true;
     @Getter
     private boolean selected = false;
-
     private BufferedImage overlayTexture = null;
     private float overlayAlpha = 1.0f;
-
     @Setter
     private CellInteractionListener cellListener;
-
 
     public CellPanel(Coordinate coordinate) {
         this.coordinate = coordinate;
@@ -56,26 +54,27 @@ public class CellPanel extends JLabel {
         refresh();
 
         addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                if (cellListener != null) {
-                    cellListener.onCellHover(coordinate);
-                }
-            }
+                             @Override
+                             public void mouseEntered(MouseEvent e) {
+                                 if (cellListener != null) {
+                                     cellListener.onCellHover(coordinate);
+                                 }
+                             }
 
-            @Override
-            public void mouseExited(MouseEvent e) {
-                if (cellListener != null) {
-                    cellListener.onCellExit();
-                }
-            }
+                             @Override
+                             public void mouseExited(MouseEvent e) {
+                                 if (cellListener != null) {
+                                     cellListener.onCellExit();
+                                 }
+                             }
 
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (cellListener != null) {
-                    cellListener.onCellClicked(coordinate);
-                }
-            }}
+                             @Override
+                             public void mouseClicked(MouseEvent e) {
+                                 if (cellListener != null) {
+                                     cellListener.onCellClicked(coordinate);
+                                 }
+                             }
+                         }
         );
     }
 
@@ -85,11 +84,8 @@ public class CellPanel extends JLabel {
     }
 
     private Color applyOpacity(Color color, double opacity) {
-        return new Color(color.getRed(), color.getGreen(), color.getBlue(), (int)(opacity * 255));
+        return new Color(color.getRed(), color.getGreen(), color.getBlue(), (int) (opacity * 255));
     }
-
-    @Getter
-    BufferedImage texture = null;
 
     public void addTexture(BufferedImage texture) {
         int w = Math.max(getWidth(), getPreferredSize().width);
@@ -103,7 +99,7 @@ public class CellPanel extends JLabel {
         this.texture = null;
     }
 
-    public void updateState(CellState newState){
+    public void updateState(CellState newState) {
         this.currentState = newState;
         refresh();
     }

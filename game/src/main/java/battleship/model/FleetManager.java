@@ -35,7 +35,7 @@ public class FleetManager {
     @Getter
     private final Map<ShipType, Integer> requiredFleetConfiguration;
 
-    public FleetManager(@NonNull Grid grid, @NonNull Map<ShipType, Integer> requiredFleetConfiguration){
+    public FleetManager(@NonNull Grid grid, @NonNull Map<ShipType, Integer> requiredFleetConfiguration) {
         this.grid = grid;
         this.requiredFleetConfiguration = requiredFleetConfiguration;
     }
@@ -47,14 +47,14 @@ public class FleetManager {
      *
      * @return true if the current fleet matches the required fleet configuration exactly; false otherwise
      */
-    public boolean isFleetComplete(){
+    public boolean isFleetComplete() {
         Map<ShipType, Long> currentFleetCounts = fleet.stream().collect(Collectors.groupingBy(Ship::getShipType, Collectors.counting()));
 
-        for (Map.Entry<ShipType, Integer> entry : requiredFleetConfiguration.entrySet()){
+        for (Map.Entry<ShipType, Integer> entry : requiredFleetConfiguration.entrySet()) {
             ShipType shipType = entry.getKey();
             int count = entry.getValue();
             Long currentCount = currentFleetCounts.getOrDefault(shipType, 0L);
-            if (currentCount != count){
+            if (currentCount != count) {
                 return false;
             }
         }
@@ -77,10 +77,10 @@ public class FleetManager {
      *
      * @param ship the ship to be added to the fleet; must be non-null
      * @return true if the ship is successfully added to the fleet, false if the
-     *         placement is invalid
+     * placement is invalid
      */
-    public boolean addShip(@NonNull Ship ship){
-        if (!canPlaceShip(ship)){
+    public boolean addShip(@NonNull Ship ship) {
+        if (!canPlaceShip(ship)) {
             return false;
         }
         fleet.add(ship);
@@ -94,9 +94,9 @@ public class FleetManager {
      * @param ship the ship to be evaluated; must be non-null
      * @return true if the ship can be added to the fleet based on the configuration, false otherwise
      */
-    private boolean canAddShipType(@NonNull Ship ship){
+    private boolean canAddShipType(@NonNull Ship ship) {
         Integer maxAllowed = requiredFleetConfiguration.get(ship.getShipType());
-        if (maxAllowed == null){
+        if (maxAllowed == null) {
             return false;
         }
         return countShipsOfType(ship.getShipType()) < maxAllowed;
@@ -108,7 +108,7 @@ public class FleetManager {
      * @param shipType the type of ships to be counted; must be non-null
      * @return the count of ships of the specified type in the fleet
      */
-    private int countShipsOfType(@NonNull ShipType shipType){
+    private int countShipsOfType(@NonNull ShipType shipType) {
         return (int) fleet.stream().filter(ship -> ship.getShipType() == shipType).count();
     }
 
@@ -119,14 +119,14 @@ public class FleetManager {
      *
      * @param ship the ship whose placement is being validated; must be non-null
      * @return true if the placement is valid and the ship can be placed without
-     *         conflict; false otherwise
+     * conflict; false otherwise
      */
-    private boolean isPlacementValid(@NonNull Ship ship){
-        if (fleet.isEmpty()){
+    private boolean isPlacementValid(@NonNull Ship ship) {
+        if (fleet.isEmpty()) {
             return true;
-        }else {
-            for(Ship existingShip : fleet) {
-                if (!areShipOverlapping(existingShip, ship)){
+        } else {
+            for (Ship existingShip : fleet) {
+                if (!areShipOverlapping(existingShip, ship)) {
                     return false;
                 }
             }
@@ -134,15 +134,15 @@ public class FleetManager {
         return true;
     }
 
-    private boolean areShipOverlapping(@NonNull Ship existingShip, @NonNull Ship ship){
-        for(Coordinate coordinate : existingShip.getCoordinates()) {
-            for( Coordinate existingCoordinate : ship.getCoordinates()){
+    private boolean areShipOverlapping(@NonNull Ship existingShip, @NonNull Ship ship) {
+        for (Coordinate coordinate : existingShip.getCoordinates()) {
+            for (Coordinate existingCoordinate : ship.getCoordinates()) {
                 int dx = Math.abs(coordinate.row() - existingCoordinate.row());
                 int dy = Math.abs(coordinate.col() - existingCoordinate.col());
 
                 // Invalid if ships overlap or touch (also diagonally).
                 // Requiring at least 1 empty cell between ships means max(dx, dy) must be >= 2.
-                if (Math.max(dx, dy) <= MIN_DISTANCE_THRESHOLD){
+                if (Math.max(dx, dy) <= MIN_DISTANCE_THRESHOLD) {
                     return false;
                 }
             }
@@ -156,7 +156,7 @@ public class FleetManager {
      * @param ship the ship to be removed; must be non-null
      * @return true if the ship was successfully removed from the fleet, false if the ship was not found
      */
-    public boolean removeShipByReference(@NonNull Ship ship){
+    public boolean removeShipByReference(@NonNull Ship ship) {
         return fleet.remove(ship);
     }
 
@@ -166,7 +166,7 @@ public class FleetManager {
      * @param coordinate the coordinate to check for ship removal; must be non-null
      * @return true if a ship occupying the specified coordinate was successfully removed, false otherwise
      */
-    public boolean removeShipByCoordinate(@NonNull Coordinate coordinate){
+    public boolean removeShipByCoordinate(@NonNull Coordinate coordinate) {
         return fleet.removeIf(ship -> ship.getCoordinates().contains(coordinate));
     }
 
@@ -176,7 +176,7 @@ public class FleetManager {
      * @param ship the ship to be searched in the fleet; must be non-null
      * @return the matching ship from the fleet if found, or {@code null} if no match exists
      */
-    public Ship getShipByReference(@NonNull Ship ship){
+    public Ship getShipByReference(@NonNull Ship ship) {
         return fleet.stream().filter(ship::equals).findFirst().orElse(null);
     }
 
@@ -186,7 +186,7 @@ public class FleetManager {
      * @param coordinate the coordinate to check for a ship; must be non-null
      * @return the ship located at the given coordinate, or null if no ship is found or the coordinate is invalid
      */
-    public Ship getShipByCoordinate(@NonNull Coordinate coordinate){
+    public Ship getShipByCoordinate(@NonNull Coordinate coordinate) {
         return fleet.stream().filter(ship -> ship.getCoordinates().contains(coordinate)).findFirst().orElse(null);
     }
 
@@ -199,17 +199,17 @@ public class FleetManager {
      * @param coordinate the coordinate of the incoming shot; must be non-null
      * @return true if the shot hit or false if is a miss
      */
-    public boolean handleIncomingShot(@NonNull Coordinate coordinate){
+    public boolean handleIncomingShot(@NonNull Coordinate coordinate) {
         Ship ship = getShipByCoordinate(coordinate);
-        if (ship != null){
+        if (ship != null) {
             boolean isNewHit = ship.addHit(coordinate);
-            if (isNewHit){
+            if (isNewHit) {
                 grid.changeState(coordinate, CellState.HIT);
-                if (ship.isSunk()){
+                if (ship.isSunk()) {
                     ship.getCoordinates().forEach(coord -> grid.changeState(coord, CellState.SUNK));
                 }
             }
-        }else {
+        } else {
             grid.changeState(coordinate, CellState.MISS);
             return false;
         }
@@ -225,7 +225,7 @@ public class FleetManager {
      *
      * @return true if all ships in the fleet are sunk, indicating the game is over; false otherwise
      */
-    public boolean isGameOver(){
+    public boolean isGameOver() {
         return fleet.stream().allMatch(Ship::isSunk);
     }
 
@@ -233,9 +233,9 @@ public class FleetManager {
      * Calculates the number of ships of each type currently placed in the fleet.
      *
      * @return a map associating each ShipType with the number of ships of that type
-     *         already present in the fleet.
+     * already present in the fleet.
      */
-    public Map<ShipType, Integer> getPlacedCounts(){
+    public Map<ShipType, Integer> getPlacedCounts() {
         return fleet.stream()
                 .collect(Collectors.groupingBy(
                         Ship::getShipType,
@@ -246,15 +246,15 @@ public class FleetManager {
     /**
      * Retrieves a serialized representation of the current grid state.
      */
-    public String getSerializedGridState(){
+    public String getSerializedGridState() {
         return GridMapper.serialize(grid.getGrid());
     }
 
-    public int getGridRows(){
+    public int getGridRows() {
         return grid.getRow();
     }
 
-    public int getGridCols(){
+    public int getGridCols() {
         return grid.getCol();
     }
 }

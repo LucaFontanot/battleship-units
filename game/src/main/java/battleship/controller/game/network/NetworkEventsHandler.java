@@ -7,7 +7,10 @@ import battleship.serializer.GameDataMapper;
 import it.units.battleship.Coordinate;
 import it.units.battleship.GameState;
 import it.units.battleship.Logger;
-import it.units.battleship.data.socket.payloads.*;
+import it.units.battleship.data.socket.payloads.GameConfigDTO;
+import it.units.battleship.data.socket.payloads.GameStatusDTO;
+import it.units.battleship.data.socket.payloads.GridUpdateDTO;
+import it.units.battleship.data.socket.payloads.ShotRequestDTO;
 
 import java.util.List;
 

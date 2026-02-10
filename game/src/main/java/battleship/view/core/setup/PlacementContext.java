@@ -6,6 +6,7 @@ import it.units.battleship.ShipType;
 
 public interface PlacementContext {
     ShipType getSelectedShipType();
+
     Orientation getSelectedOrientation();
 }
 

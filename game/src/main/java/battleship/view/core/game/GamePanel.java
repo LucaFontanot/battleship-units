@@ -8,7 +8,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.swing.*;
-
 import java.awt.*;
 import java.util.List;
 
@@ -16,13 +15,13 @@ import java.util.List;
  * The main Swing application window (JFrame) for the Battleship game.
  * Implements the {@link GameView} interface to bridge the gap between the game logic (Controller)
  * and the user interface.
- *
+ * <p>
  * Responsibilities:
- *  - Acts as the root container for all visual components (Player Grid, Opponent Grid).
- *  - Delegates specific rendering tasks to specialized components.
- *  - Manages the high-level layout of the application.
+ * - Acts as the root container for all visual components (Player Grid, Opponent Grid).
+ * - Delegates specific rendering tasks to specialized components.
+ * - Manages the high-level layout of the application.
  */
-public class GamePanel extends JPanel implements GameView{
+public class GamePanel extends JPanel implements GameView {
     @Getter
     private final GridUI playerGridUI;
     @Getter
@@ -32,9 +31,9 @@ public class GamePanel extends JPanel implements GameView{
     private final JLabel systemMessage = new JLabel(" ");
 
     private final JButton returnToMenuBtn = new JButton("Return to menu");
+    private final JPanel bottomBar = new JPanel(new FlowLayout(FlowLayout.RIGHT));
     @Setter
     private Runnable returnToMenuAction;
-    private final JPanel bottomBar = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
     public GamePanel(int rows, int cols) {
         setLayout(new BorderLayout(10, 10));
@@ -43,7 +42,7 @@ public class GamePanel extends JPanel implements GameView{
         opponentGridUI = new GridUI(rows, cols);
 
         // Status bar at top
-        JPanel topPanel = new JPanel(new GridLayout(2,1));
+        JPanel topPanel = new JPanel(new GridLayout(2, 1));
         turnIndicator.setHorizontalAlignment(SwingConstants.HORIZONTAL);
         turnIndicator.setFont(new Font("Arial", Font.BOLD, 16));
         systemMessage.setHorizontalAlignment(SwingConstants.CENTER);
@@ -118,12 +117,12 @@ public class GamePanel extends JPanel implements GameView{
         systemMessage.setText(message != null ? message : " ");
     }
 
-    public void setPlayerTurn(boolean isPlayerTurn){
+    public void setPlayerTurn(boolean isPlayerTurn) {
         opponentGridUI.setEnabled(isPlayerTurn);
-        if (isPlayerTurn){
+        if (isPlayerTurn) {
             turnIndicator.setText("Your turn!");
             showSystemMessage("Select a target on the enemy grid.");
-        }else {
+        } else {
             opponentGridUI.clearPlacementPreview();
             turnIndicator.setText("Opponent's turn");
             showSystemMessage("Waiting for opponent...");
@@ -147,7 +146,7 @@ public class GamePanel extends JPanel implements GameView{
         Toolkit.getDefaultToolkit().beep();
     }
 
-    public void showStatusMessage(String message){
+    public void showStatusMessage(String message) {
         systemMessage.setText(message);
     }
 }

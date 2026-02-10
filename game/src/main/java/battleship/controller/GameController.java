@@ -4,10 +4,12 @@ import battleship.controller.game.ui.OpponentGridHandler;
 import battleship.controller.game.ui.PlayerGridHandler;
 import battleship.controller.mode.GameModeStrategy;
 import battleship.controller.turn.TurnManager;
-import battleship.controller.turn.states.WaitingSetupState;
-import battleship.model.*;
+import battleship.model.FleetManager;
+import battleship.model.Ship;
 import battleship.view.core.BattleshipView;
-import it.units.battleship.*;
+import it.units.battleship.Coordinate;
+import it.units.battleship.GameState;
+import it.units.battleship.Logger;
 import lombok.NonNull;
 
 import java.util.List;
@@ -31,7 +33,7 @@ public class GameController implements GameModeStrategy.GameModeCallback {
 
         this.turnManager = new TurnManager(fleetManager, view, gameMode);
 
-        view.setOpponentGridListener(new OpponentGridHandler( turnManager));
+        view.setOpponentGridListener(new OpponentGridHandler(turnManager));
         view.setPlayerGridListener(new PlayerGridHandler(turnManager));
 
         turnManager.setSetupCompleteCallback(this::onLocalSetupComplete);

@@ -56,9 +56,13 @@ public interface GameModeStrategy {
      */
     interface GameModeCallback {
         void onOpponentReady();
+
         void onShotReceived(Coordinate coordinate);
+
         void onGridUpdateReceived(String gridSerialized, List<Ship> fleet);
+
         void onGameStatusReceived(GameState state, String message);
+
         void onConnectionError(String error);
     }
 }
