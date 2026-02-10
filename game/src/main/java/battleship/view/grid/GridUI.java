@@ -167,6 +167,17 @@ public class GridUI extends JPanel implements CellInteractionListener {
         repaint();
     }
 
+    public void removeShip(Ship ship) {
+        for (Coordinate c : ship.getCoordinates()) {
+            if (c.row() < 0 || c.row() >= rows || c.col() < 0 || c.col() >= cols) continue;
+
+            cells[c.row()][c.col()].removeTexture();
+            cells[c.row()][c.col()].setSelected(false);
+        }
+        revalidate();
+        repaint();
+    }
+
 
     public void clearSelected() {
         for (CellPanel[] row : cells) {

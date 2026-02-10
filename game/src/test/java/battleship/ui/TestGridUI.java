@@ -1,21 +1,32 @@
 package battleship.ui;
 
-import it.units.battleship.CellState;
+import battleship.model.FleetManager;
+import it.units.battleship.*;
 import battleship.model.Grid;
 import battleship.model.Ship;
 import battleship.view.grid.GridUI;
-import it.units.battleship.Coordinate;
-import it.units.battleship.Orientation;
-import it.units.battleship.ShipType;
+import it.units.battleship.service.PathManager;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
+import javax.swing.*;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public class TestGridUI {
+
+    @BeforeEach
+    public void setup() {
+        Logger.setDebugEnabled(true);
+    }
+
+    Orientation[] orientations = Orientation.values();
+    ShipType[] shipTypes = ShipType.values();
 
     @Test
     public void testGridInitialization() {
@@ -58,4 +69,52 @@ public class TestGridUI {
                     "Rendering failed for " + type + " oriented " + orientation);
         }
     }
+
+    @Test
+    public void testVisualUI() throws InterruptedException {
+        Grid grid = new Grid(10, 10);
+
+        List<Ship> ships = List.of(
+                Ship.createShip(new Coordinate(0, 0), Orientation.HORIZONTAL_RIGHT, ShipType.DESTROYER, grid),
+                Ship.createShip(new Coordinate(2, 2), Orientation.VERTICAL_DOWN, ShipType.BATTLESHIP, grid),
+                Ship.createShip(new Coordinate(4, 4), Orientation.HORIZONTAL_RIGHT, ShipType.CRUISER, grid),
+                Ship.createShip(new Coordinate(7, 7), Orientation.VERTICAL_DOWN, ShipType.FRIGATE, grid),
+                Ship.createShip(new Coordinate(0, 5), Orientation.HORIZONTAL_RIGHT, ShipType.CARRIER, grid)
+        );
+
+        GridUI gridUI = new GridUI(10, 10);
+        for (Ship ship : ships) {
+            gridUI.placeShip(ship);
+        }
+        JFrame frame = new javax.swing.JFrame("GridUI Test");
+        frame.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
+        frame.getContentPane().add(gridUI);
+        frame.pack();
+        frame.setVisible(true);
+        Thread.sleep(2000);
+        frame.dispose();
+    }
+
+    @Test
+    public void testOrientations() throws InterruptedException {
+        Grid grid = new Grid(15, 15);
+        GridUI gridUI = new GridUI(15, 15);
+        JFrame frame = new javax.swing.JFrame("GridUI Test");
+        frame.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
+        frame.getContentPane().add(gridUI);
+        frame.pack();
+        frame.setVisible(true);
+        for (ShipType type : ShipType.values()) {
+            for (Orientation orientation : Orientation.values()) {
+                Coordinate start = new Coordinate(7, 7);
+                Ship ship = Ship.createShip(start, orientation, type, grid);
+                Assertions.assertDoesNotThrow(() -> gridUI.displayData("0".repeat(15 * 15), List.of(ship)),
+                        "Failed to render " + type + " in orientation " + orientation);
+                gridUI.placeShip(ship);
+                Thread.sleep(1000);
+                gridUI.removeShip(ship);
+            }
+        }
+    }
+
 }
