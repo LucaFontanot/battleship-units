@@ -1,7 +1,15 @@
+plugins {
+    id 'application'
+}
+
 dependencies {
     implementation project(':battleship-common')
     implementation 'io.javalin:javalin:6.7.0'
     testImplementation 'com.squareup.okhttp3:okhttp:5.3.2'
+}
+
+application {
+    mainClass = 'it.units.battleship.Main'
 }
 
 shadowJar {
