@@ -19,11 +19,6 @@ public class WaitingOpponentState extends BaseGameState {
     }
 
     @Override
-    public void handleOpponentGridUpdate(TurnManager manager, String grid, List<Ship> fleet){
-        super.handleOpponentGridUpdate(manager, grid, fleet);
-    }
-
-    @Override
     public void handleIncomingShot(TurnManager manager, Coordinate coordinate) {
         boolean gameOver = manager.processIncomingShot(coordinate);
 
