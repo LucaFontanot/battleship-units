@@ -10,7 +10,7 @@ import java.util.List;
  * Interface for the game logic to react to network-triggered events.
  * It serves as the final entry point for network data into the game strategy
  */
-public interface NetworkInputActions {
+public interface NetworkActionsReceiver {
     /**
      * Triggered when a shot is received from the opponent.
      */

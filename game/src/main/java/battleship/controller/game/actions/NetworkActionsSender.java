@@ -12,7 +12,7 @@ import java.util.List;
  * Acts as an intermediate layer (Object to DTO) for outgoing communication,
  * abstracting the domain models from the network transport format.
  */
-public interface NetworkOutputActions {
+public interface NetworkActionsSender {
     /**
      * Sends the current game status and an optional message to the opponent.
      */

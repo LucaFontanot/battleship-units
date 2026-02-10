@@ -2,7 +2,7 @@ package battleship.controller.mode;
 
 import battleship.controller.game.network.NetworkClient;
 import battleship.controller.game.network.NetworkEventsHandler;
-import battleship.controller.game.actions.NetworkInputActions;
+import battleship.controller.game.actions.NetworkActionsReceiver;
 import battleship.model.Grid;
 import battleship.model.Ship;
 import it.units.battleship.Coordinate;
@@ -25,7 +25,7 @@ public class OnlineMultiplayerStrategy implements GameModeStrategy {
 
     @Override
     public void initialize(GameModeCallback callback) {
-        NetworkInputActions inputActions = new OnlineMultiplayerInputHandler(callback);
+        NetworkActionsReceiver inputActions = new OnlineMultiplayerInputHandler(callback);
         networkClient.addCommunicationEventsListener(new NetworkEventsHandler(inputActions));
 
         Logger.log("OnlineMultiplayerStrategy initialized");
@@ -61,7 +61,7 @@ public class OnlineMultiplayerStrategy implements GameModeStrategy {
         return "Online Multiplayer";
     }
 
-    private static class OnlineMultiplayerInputHandler implements NetworkInputActions {
+    private static class OnlineMultiplayerInputHandler implements NetworkActionsReceiver {
         private final GameModeCallback callback;
 
         OnlineMultiplayerInputHandler(GameModeCallback callback) {

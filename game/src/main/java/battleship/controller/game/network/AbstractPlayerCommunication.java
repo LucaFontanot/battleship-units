@@ -1,6 +1,6 @@
 package battleship.controller.game.network;
 
-import battleship.controller.game.actions.NetworkOutputActions;
+import battleship.controller.game.actions.NetworkActionsSender;
 import battleship.controller.game.events.CommunicationEvents;
 import battleship.model.Grid;
 import battleship.model.Ship;
@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * Abstract class for player communication handling.
  */
-public abstract class AbstractPlayerCommunication implements CommunicationEvents, NetworkOutputActions {
+public abstract class AbstractPlayerCommunication implements CommunicationEvents, NetworkActionsSender {
     final List<CommunicationEvents> communicationEventsListeners = new ArrayList<>();
 
     /**
