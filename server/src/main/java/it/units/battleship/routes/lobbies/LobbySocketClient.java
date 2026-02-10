@@ -197,13 +197,7 @@ public class LobbySocketClient implements WebSocketConnection {
     public void onBinaryMessage(WsBinaryMessageContext ctx) {
     }
 
-    /**
-     * Handles WebSocket connection closure. If the client was authenticated and part of a lobby, it updates the lobby state accordingly and removes the lobby if necessary.
-     *
-     * @param ctx the WebSocket close context
-     */
-    @Override
-    public void onClose(WsCloseContext ctx) {
+    void disposeLobby() {
         if (lobby != null && isAuthenticated.get()) {
             if (playerType.equals(LobbiesService.PlayerType.PLAYER_ONE)) {
                 lobby.setPlayerOneCtx(null);
@@ -219,6 +213,17 @@ public class LobbySocketClient implements WebSocketConnection {
     }
 
     /**
+     * Handles WebSocket connection closure. If the client was authenticated and part of a lobby, it updates the lobby state accordingly and removes the lobby if necessary.
+     *
+     * @param ctx the WebSocket close context
+     */
+    @Override
+    public void onClose(WsCloseContext ctx) {
+        Logger.log("[LobbySocketClient] WebSocket connection closed: " + ctx.sessionId() + " (Reason: " + ctx.reason() + ")");
+        disposeLobby();
+    }
+
+    /**
      * Handles WebSocket errors
      *
      * @param ctx the WebSocket error context
@@ -226,5 +231,6 @@ public class LobbySocketClient implements WebSocketConnection {
     @Override
     public void onError(WsErrorContext ctx) {
         Logger.error("[LobbySocketClient] WebSocket error: " + ctx.error().getMessage());
+            disposeLobby();
     }
 }

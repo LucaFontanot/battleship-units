@@ -3,10 +3,10 @@ package it.units.battleship;
 import java.util.Map;
 
 public class Defaults {
-    public static final String HTTP_SERVER_SCHEME = "http";
-    public static final String WS_SERVER_SCHEME = "ws";
-    public static final String HTTP_SERVER_HOST = "localhost";
-    public static final int HTTP_SERVER_PORT = 8080;
+    public static final String HTTP_SERVER_SCHEME = "https";
+    public static final String WS_SERVER_SCHEME = "wss";
+    public static final String HTTP_SERVER_HOST = "battleship.lucafontanot.it";
+    public static final int HTTP_SERVER_PORT = 443;
 
     public static final String HTTP_LOBBY_PATH = "/api/lobbies";
     public static final String HTTP_LOBBY_ENDPOINT = HTTP_SERVER_SCHEME + "://" + HTTP_SERVER_HOST + ":" + HTTP_SERVER_PORT + HTTP_LOBBY_PATH;
