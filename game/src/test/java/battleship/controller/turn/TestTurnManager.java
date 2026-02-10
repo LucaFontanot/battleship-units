@@ -22,8 +22,6 @@ import static org.mockito.Mockito.*;
 class TestTurnManager {
 
     @Mock
-    private Grid grid;
-    @Mock
     private FleetManager fleetManager;
     @Mock
     private BattleshipView view;
@@ -36,23 +34,15 @@ class TestTurnManager {
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        // Mock FleetManager and Grid methods needed by onEnter method
-        when(fleetManager.getGrid()).thenReturn(grid);
-        CellState[][] emptyGrid = new CellState[10][10];
-        for (int i = 0; i < 10; i++) {
-            for (int j = 0; j < 10; j++) {
-                emptyGrid[i][j] = CellState.EMPTY;
-            }
-        }
-        when(grid.getGrid()).thenReturn(emptyGrid);
-        // TurnManager constructor creates opponentGrid
-        when(grid.getRow()).thenReturn(10);
-        when(grid.getCol()).thenReturn(10);
+        // Mock FleetManager methods needed by TurnManager constructor and onEnter
+        when(fleetManager.getGridRows()).thenReturn(10);
+        when(fleetManager.getGridCols()).thenReturn(10);
         when(fleetManager.getFleet()).thenReturn(java.util.List.of());
         when(fleetManager.getPlacedCounts()).thenReturn(java.util.Map.of());
         when(fleetManager.getRequiredFleetConfiguration()).thenReturn(java.util.Map.of());
+        when(fleetManager.getSerializedGridState()).thenReturn("0".repeat(100));
 
-        manager = new TurnManager(grid, fleetManager, view, gameMode);
+        manager = new TurnManager(fleetManager, view, gameMode);
     }
 
     @Test
@@ -249,7 +239,9 @@ class TestTurnManager {
     @Test
     void getters_returnInjectedDependencies() {
         // basic getters test – boring but useful when refactoring
-        assertEquals(grid, manager.getGrid());
+        assertNotNull(manager.getOpponentGrid());
+        assertEquals(10, manager.getOpponentGrid().getRow());
+        assertEquals(10, manager.getOpponentGrid().getCol());
         assertEquals(fleetManager, manager.getFleetManager());
         assertEquals(view, manager.getView());
         assertEquals(gameMode, manager.getGameModeStrategy());

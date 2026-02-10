@@ -74,7 +74,6 @@ public class WelcomeUi implements WelcomeUiActions {
         BattleshipView view = new BattleshipFrame(GRID_ROWS, GRID_COLS);
 
         GameController controller = new GameController(
-                playerGrid,
                 fleetManager,
                 singlePlayerMode,
                 view
@@ -95,7 +94,6 @@ public class WelcomeUi implements WelcomeUiActions {
             BattleshipView view = new BattleshipFrame(GRID_ROWS, GRID_COLS);
 
             GameController controller = new GameController(
-                    playerGrid,
                     fleetManager,
                     onlineMode,
                     view
