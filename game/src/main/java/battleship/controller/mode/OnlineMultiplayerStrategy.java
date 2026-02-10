@@ -18,7 +18,6 @@ import java.util.List;
 public class OnlineMultiplayerStrategy implements GameModeStrategy {
 
     private final NetworkClient networkClient;
-    private GameModeCallback callback;
 
     public OnlineMultiplayerStrategy(NetworkClient networkClient) {
         this.networkClient = networkClient;
@@ -26,8 +25,6 @@ public class OnlineMultiplayerStrategy implements GameModeStrategy {
 
     @Override
     public void initialize(GameModeCallback callback) {
-        this.callback = callback;
-
         NetworkInputActions inputActions = new OnlineMultiplayerInputHandler(callback);
         networkClient.addCommunicationEventsListener(new NetworkEventsHandler(inputActions));
 
