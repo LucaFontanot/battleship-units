@@ -275,4 +275,12 @@ public class FleetManager {
     public String getSerializedGridState(){
         return GridMapper.serialize(grid.getGrid());
     }
+
+    public int getGridRows(){
+        return grid.getRow();
+    }
+
+    public int getGridCols(){
+        return grid.getCol();
+    }
 }
