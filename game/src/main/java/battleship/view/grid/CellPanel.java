@@ -88,14 +88,19 @@ public class CellPanel extends JLabel {
         return new Color(color.getRed(), color.getGreen(), color.getBlue(), (int)(opacity * 255));
     }
 
+    @Getter
+    BufferedImage texture = null;
+
     public void addTexture(BufferedImage texture) {
         int w = Math.max(getWidth(), getPreferredSize().width);
         int h = Math.max(getHeight(), getPreferredSize().height);
         setIcon(new ImageIcon(texture.getScaledInstance(w, h, Image.SCALE_SMOOTH)));
+        this.texture = texture;
     }
 
     public void removeTexture() {
         setIcon(null);
+        this.texture = null;
     }
 
     public void updateState(CellState newState){

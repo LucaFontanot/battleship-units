@@ -56,35 +56,39 @@ public class GridUI extends JPanel implements CellInteractionListener {
         }
     }
 
+    CellState[][] previousStates = null;
+
+    public Ship getShipOnCoordinate(List<Ship> ships, Coordinate coordinate) {
+        for (Ship ship : ships) {
+            if (ship.getCoordinates().contains(coordinate)) {
+                return ship;
+            }
+        }
+        return null;
+    }
+
     public void displayData(@NonNull String gridSerialized, List<Ship> ships){
+        CellState[][] states = GridMapper.deserialize(gridSerialized, rows, cols);
+
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
-                cells[r][c].removeTexture();
-            }
-        }
-
-        CellState[][] states = GridMapper.deserialize(gridSerialized, rows, cols);
-        for(int r=0; r<rows ; r++){
-            for(int c=0; c<cols; c++){
-                cells[r][c].updateState(states[r][c]);
-            }
-        }
-
-        for (Ship ship : ships) {
-            for (Coordinate coord : ship.getCoordinates()) {
-                BufferedImage image = TextureLoader.getTextureForShip(ship, coord);
-                if (image == null) {
-                    Logger.warn("No texture found for ship at coordinate: " + coord);
+                Coordinate coordinate = new Coordinate(r, c);
+                Ship ship = getShipOnCoordinate(ships, coordinate);
+                if ((previousStates != null && states[r][c] == previousStates[r][c]) && ship == null) {
                     continue;
                 }
-                cells[coord.row()][coord.col()].addTexture(image);
-            }
-        }
-        for (int r = 0; r < rows; r++) {
-            for (int c = 0; c < cols; c++) {
+                cells[r][c].removeTexture();
+                cells[r][c].updateState(states[r][c]);
+                if (ship != null) {
+                    BufferedImage image = TextureLoader.getTextureForShip(ship, coordinate);
+                    if (image != null && (cells[r][c].getTexture() == null || !TextureLoader.compareTextures(image, cells[r][c].getTexture()))) {
+                        cells[r][c].addTexture(image);
+                    }
+                }
                 cells[r][c].refresh();
             }
         }
+        previousStates = states;
         revalidate();
         repaint();
     }

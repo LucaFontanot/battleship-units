@@ -61,6 +61,23 @@ public class TextureLoader {
         return getTexture(col, row, rotationAngle, false);
     }
 
+    public static boolean compareTextures(BufferedImage img1, BufferedImage img2) {
+        if (img1 == null || img2 == null) {
+            return false;
+        }
+        if (img1.getWidth() != img2.getWidth() || img1.getHeight() != img2.getHeight()) {
+            return false;
+        }
+        for (int x = 0; x < img1.getWidth(); x++) {
+            for (int y=0; y<img1.getHeight(); y++){
+                if (img1.getRGB(x, y) != img2.getRGB(x, y)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     public static BufferedImage getTextureForShip(Ship ship, Coordinate coordinate){
         List<Coordinate> shipCoordinates = new ArrayList<>(ship.getCoordinates());
         Orientation orientation = ship.getOrientation();
