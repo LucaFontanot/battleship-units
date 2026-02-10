@@ -6,13 +6,14 @@ import it.units.battleship.GridMapper;
 import it.units.battleship.ShipType;
 import lombok.Getter;
 import lombok.NonNull;
-import org.apache.logging.log4j.core.tools.picocli.CommandLine;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static it.units.battleship.Defaults.MIN_DISTANCE_THRESHOLD;
 
 /**
  * The FleetManager class is responsible for managing a fleet of ships within a specified grid.
@@ -27,7 +28,6 @@ public class FleetManager {
      * is used to determine whether the placement of a new ship is too close
      * to an existing one, thereby violating the rules of the game.
      */
-    private static final int MIN_DISTANCE_THRESHOLD = 1;
 
     @Getter
     private final Grid grid;
@@ -86,32 +86,6 @@ public class FleetManager {
         fleet.add(ship);
         return true;
     }
-
-    /**
-     * Calculates the number of remaining ships of a specific type that can be added to the fleet.
-     *
-     * @param shipType the type of ship to check for remaining count; must be non-null
-     * @return the number of remaining ships
-     */
-    public int getRemaining(@NonNull ShipType shipType) {
-        Integer required = requiredFleetConfiguration.get(shipType);
-        if (required == null) {
-            return 0;
-        }
-        int placed = countShipsOfType(shipType);
-        return Math.max(0, required - placed);
-    }
-
-    /**
-     * Retrieves the required count of ships for a specific type as defined in the fleet configuration.
-     *
-     * @param shipType the type of ship to check for required count; must be non-null
-     * @return the required count of ships for the specified type
-     */
-    public int getRequiredCount(@NonNull ShipType shipType) {
-        return requiredFleetConfiguration.getOrDefault(shipType, 0);
-    }
-
 
     /**
      * Determines whether a ship of the given type can be added to the fleet based on the
@@ -274,5 +248,13 @@ public class FleetManager {
      */
     public String getSerializedGridState(){
         return GridMapper.serialize(grid.getGrid());
+    }
+
+    public int getGridRows(){
+        return grid.getRow();
+    }
+
+    public int getGridCols(){
+        return grid.getCol();
     }
 }

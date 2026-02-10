@@ -84,7 +84,6 @@ public class WelcomeUi implements WelcomeUiActions {
         });
 
         GameController controller = new GameController(
-                playerGrid,
                 fleetManager,
                 singlePlayerMode,
                 view
@@ -110,7 +109,6 @@ public class WelcomeUi implements WelcomeUiActions {
             });
 
             GameController controller = new GameController(
-                    playerGrid,
                     fleetManager,
                     onlineMode,
                     view

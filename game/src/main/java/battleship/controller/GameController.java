@@ -23,14 +23,13 @@ public class GameController implements GameModeStrategy.GameModeCallback {
     private final GameModeStrategy gameMode;
     private final BattleshipView view;
 
-    public GameController(@NonNull Grid grid,
-                          @NonNull FleetManager fleetManager,
+    public GameController(@NonNull FleetManager fleetManager,
                           @NonNull GameModeStrategy gameMode,
                           @NonNull BattleshipView view) {
         this.gameMode = gameMode;
         this.view = view;
 
-        this.turnManager = new TurnManager(grid, fleetManager, view, gameMode);
+        this.turnManager = new TurnManager(fleetManager, view, gameMode);
 
         view.setOpponentGridListener(new OpponentGridHandler( turnManager));
         view.setPlayerGridListener(new PlayerGridHandler(turnManager));

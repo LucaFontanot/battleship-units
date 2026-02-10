@@ -55,7 +55,9 @@ class TestGameController {
             }
         }
         when(gridMock.getGrid()).thenReturn(emptyGrid);
-        // TurnManager constructor creates opponentGrid using grid.getRow() and grid.getCol()
+        // TurnManager constructor creates opponentGrid using fleetManager.getGridRows() and fleetManager.getGridCols()
+        when(fleetMgrMock.getGridRows()).thenReturn(10);
+        when(fleetMgrMock.getGridCols()).thenReturn(10);
         when(gridMock.getRow()).thenReturn(10);
         when(gridMock.getCol()).thenReturn(10);
         when(fleetMgrMock.getFleet()).thenReturn(java.util.List.of());
@@ -65,7 +67,7 @@ class TestGameController {
 
     @Test
     void gameController_isCreatedAndHooksViewListeners() {
-        controller = new GameController(gridMock, fleetMgrMock, modeMock, viewMock);
+        controller = new GameController(fleetMgrMock, modeMock, viewMock);
 
         assertNotNull(controller, "Controller should be created");
 
@@ -76,7 +78,7 @@ class TestGameController {
 
     @Test
     void startGame_initializesGameModeAndStartsFlow() {
-        controller = new GameController(gridMock, fleetMgrMock, modeMock, viewMock);
+        controller = new GameController(fleetMgrMock, modeMock, viewMock);
 
         controller.startGame();
 
@@ -90,7 +92,7 @@ class TestGameController {
 
     @Test
     void onOpponentReady_doesNotCrash() {
-        controller = new GameController(gridMock, fleetMgrMock, modeMock, viewMock);
+        controller = new GameController(fleetMgrMock, modeMock, viewMock);
 
         // Currently this method only logs, so just make sure it’s safe
         assertDoesNotThrow(() -> controller.onOpponentReady());
@@ -98,7 +100,7 @@ class TestGameController {
 
     @Test
     void onShotReceived_acceptsIncomingShot() {
-        controller = new GameController(gridMock, fleetMgrMock, modeMock, viewMock);
+        controller = new GameController(fleetMgrMock, modeMock, viewMock);
         Coordinate coord = new Coordinate(0, 0);
 
         // TurnManager is internal, so we can't verify delegation directly
@@ -107,7 +109,7 @@ class TestGameController {
 
     @Test
     void onGridUpdateReceived_acceptsSerializedGrid() {
-        controller = new GameController(gridMock, fleetMgrMock, modeMock, viewMock);
+        controller = new GameController(fleetMgrMock, modeMock, viewMock);
 
         String fakeGrid = "grid_data"; // not a real grid, but enough for the test
         List<Ship> emptyFleet = List.of();
@@ -119,7 +121,7 @@ class TestGameController {
 
     @Test
     void onGameStatusReceived_gameOverDoesNotThrow() {
-        controller = new GameController(gridMock, fleetMgrMock, modeMock, viewMock);
+        controller = new GameController(fleetMgrMock, modeMock, viewMock);
         String msg = "Game Over";
 
         assertDoesNotThrow(() ->
@@ -129,7 +131,7 @@ class TestGameController {
 
     @Test
     void onGameStatusReceived_activeTurnStateHandled() {
-        controller = new GameController(gridMock, fleetMgrMock, modeMock, viewMock);
+        controller = new GameController(fleetMgrMock, modeMock, viewMock);
 
         assertDoesNotThrow(() ->
                 controller.onGameStatusReceived(GameState.ACTIVE_TURN, "Game started")
@@ -138,7 +140,7 @@ class TestGameController {
 
     @Test
     void onGameStatusReceived_waitingForOpponentHandled() {
-        controller = new GameController(gridMock, fleetMgrMock, modeMock, viewMock);
+        controller = new GameController(fleetMgrMock, modeMock, viewMock);
 
         assertDoesNotThrow(() ->
                 controller.onGameStatusReceived(GameState.WAITING_FOR_OPPONENT, "Waiting")
@@ -147,7 +149,7 @@ class TestGameController {
 
     @Test
     void onConnectionError_showsEndGameScreen() {
-        controller = new GameController(gridMock, fleetMgrMock, modeMock, viewMock);
+        controller = new GameController(fleetMgrMock, modeMock, viewMock);
         String errorMsg = "Connection failed";
 
         controller.onConnectionError(errorMsg);
@@ -160,7 +162,7 @@ class TestGameController {
     void controller_canBeCreatedWithoutSpecialFlags() {
         // This test is a bit redundant, but it documents that
         // there is no hidden configuration required.
-        controller = new GameController(gridMock, fleetMgrMock, modeMock, viewMock);
+        controller = new GameController(fleetMgrMock, modeMock, viewMock);
 
         assertNotNull(controller);
     }

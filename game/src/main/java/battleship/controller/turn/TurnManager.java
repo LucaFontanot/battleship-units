@@ -21,8 +21,6 @@ import java.util.Map;
 public class TurnManager implements GameInteractionFacade {
     @Getter
     private TurnState currentState;
-    @Getter
-    private final Grid grid;
     @Getter@Setter
     private Grid opponentGrid;
     @Getter
@@ -34,17 +32,15 @@ public class TurnManager implements GameInteractionFacade {
     @Setter
     private SetupCompleteCallback setupCompleteCallback;
 
-    public TurnManager(@NonNull Grid grid,
-                       @NonNull FleetManager fleetManager,
+    public TurnManager(@NonNull FleetManager fleetManager,
                        @NonNull BattleshipView view,
                        @NonNull GameModeStrategy gameModeStrategy) {
-        this.grid = grid;
         this.fleetManager = fleetManager;
         this.gameModeStrategy = gameModeStrategy;
         this.view = view;
         //using grid.getRow and grid.getCol indeed using the default values,
         //oppoennt grid will scale automatically if diff grid size are implemented
-        this.opponentGrid = new Grid(grid.getRow(), grid.getCol());
+        this.opponentGrid = new Grid(fleetManager.getGridRows(), fleetManager.getGridCols());
 
         this.currentState = new SetupState();
     }
