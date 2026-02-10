@@ -29,7 +29,7 @@ public class TestPingRoute {
         if (webServerApp != null) {
             webServerApp.close();
         }
-        // webServerThread.interrupt(); // No longer needed if we close the app
+        webServerThread.interrupt();
     }
 
     @Test
