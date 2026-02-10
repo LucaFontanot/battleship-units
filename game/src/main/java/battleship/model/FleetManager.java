@@ -6,13 +6,14 @@ import it.units.battleship.GridMapper;
 import it.units.battleship.ShipType;
 import lombok.Getter;
 import lombok.NonNull;
-import org.apache.logging.log4j.core.tools.picocli.CommandLine;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static it.units.battleship.Defaults.MIN_DISTANCE_THRESHOLD;
 
 /**
  * The FleetManager class is responsible for managing a fleet of ships within a specified grid.
@@ -27,7 +28,6 @@ public class FleetManager {
      * is used to determine whether the placement of a new ship is too close
      * to an existing one, thereby violating the rules of the game.
      */
-    private static final int MIN_DISTANCE_THRESHOLD = 1;
 
     @Getter
     private final Grid grid;

@@ -26,4 +26,6 @@ public class Defaults {
 
     public static final int GRID_ROWS = 10;
     public static final int GRID_COLS = 10;
+
+    public static final int MIN_DISTANCE_THRESHOLD = 1;
 }
