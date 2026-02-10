@@ -68,9 +68,6 @@ public class WelcomeUi implements WelcomeUiActions {
     public void onSinglePlayerSelected() {
         frame.dispose();
 
-        Map<ShipType, Integer> FLEET_CONFIGURATION = Map.of(
-                ShipType.CARRIER, 1);
-
         Grid playerGrid = new Grid(GRID_ROWS, GRID_COLS);
         FleetManager fleetManager = new FleetManager(playerGrid, FLEET_CONFIGURATION);
 
