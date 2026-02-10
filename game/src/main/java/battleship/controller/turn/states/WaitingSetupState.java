@@ -25,6 +25,7 @@ public class WaitingSetupState extends BaseGameState {
      * Handles game status updates from the server.
      * When both players are ready, the server sends the actual starting state.
      */
+    @Override
     public void handleGameStatusReceived(TurnManager manager, GameState state) {
         manager.transitionToGamePhase();
         if (state == GameState.ACTIVE_TURN) {
