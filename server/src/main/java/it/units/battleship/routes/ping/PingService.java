@@ -10,9 +10,10 @@ public class PingService {
 
     /**
      * Generates a ping response containing the server time and version.
+     *
      * @return PingResponseData object with server time and version
      */
-    public PingResponseData getPingResponse(){
+    public PingResponseData getPingResponse() {
         return PingResponseData.builder()
                 .serverTime(System.currentTimeMillis())
                 .serverVersion(BuildConstants.VERSION)

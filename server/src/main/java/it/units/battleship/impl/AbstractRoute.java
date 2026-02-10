@@ -8,7 +8,7 @@ import lombok.Getter;
 /**
  * AbstractRoute class that serves
  */
-public abstract class AbstractRoute <T> {
+public abstract class AbstractRoute<T> {
 
     @Getter
     final WebServerApp app;
@@ -24,6 +24,7 @@ public abstract class AbstractRoute <T> {
 
     /**
      * Returns the service associated with the route.
+     *
      * @return the service of type T
      */
     public T getService() {
@@ -41,6 +42,7 @@ public abstract class AbstractRoute <T> {
 
     /**
      * Handles GET requests.
+     *
      * @param ctx the Javalin context
      */
     public void handleGetRequest(Context ctx) {
@@ -49,6 +51,7 @@ public abstract class AbstractRoute <T> {
 
     /**
      * Handles POST requests.
+     *
      * @param ctx the Javalin context
      */
     public void handlePostRequest(Context ctx) {
@@ -57,6 +60,7 @@ public abstract class AbstractRoute <T> {
 
     /**
      * Handles PUT requests.
+     *
      * @param ctx the Javalin context
      */
     public void handlePutRequest(Context ctx) {
@@ -65,6 +69,7 @@ public abstract class AbstractRoute <T> {
 
     /**
      * Handles DELETE requests.
+     *
      * @param ctx the Javalin context
      */
     public void handleDeleteRequest(Context ctx) {
@@ -73,6 +78,7 @@ public abstract class AbstractRoute <T> {
 
     /**
      * Handles PATCH requests.
+     *
      * @param ctx the Javalin context
      */
     public void handlePatchRequest(Context ctx) {
@@ -81,6 +87,7 @@ public abstract class AbstractRoute <T> {
 
     /**
      * Handles WebSocket requests.
+     *
      * @param config the WebSocket configuration
      */
     public void handleWebsocketRequest(WsConfig config) {

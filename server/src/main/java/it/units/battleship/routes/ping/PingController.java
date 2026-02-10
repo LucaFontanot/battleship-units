@@ -23,6 +23,7 @@ public class PingController extends AbstractRoute<PingService> {
 
     /**
      * Returns the PingService associated with the route.
+     *
      * @return the PingService
      */
     @Override
@@ -41,6 +42,7 @@ public class PingController extends AbstractRoute<PingService> {
 
     /**
      * Handles GET requests.
+     *
      * @param ctx the Javalin context
      */
     @Override

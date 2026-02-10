@@ -15,11 +15,8 @@ import java.util.UUID;
 
 public class LobbiesController extends AbstractRoute<LobbiesService> {
 
-    /**
-     * Constructor for AbstractRoute.
-     *
-     * @param app the WebServerApp instance
-     */
+    HashMap<WsContext, LobbySocketClient> websocketClients = new HashMap<>();
+
     public LobbiesController(WebServerApp app) {
         super(app);
     }
@@ -54,9 +51,6 @@ public class LobbiesController extends AbstractRoute<LobbiesService> {
         getService().addLobby(newLobby);
         ctx.status(201).result(getApp().getGson().toJson(newLobby, LobbyData.class));
     }
-
-
-    HashMap<WsContext, LobbySocketClient> websocketClients = new HashMap<>();
 
     @Override
     public void handleWebsocketRequest(WsConfig config) {

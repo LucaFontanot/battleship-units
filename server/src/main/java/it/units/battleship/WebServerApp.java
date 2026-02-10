@@ -28,6 +28,9 @@ public class WebServerApp extends Thread {
     @Getter
     final LobbiesService lobbiesService = new LobbiesService();
 
+    /**
+     * Array of AbstractRoute instances representing the different routes of the web server.
+     */
     final AbstractRoute<?>[] routes = new AbstractRoute<?>[]{
             new PingController(this),
             new LobbiesController(this),
@@ -44,7 +47,7 @@ public class WebServerApp extends Thread {
             config.jetty.modifyWebSocketServletFactory(factory -> {
                 factory.setIdleTimeout(Duration.ofHours(1));
             });
-            config.router.mount( router -> {
+            config.router.mount(router -> {
                 router.before(ctx -> {
                     Logger.log(String.format("[%s] %s %s", ctx.method(), ctx.path(), ctx.ip()));
                 });
@@ -70,7 +73,7 @@ public class WebServerApp extends Thread {
     /**
      * Stops the Javalin web server.
      */
-    public void close(){
+    public void close() {
         app.stop();
     }
 }

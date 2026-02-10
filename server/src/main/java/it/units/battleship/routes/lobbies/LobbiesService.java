@@ -5,12 +5,20 @@ import it.units.battleship.models.Lobby;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * LobbyService class that manages game lobbies.
  */
-public class LobbiesService {
+public class LobbiesService implements Runnable {
     final HashMap<String, Lobby> lobbies = new HashMap<>();
+
+    final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+
+    public LobbiesService() {
+        scheduler.scheduleAtFixedRate(this, 0, 5, java.util.concurrent.TimeUnit.SECONDS);
+    }
 
     /**
      * Returns a list of all lobbies.
@@ -71,10 +79,16 @@ public class LobbiesService {
         lobbies.remove(lobbyID);
     }
 
-    public enum PlayerType {
-        PLAYER_ONE,
-        PLAYER_TWO,
-        INVALID
+    /**
+     * Periodically checks for disconnected lobbies and removes them from the lobby list.
+     */
+    @Override
+    public void run() {
+        for (String lobbyID : lobbies.keySet()) {
+            if (!LobbySocketClient.connectedLobbies.containsKey(lobbyID)) {
+                lobbies.remove(lobbyID);
+            }
+        }
     }
 
     /**
@@ -162,5 +176,11 @@ public class LobbiesService {
                 lobbies.remove(lobbyID);
             }
         }
+    }
+
+    public enum PlayerType {
+        PLAYER_ONE,
+        PLAYER_TWO,
+        INVALID
     }
 }
