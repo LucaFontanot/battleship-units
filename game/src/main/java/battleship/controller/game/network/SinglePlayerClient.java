@@ -1,6 +1,6 @@
 package battleship.controller.game.network;
 
-import battleship.model.game.Grid;
+import battleship.model.Grid;
 import battleship.serializer.GameDataMapper;
 import it.units.battleship.Coordinate;
 import it.units.battleship.Defaults;

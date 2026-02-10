@@ -1,5 +1,9 @@
-plugins {
+plugins{
     id 'application'
+}
+
+application {
+    mainClass = 'battleship.Main'
 }
 
 dependencies {
@@ -13,10 +17,6 @@ dependencies {
     testImplementation 'org.mockito:mockito-junit-jupiter:5.11.0'
 }
 
-application {
-    mainClass = 'battleship.Main'
-}
-
 test {
     useJUnitPlatform()
 
@@ -28,7 +28,7 @@ shadowJar {
     mergeServiceFiles()
     manifest {
         attributes(
-                'Main-Class': 'battleship.Main'
+                'Main-Class': 'it.units.battleship.Main'
         )
     }
 }

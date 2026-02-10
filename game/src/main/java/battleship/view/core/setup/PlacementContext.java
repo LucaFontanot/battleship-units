@@ -1,4 +1,4 @@
-package battleship.view.setup;
+package battleship.view.core.setup;
 
 
 import it.units.battleship.Orientation;

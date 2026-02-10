@@ -1,10 +1,14 @@
 package battleship.view.welcome;
 
-import battleship.controller.game.GameController;
-import battleship.controller.game.network.SinglePlayerClient;
+import battleship.controller.GameController;
 import battleship.controller.lobby.LobbyController;
-import battleship.model.game.FleetManager;
-import battleship.model.game.Grid;
+import battleship.controller.mode.GameModeStrategy;
+import battleship.controller.mode.OnlineMultiplayerStrategy;
+import battleship.controller.mode.SinglePlayerStrategy;
+import battleship.model.FleetManager;
+import battleship.model.Grid;
+import battleship.view.core.BattleshipFrame;
+import battleship.view.core.BattleshipView;
 
 import battleship.view.lobby.LobbySelector;
 import battleship.utils.DimensionsUtils;
@@ -14,10 +18,11 @@ import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
 import it.units.battleship.Logger;
-import it.units.battleship.data.LobbyData;
+import it.units.battleship.ShipType;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Map;
 
 import static it.units.battleship.Defaults.*;
 
@@ -61,15 +66,31 @@ public class WelcomeUi implements WelcomeUiActions {
 
     @Override
     public void onSinglePlayerSelected() {
-        dispose();
+        frame.dispose();
+
+        Map<ShipType, Integer> FLEET_CONFIGURATION = Map.of(
+                ShipType.CARRIER, 1);
+
         Grid playerGrid = new Grid(GRID_ROWS, GRID_COLS);
         FleetManager fleetManager = new FleetManager(playerGrid, FLEET_CONFIGURATION);
 
-        // Todo, instead of null, we should put the single player abstract communication handler
-        GameController controller = new GameController(playerGrid, fleetManager, new SinglePlayerClient(
-                LobbyData.builder().build(), "Player1"
-        ));
-        controller.setupGame();
+        // Use the new unified approach
+        GameModeStrategy singlePlayerMode = new SinglePlayerStrategy(FLEET_CONFIGURATION);
+        BattleshipView view = new BattleshipFrame(GRID_ROWS, GRID_COLS);
+
+        view.setReturnToMenuAction(() -> {
+            view.dispose();
+            show();
+        });
+
+        GameController controller = new GameController(
+                playerGrid,
+                fleetManager,
+                singlePlayerMode,
+                view
+        );
+
+        controller.startGame();
     }
 
     @Override
@@ -79,11 +100,27 @@ public class WelcomeUi implements WelcomeUiActions {
             Logger.debug("WelcomeUI::LobbySelected - Client ready for online multiplayer");
             Grid playerGrid = new Grid(GRID_ROWS, GRID_COLS);
             FleetManager fleetManager = new FleetManager(playerGrid, FLEET_CONFIGURATION);
-            GameController controller = new GameController(playerGrid, fleetManager, client);
-            controller.setupGame();
+
+            GameModeStrategy onlineMode = new OnlineMultiplayerStrategy(client);
+            BattleshipView view = new BattleshipFrame(GRID_ROWS, GRID_COLS);
+
+            view.setReturnToMenuAction(() -> {
+                view.dispose();
+                show();
+            });
+
+            GameController controller = new GameController(
+                    playerGrid,
+                    fleetManager,
+                    onlineMode,
+                    view
+            );
+
+            controller.startGame();
         }));
         lobbySelector.show();
     }
+
 
     @Override
     public void onThemeAutoSelected() {

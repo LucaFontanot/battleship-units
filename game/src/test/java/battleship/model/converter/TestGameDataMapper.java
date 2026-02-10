@@ -1,8 +1,6 @@
 package battleship.model.converter;
 
-import battleship.model.game.FleetManager;
-import battleship.model.game.Grid;
-import battleship.model.game.Ship;
+import battleship.model.*;
 import battleship.serializer.GameDataMapper;
 import it.units.battleship.Coordinate;
 import it.units.battleship.GameState;

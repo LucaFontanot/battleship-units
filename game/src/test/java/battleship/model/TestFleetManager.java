@@ -1,8 +1,5 @@
 package battleship.model;
 
-import battleship.model.game.FleetManager;
-import battleship.model.game.Grid;
-import battleship.model.game.Ship;
 import it.units.battleship.CellState;
 import it.units.battleship.Coordinate;
 import it.units.battleship.GridMapper;

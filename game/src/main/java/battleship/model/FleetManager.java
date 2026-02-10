@@ -1,10 +1,12 @@
-package battleship.model.game;
+package battleship.model;
 
 import it.units.battleship.CellState;
 import it.units.battleship.Coordinate;
+import it.units.battleship.GridMapper;
 import it.units.battleship.ShipType;
 import lombok.Getter;
 import lombok.NonNull;
+import org.apache.logging.log4j.core.tools.picocli.CommandLine;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -265,5 +267,12 @@ public class FleetManager {
                         Ship::getShipType,
                         Collectors.collectingAndThen(Collectors.counting(), Long::intValue)
                 ));
+    }
+
+    /**
+     * Retrieves a serialized representation of the current grid state.
+     */
+    public String getSerializedGridState(){
+        return GridMapper.serialize(grid.getGrid());
     }
 }

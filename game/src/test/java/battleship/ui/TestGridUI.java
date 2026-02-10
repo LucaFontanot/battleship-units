@@ -1,8 +1,8 @@
 package battleship.ui;
 
 import it.units.battleship.CellState;
-import battleship.model.game.Grid;
-import battleship.model.game.Ship;
+import battleship.model.Grid;
+import battleship.model.Ship;
 import battleship.view.grid.GridUI;
 import it.units.battleship.Coordinate;
 import it.units.battleship.Orientation;

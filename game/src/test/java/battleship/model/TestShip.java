@@ -1,7 +1,5 @@
 package battleship.model;
 
-import battleship.model.game.Grid;
-import battleship.model.game.Ship;
 import it.units.battleship.Coordinate;
 import it.units.battleship.Orientation;
 import it.units.battleship.ShipType;

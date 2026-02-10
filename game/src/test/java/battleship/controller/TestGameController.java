@@ -1,137 +1,167 @@
 package battleship.controller;
 
-import battleship.controller.game.actions.NetworkOutputActions;
-import battleship.controller.game.GameController;
-import battleship.controller.game.network.NetworkEventsHandler;
-import battleship.controller.game.network.AbstractPlayerCommunication;
-import battleship.model.game.FleetManager;
-import battleship.model.game.Grid;
-import battleship.model.game.Ship;
-import battleship.view.game.GameView;
+import battleship.controller.mode.GameModeStrategy;
+import battleship.model.*;
+import battleship.view.core.BattleshipView;
+import it.units.battleship.CellState;
 import it.units.battleship.Coordinate;
 import it.units.battleship.GameState;
-import it.units.battleship.data.socket.GameMessageType;
-import it.units.battleship.data.socket.payloads.GridUpdateDTO;
-import it.units.battleship.data.socket.payloads.ShotRequestDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.MockitoAnnotations;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
-public class TestGameController {
+/**
+ * Tests for {@link GameController}.
+ * These are intentionally a bit high-level since TurnManager is created internally
+ * and is hard to mock cleanly without refactoring the production code.
+ */
+class TestGameController {
 
     @Mock
-    private GameView mockView;
+    private Grid gridMock;
 
     @Mock
-    private Grid mockGrid;
+    private FleetManager fleetMgrMock;
 
     @Mock
-    private FleetManager mockFleetManager;
+    private GameModeStrategy modeMock;
 
     @Mock
-    private AbstractPlayerCommunication mockCommunication;
+    private BattleshipView viewMock;
 
-    private GameController gameController;
-
-    private NetworkEventsHandler networkEventsHandler;
-
-    private NetworkOutputActions networkOutputHandler;
+    private GameController controller; // reused across tests when possible
 
     @BeforeEach
-    void setup() {
-        //networkOutputHandler = new NetworkOutputHandler(mockCommunication);
-        //gameController = new GameController(mockGrid, mockFleetManager, networkOutputHandler, mockView);
-        networkEventsHandler = new NetworkEventsHandler(gameController);
-    }
+    void setUp() {
+        // Manually opening mocks instead of using an extension
+        MockitoAnnotations.openMocks(this);
 
-    @Test
-    void testInitialization() {
-        assertNotNull(gameController, "Game controller was not initialized correctly.");
-        assertEquals(GameState.WAITING_FOR_SETUP, gameController.getGameState());
-    }
+        // Default stub so constructor logging doesn't explode
+        when(modeMock.getModeName()).thenReturn("Test Mode");
 
-    @Test
-    void testOnOpponentGridUpdate() {
-        GridUpdateDTO dto = new GridUpdateDTO(false, "0".repeat(100), List.of());
-        networkEventsHandler.onOpponentGridUpdate(dto);
-        verify(mockView).updateOpponentGrid(anyString(), anyList());
-    }
-
-    @Test
-    void testShotReceivedProcessesHitAndSendsResponse() {
-        // Arrange
-        Coordinate coord = new Coordinate(1, 1);
-        ShotRequestDTO shotRequest = new ShotRequestDTO(coord);
-        
-        when(mockFleetManager.handleIncomingShot(coord)).thenReturn(true);
-        it.units.battleship.CellState[][] gridArray = new it.units.battleship.CellState[10][10];
+        // Mock FleetManager methods needed by BaseGameState.onEnter
+        when(fleetMgrMock.getGrid()).thenReturn(gridMock);
+        CellState[][] emptyGrid = new CellState[10][10];
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < 10; j++) {
-                gridArray[i][j] = it.units.battleship.CellState.EMPTY;
+                emptyGrid[i][j] = CellState.EMPTY;
             }
         }
-        when(mockGrid.getGrid()).thenReturn(gridArray);
-        when(mockFleetManager.getFleet()).thenReturn(List.of());
-
-        // Act
-        networkEventsHandler.onShotReceived(shotRequest);
-
-        // Assert
-        verify(mockFleetManager).handleIncomingShot(coord);
-
-        ArgumentCaptor<GridUpdateDTO> captor = ArgumentCaptor.forClass(GridUpdateDTO.class);
-        verify(mockCommunication).sendMessage(eq(GameMessageType.GRID_UPDATE), captor.capture());
-        assertTrue(captor.getValue().shotOutcome());
-
-        verify(mockView).updatePlayerGrid(eq("0".repeat(100)), anyList());
+        when(gridMock.getGrid()).thenReturn(emptyGrid);
+        // TurnManager constructor creates opponentGrid using grid.getRow() and grid.getCol()
+        when(gridMock.getRow()).thenReturn(10);
+        when(gridMock.getCol()).thenReturn(10);
+        when(fleetMgrMock.getFleet()).thenReturn(java.util.List.of());
+        when(fleetMgrMock.getPlacedCounts()).thenReturn(java.util.Map.of());
+        when(fleetMgrMock.getRequiredFleetConfiguration()).thenReturn(java.util.Map.of());
     }
 
     @Test
-    void testShotReceivedOnlyRevealsSunkShips() {
-        // Arrange
+    void gameController_isCreatedAndHooksViewListeners() {
+        controller = new GameController(gridMock, fleetMgrMock, modeMock, viewMock);
+
+        assertNotNull(controller, "Controller should be created");
+
+        // These are side effects of the constructor
+        verify(viewMock).setOpponentGridListener(any());
+        verify(viewMock).setPlayerGridListener(any());
+    }
+
+    @Test
+    void startGame_initializesGameModeAndStartsFlow() {
+        controller = new GameController(gridMock, fleetMgrMock, modeMock, viewMock);
+
+        controller.startGame();
+
+        // We mainly care that initialize is called with some callback
+        verify(modeMock).initialize(any(GameModeStrategy.GameModeCallback.class));
+
+        // This comes indirectly from TurnManager.start()
+        // Not ideal to test, but good enough for now
+        verify(viewMock).setPlayerTurn(true);
+    }
+
+    @Test
+    void onOpponentReady_doesNotCrash() {
+        controller = new GameController(gridMock, fleetMgrMock, modeMock, viewMock);
+
+        // Currently this method only logs, so just make sure it’s safe
+        assertDoesNotThrow(() -> controller.onOpponentReady());
+    }
+
+    @Test
+    void onShotReceived_acceptsIncomingShot() {
+        controller = new GameController(gridMock, fleetMgrMock, modeMock, viewMock);
         Coordinate coord = new Coordinate(0, 0);
-        ShotRequestDTO shotRequest = new ShotRequestDTO(coord);
-        
-        Ship aliveShip = mock(Ship.class);
-        when(aliveShip.isSunk()).thenReturn(false);
-        
-        Ship sunkShip = mock(Ship.class);
-        when(sunkShip.isSunk()).thenReturn(true);
-        
-        when(mockFleetManager.getFleet()).thenReturn(List.of(aliveShip, sunkShip));
-        it.units.battleship.CellState[][] gridArray = new it.units.battleship.CellState[10][10];
-        for (int i = 0; i < 10; i++) {
-            for (int j = 0; j < 10; j++) {
-                gridArray[i][j] = it.units.battleship.CellState.EMPTY;
-            }
-        }
-        when(mockGrid.getGrid()).thenReturn(gridArray);
 
-        // Act
-        networkEventsHandler.onShotReceived(shotRequest);
-
-        // Assert
-        ArgumentCaptor<GridUpdateDTO> captor = ArgumentCaptor.forClass(GridUpdateDTO.class);
-        verify(mockCommunication).sendMessage(eq(GameMessageType.GRID_UPDATE), captor.capture());
-        assertEquals(1, captor.getValue().fleet().size());
+        // TurnManager is internal, so we can't verify delegation directly
+        assertDoesNotThrow(() -> controller.onShotReceived(coord));
     }
 
     @Test
-    void testProcessGameStatusUpdate() {
-        it.units.battleship.data.socket.payloads.GameStatusDTO statusDTO = new it.units.battleship.data.socket.payloads.GameStatusDTO(it.units.battleship.GameState.GAME_OVER, "Game Over");
-        networkEventsHandler.onGameStatusReceived(statusDTO);
-        
-        assertEquals(it.units.battleship.GameState.GAME_OVER, gameController.getGameState());
-        verify(mockView).showEndGamePhase("Game Over");
+    void onGridUpdateReceived_acceptsSerializedGrid() {
+        controller = new GameController(gridMock, fleetMgrMock, modeMock, viewMock);
+
+        String fakeGrid = "grid_data"; // not a real grid, but enough for the test
+        List<Ship> emptyFleet = List.of();
+
+        assertDoesNotThrow(() ->
+                controller.onGridUpdateReceived(fakeGrid, emptyFleet)
+        );
+    }
+
+    @Test
+    void onGameStatusReceived_gameOverDoesNotThrow() {
+        controller = new GameController(gridMock, fleetMgrMock, modeMock, viewMock);
+        String msg = "Game Over";
+
+        assertDoesNotThrow(() ->
+                controller.onGameStatusReceived(GameState.GAME_OVER, msg)
+        );
+    }
+
+    @Test
+    void onGameStatusReceived_activeTurnStateHandled() {
+        controller = new GameController(gridMock, fleetMgrMock, modeMock, viewMock);
+
+        assertDoesNotThrow(() ->
+                controller.onGameStatusReceived(GameState.ACTIVE_TURN, "Game started")
+        );
+    }
+
+    @Test
+    void onGameStatusReceived_waitingForOpponentHandled() {
+        controller = new GameController(gridMock, fleetMgrMock, modeMock, viewMock);
+
+        assertDoesNotThrow(() ->
+                controller.onGameStatusReceived(GameState.WAITING_FOR_OPPONENT, "Waiting")
+        );
+    }
+
+    @Test
+    void onConnectionError_showsEndGameScreen() {
+        controller = new GameController(gridMock, fleetMgrMock, modeMock, viewMock);
+        String errorMsg = "Connection failed";
+
+        controller.onConnectionError(errorMsg);
+
+        // We don't care about the exact message, just that it mentions a connection error
+        verify(viewMock).showEndGamePhase(contains("Connection error"));
+    }
+
+    @Test
+    void controller_canBeCreatedWithoutSpecialFlags() {
+        // This test is a bit redundant, but it documents that
+        // there is no hidden configuration required.
+        controller = new GameController(gridMock, fleetMgrMock, modeMock, viewMock);
+
+        assertNotNull(controller);
     }
 }

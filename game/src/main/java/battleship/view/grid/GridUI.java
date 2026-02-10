@@ -1,7 +1,7 @@
 package battleship.view.grid;
 
 import battleship.controller.game.actions.GridInteractionObserver;
-import battleship.model.game.Ship;
+import battleship.model.Ship;
 import battleship.utils.TextureLoader;
 import it.units.battleship.CellState;
 import it.units.battleship.Coordinate;

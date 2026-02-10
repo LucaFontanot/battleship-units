@@ -14,6 +14,9 @@ import it.units.battleship.data.socket.payloads.ShotRequestDTO;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 /**
  * Handles network communication with the battleship server using WebSockets.
  * It manages connection lifecycle and serializes/deserializes game messages.
@@ -27,7 +30,7 @@ import org.jspecify.annotations.Nullable;
 import static it.units.battleship.data.socket.GameMessageType.*;
 
 @Slf4j
-public class NetworkClient extends AbstractPlayerCommunication {
+public class NetworkClient extends AbstractPlayerCommunication{
 
     private final WebSocket client;
     private final Gson gson = new Gson();
@@ -39,8 +42,16 @@ public class NetworkClient extends AbstractPlayerCommunication {
     private final LobbyData lobbyData;
 
     public NetworkClient(LobbyData data, String playerName) {
+        this(java.net.URI.create(Defaults.WEBSOCKET_LOBBY_ENDPOINT), data, playerName);
+    }
+
+    public NetworkClient(java.net.URI serverUri, String playerName) {
+        this(serverUri, null, playerName);
+    }
+
+    private NetworkClient(java.net.URI serverUri, LobbyData data, String playerName) {
         Request request = new Request.Builder()
-                .url(Defaults.WEBSOCKET_LOBBY_ENDPOINT)
+                .url(serverUri.toString())
                 .build();
         this.client = new OkHttpClient().newWebSocket(request, new WebSocketListener() {
             @Override
@@ -84,6 +95,10 @@ public class NetworkClient extends AbstractPlayerCommunication {
     }
 
     void beginAuthentication() {
+        if (lobbyData == null) {
+            Logger.log("Skipping authentication: No lobby data provided.");
+            return;
+        }
         WebSocketAuthenticationRequest webSocketAuthenticationRequest = new WebSocketAuthenticationRequest(lobbyData.getLobbyID(), playerName);
         WebSocketMessage<WebSocketAuthenticationRequest> authMessage = new WebSocketMessage<>("authenticate", webSocketAuthenticationRequest);
         String authMessageJson = gson.toJson(authMessage);

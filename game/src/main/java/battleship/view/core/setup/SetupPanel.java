@@ -1,8 +1,7 @@
-package battleship.view.setup;
+package battleship.view.core.setup;
 
-import battleship.controller.game.GameController;
-import battleship.controller.setup.SetupGridHandler;
-import battleship.model.game.Ship;
+import battleship.controller.game.actions.GridInteractionObserver;
+import battleship.model.Ship;
 import battleship.view.grid.GridUI;
 import battleship.utils.DimensionsUtils;
 import it.units.battleship.Coordinate;
@@ -23,27 +22,34 @@ public class SetupPanel extends JPanel implements PlacementContext, SetupView {
     JFrame mainFrame;
 
     @Getter
-    private final GridUI gridUI;
+    private final GridUI playerGridUI;
 
     private final JPanel shipPalette;
 
     @Getter
     private ShipType selectedShipType = null;
 
-    private JButton readyButton;
-
     @Getter
     private Orientation selectedOrientation = Orientation.HORIZONTAL_RIGHT;
 
     private final Map<ShipType, JButton> shipButtons = new EnumMap<>(ShipType.class);
 
-    private SetupGridHandler observer;
-
-    public SetupPanel(GameController controller) {
+    public SetupPanel(int rows, int cols) {
 
         setLayout(new BorderLayout());
-        gridUI = new GridUI(controller.getGrid().getRow(), controller.getGrid().getCol());
-        shipPalette = new JPanel(new GridBagLayout());
+        playerGridUI = new GridUI(rows, cols);
+
+        shipPalette = createShipPalette();
+        add(shipPalette, BorderLayout.WEST);
+
+        JPanel gridWrapper = new JPanel(new GridBagLayout());
+        gridWrapper.add(playerGridUI);
+
+        add(gridWrapper, BorderLayout.CENTER);
+    }
+
+    private JPanel createShipPalette() {
+        JPanel shipPalette = new JPanel(new GridBagLayout());
         shipPalette.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -89,32 +95,12 @@ public class SetupPanel extends JPanel implements PlacementContext, SetupView {
         gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
         shipPalette.add(Box.createGlue(), gbc);
-
-        add(shipPalette, BorderLayout.WEST);
-        JPanel gridWrapper = new JPanel(new GridBagLayout());
-        gridWrapper.add(gridUI);
-
-        add(gridWrapper, BorderLayout.CENTER);
-
-        // ready button
-        JPanel bottomBar = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 12));
-        readyButton = new JButton("Ready!");
-        readyButton.setEnabled(false);
-        readyButton.setFocusPainted(false);
-
-        readyButton.addActionListener(e -> {
-            observer.requestSetupCompletion();
-            readyButton.setEnabled(false);
-            readyButton.setText("Waiting...");
-        });
-
-        bottomBar.add(readyButton);
-        add(bottomBar, BorderLayout.SOUTH);
+        return shipPalette;
     }
 
     @Override
     public void showPlacementPreview(LinkedHashSet<Coordinate> coord, boolean validShip, Ship ship) {
-        getGridUI().showPlacementPreview(coord, validShip, ship);
+        getPlayerGridUI().showPlacementPreview(coord, validShip, ship);
     }
 
     @Override
@@ -133,16 +119,21 @@ public class SetupPanel extends JPanel implements PlacementContext, SetupView {
         mainFrame.setVisible(true);
     }
 
-    @Override
-    public void updateSetupGrid(String gridSerialized, List<Ship> fleetToRender) {
-        getGridUI().displayData(gridSerialized, fleetToRender);
+    void dispose() {
+        if (mainFrame != null) {
+            mainFrame.dispose();
+        }
     }
 
     @Override
-    public void setObserver(SetupGridHandler observer) {
+    public void updateSetupGrid(String gridSerialized, List<Ship> fleetToRender) {
+        getPlayerGridUI().displayData(gridSerialized, fleetToRender);
+    }
+
+    @Override
+    public void setObserver(GridInteractionObserver observer) {
         Logger.debug("SetupPanel::setObserver");
-        getGridUI().setObserver(observer);
-        this.observer = observer;
+        getPlayerGridUI().setObserver(observer);
     }
 
     private void highlightSelectedShipButton(JButton selected) {
@@ -156,8 +147,6 @@ public class SetupPanel extends JPanel implements PlacementContext, SetupView {
 
     @Override
     public void updateShipButtons(Map<ShipType, Integer> placedShip, Map<ShipType, Integer> fleetConfiguration) {
-
-        boolean isFleetComplete = true;
         for (ShipType type : ShipType.values()) {
             JButton button = shipButtons.get(type);
             if (button == null) continue;
@@ -168,11 +157,7 @@ public class SetupPanel extends JPanel implements PlacementContext, SetupView {
 
             button.setText(type.getName() + " (" + remaining + "/" + total + ")");
             button.setEnabled(remaining > 0);
-
-            if (placed < total) {
-                isFleetComplete = false;
-                continue;
-            }
+            button.setVisible(total > 0);
 
             if (selectedShipType == type && remaining <= 0) {
                 clearShipSelection();
@@ -180,10 +165,6 @@ public class SetupPanel extends JPanel implements PlacementContext, SetupView {
         }
         shipPalette.revalidate();
         shipPalette.repaint();
-
-        if (readyButton != null) {
-            readyButton.setEnabled(isFleetComplete);
-        }
     }
 
     private void clearShipSelection() {
