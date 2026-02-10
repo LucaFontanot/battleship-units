@@ -20,8 +20,8 @@ public class SimpleAIOpponent implements AIOpponent {
     private final Random random = new Random();
 
     private final Set<Coordinate> shotsFired = new HashSet<>();
-    private final Queue<Coordinate> targetQueue = new LinkedList<>();
-    private Coordinate lastHit = null;
+
+    private List<Ship> opponentFleetManager = new ArrayList<>();
 
     public SimpleAIOpponent(Grid grid, FleetManager fleetManager) {
         this.grid = grid;
@@ -62,12 +62,18 @@ public class SimpleAIOpponent implements AIOpponent {
 
     @Override
     public Coordinate calculateNextShot() {
-        // If we have target in queue we can use those
-        while (!targetQueue.isEmpty()) {
-            Coordinate target = targetQueue.poll();
-            if (!shotsFired.contains(target) && isValidCoordinate(target)) {
-                shotsFired.add(target);
-                return target;
+
+        // Check if we have hit but not sunk a ship, if so we can try to find the rest of the ship
+        for (Ship ship : opponentFleetManager) {
+            if (!ship.isSunk() && !ship.getHitCoordinates().isEmpty()) {
+                for (Coordinate hitCoord : ship.getHitCoordinates()) {
+                    shotsFired.add(hitCoord);
+                    Coordinate target = getRandomAdjacentCoordinate(hitCoord);
+                    if (target != null) {
+                        shotsFired.add(target);
+                        return target;
+                    }
+                }
             }
         }
 
@@ -84,21 +90,12 @@ public class SimpleAIOpponent implements AIOpponent {
     }
 
     @Override
-    public void processLastShotResult(boolean hit) {
-        if (hit && lastHit != null) {
-            // Add neighborhood cells added in the queue
-            addAdjacentTargets(lastHit);
-        }
+    public void processLastShotResult(Grid grid, List<Ship> fleet, boolean shotOutcome) {
+        this.opponentFleetManager = fleet;
     }
 
-    public void setLastShot(Coordinate coord, boolean hit) {
-        if (hit) {
-            lastHit = coord;
-            addAdjacentTargets(coord);
-        }
-    }
-
-    private void addAdjacentTargets(Coordinate coord) {
+    private Coordinate getRandomAdjacentCoordinate(Coordinate coord) {
+        List<Coordinate> adjacentCoords = new ArrayList<>();
         int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
 
         for (int[] dir : directions) {
@@ -108,9 +105,15 @@ public class SimpleAIOpponent implements AIOpponent {
             );
 
             if (isValidCoordinate(adjacent) && !shotsFired.contains(adjacent)) {
-                targetQueue.add(adjacent);
+                adjacentCoords.add(adjacent);
             }
         }
+
+        if (adjacentCoords.isEmpty()) {
+            return null;
+        }
+
+        return adjacentCoords.get(random.nextInt(adjacentCoords.size()));
     }
 
     private boolean isValidCoordinate(Coordinate coord) {

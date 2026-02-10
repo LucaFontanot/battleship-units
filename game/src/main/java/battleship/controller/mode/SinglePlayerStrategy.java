@@ -78,7 +78,7 @@ public class SinglePlayerStrategy implements GameModeStrategy{
 
     @Override
     public void sendGridUpdate(Grid grid, List<Ship> fleet, boolean shotOutcome) {
-        aiOpponent.processLastShotResult(shotOutcome);
+        aiOpponent.processLastShotResult(grid, fleet, shotOutcome);
     }
 
     @Override
