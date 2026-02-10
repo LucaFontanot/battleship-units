@@ -57,7 +57,7 @@ public class LobbySelector {
 
     public void handleLobbyJoin(LobbyData lobby, String name) {
         if(controller.connectLobbyWebsocket(lobby, name)){
-            frame.dispose();
+            if(frame != null) frame.dispose();
         } else {
             JOptionPane.showMessageDialog(frame, "Failed to join lobby", "Error", JOptionPane.ERROR_MESSAGE);
         }
