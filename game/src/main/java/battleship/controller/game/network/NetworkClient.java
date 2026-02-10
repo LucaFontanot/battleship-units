@@ -14,9 +14,6 @@ import it.units.battleship.data.socket.payloads.ShotRequestDTO;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
 /**
  * Handles network communication with the battleship server using WebSockets.
  * It manages connection lifecycle and serializes/deserializes game messages.
@@ -43,10 +40,6 @@ public class NetworkClient extends AbstractPlayerCommunication{
 
     public NetworkClient(LobbyData data, String playerName) {
         this(java.net.URI.create(Defaults.WEBSOCKET_LOBBY_ENDPOINT), data, playerName);
-    }
-
-    public NetworkClient(java.net.URI serverUri, String playerName) {
-        this(serverUri, null, playerName);
     }
 
     private NetworkClient(java.net.URI serverUri, LobbyData data, String playerName) {

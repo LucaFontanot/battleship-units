@@ -5,7 +5,6 @@ import battleship.controller.game.events.CommunicationEvents;
 import battleship.model.Grid;
 import battleship.model.Ship;
 import battleship.serializer.GameDataMapper;
-import com.google.gson.Gson;
 import it.units.battleship.Coordinate;
 import it.units.battleship.GameState;
 import it.units.battleship.data.socket.GameMessageType;
@@ -23,8 +22,6 @@ import java.util.List;
  */
 public abstract class AbstractPlayerCommunication implements CommunicationEvents, NetworkOutputActions {
     final List<CommunicationEvents> communicationEventsListeners = new ArrayList<>();
-    final Gson gson = new Gson();
-
 
     /**
      * Adds a listener for communication events.
