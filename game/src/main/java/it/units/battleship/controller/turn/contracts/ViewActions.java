@@ -1,4 +1,4 @@
-package it.units.battleship.controller.turn;
+package it.units.battleship.controller.turn.contracts;
 
 import it.units.battleship.Coordinate;
 import it.units.battleship.Orientation;
