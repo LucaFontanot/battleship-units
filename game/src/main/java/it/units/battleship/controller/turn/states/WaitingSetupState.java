@@ -1,6 +1,6 @@
 package it.units.battleship.controller.turn.states;
 
-import it.units.battleship.controller.turn.TurnManager;
+import it.units.battleship.controller.turn.GameActions;
 import it.units.battleship.GameState;
 
 /**
@@ -10,10 +10,10 @@ import it.units.battleship.GameState;
 public class WaitingSetupState extends BaseGameState {
 
     @Override
-    public void onEnter(TurnManager manager) {
-        super.onEnter(manager);
-        manager.setPlayerTurn(false);
-        manager.notifyUser("Waiting for opponent setup...");
+    public void onEnter(GameActions actions) {
+        super.onEnter(actions);
+        actions.setPlayerTurn(false);
+        actions.notifyUser("Waiting for opponent setup...");
     }
 
     @Override
@@ -26,12 +26,12 @@ public class WaitingSetupState extends BaseGameState {
      * When both players are ready, the server sends the actual starting state.
      */
     @Override
-    public void handleGameStatusReceived(TurnManager manager, GameState state) {
-        manager.transitionToGamePhase();
+    public void handleGameStatusReceived(GameActions actions, GameState state) {
+        actions.transitionToGamePhase();
         if (state == GameState.ACTIVE_TURN) {
-            manager.transitionToActiveTurn();
+            actions.transitionToActiveTurn();
         } else if (state == GameState.WAITING_FOR_OPPONENT) {
-            manager.transitionToWaitingOpponent();
+            actions.transitionToWaitingOpponent();
         }
     }
 }

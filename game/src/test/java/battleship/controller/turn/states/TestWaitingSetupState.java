@@ -1,6 +1,6 @@
 package battleship.controller.turn.states;
 
-import it.units.battleship.controller.turn.TurnManager;
+import it.units.battleship.controller.turn.GameActions;
 import it.units.battleship.GameState;
 import it.units.battleship.controller.turn.states.WaitingSetupState;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,7 +14,7 @@ import static org.mockito.Mockito.*;
 class TestWaitingSetupState {
 
     @Mock
-    private TurnManager mockTurnManager;
+    private GameActions mockActions;
 
     private WaitingSetupState waitingSetupState;
 
@@ -41,56 +41,56 @@ class TestWaitingSetupState {
 
     @Test
     void testOnEnterDisablesInteractionsAndShowsMessage() {
-        waitingSetupState.onEnter(mockTurnManager);
+        waitingSetupState.onEnter(mockActions);
 
-        verify(mockTurnManager).setPlayerTurn(false);
-        verify(mockTurnManager).notifyUser("Waiting for opponent setup...");
-        verify(mockTurnManager).refreshUI();
+        verify(mockActions).setPlayerTurn(false);
+        verify(mockActions).notifyUser("Waiting for opponent setup...");
+        verify(mockActions).refreshFleetUI();
     }
 
     @Test
     void testHandleGameStatusReceivedWithActiveTurnTransitionsToActiveState() {
-        waitingSetupState.handleGameStatusReceived(mockTurnManager, GameState.ACTIVE_TURN);
+        waitingSetupState.handleGameStatusReceived(mockActions, GameState.ACTIVE_TURN);
 
-        verify(mockTurnManager).transitionToGamePhase();
-        verify(mockTurnManager).transitionToActiveTurn();
+        verify(mockActions).transitionToGamePhase();
+        verify(mockActions).transitionToActiveTurn();
     }
 
     @Test
     void testHandleGameStatusReceivedWithWaitingTransitionsToWaitingState() {
-        waitingSetupState.handleGameStatusReceived(mockTurnManager, GameState.WAITING_FOR_OPPONENT);
+        waitingSetupState.handleGameStatusReceived(mockActions, GameState.WAITING_FOR_OPPONENT);
 
-        verify(mockTurnManager).transitionToGamePhase();
-        verify(mockTurnManager).transitionToWaitingOpponent();
+        verify(mockActions).transitionToGamePhase();
+        verify(mockActions).transitionToWaitingOpponent();
     }
 
     @Test
     void testHandleGameStatusReceivedWithGameOverDoesNotTransition() {
-        waitingSetupState.handleGameStatusReceived(mockTurnManager, GameState.GAME_OVER);
+        waitingSetupState.handleGameStatusReceived(mockActions, GameState.GAME_OVER);
 
-        verify(mockTurnManager, never()).transitionToActiveTurn();
-        verify(mockTurnManager, never()).transitionToWaitingOpponent();
+        verify(mockActions, never()).transitionToActiveTurn();
+        verify(mockActions, never()).transitionToWaitingOpponent();
     }
 
     @Test
     void testHandleGameStatusReceivedWithSetupDoesNotTransition() {
-        waitingSetupState.handleGameStatusReceived(mockTurnManager, GameState.SETUP);
+        waitingSetupState.handleGameStatusReceived(mockActions, GameState.SETUP);
 
-        verify(mockTurnManager, never()).transitionToActiveTurn();
-        verify(mockTurnManager, never()).transitionToWaitingOpponent();
+        verify(mockActions, never()).transitionToActiveTurn();
+        verify(mockActions, never()).transitionToWaitingOpponent();
     }
 
     @Test
     void testPlayerCannotInteractWithGridsInWaitingSetup() {
         // All grid interaction should do nothing
-        waitingSetupState.handlePlayerGridClick(mockTurnManager, null);
-        waitingSetupState.handleOpponentGridClick(mockTurnManager, null);
-        waitingSetupState.handlePlayerGridHover(mockTurnManager, null);
-        waitingSetupState.handleOpponentGridHover(mockTurnManager, null);
+        waitingSetupState.handlePlayerGridClick(mockActions, null);
+        waitingSetupState.handleOpponentGridClick(mockActions, null);
+        waitingSetupState.handlePlayerGridHover(mockActions, null);
+        waitingSetupState.handleOpponentGridHover(mockActions, null);
 
         // Verify no transition
-        verify(mockTurnManager, never()).transitionToActiveTurn();
-        verify(mockTurnManager, never()).transitionToWaitingOpponent();
-        verify(mockTurnManager, never()).transitionToWaitingSetup();
+        verify(mockActions, never()).transitionToActiveTurn();
+        verify(mockActions, never()).transitionToWaitingOpponent();
+        verify(mockActions, never()).transitionToWaitingSetup();
     }
 }

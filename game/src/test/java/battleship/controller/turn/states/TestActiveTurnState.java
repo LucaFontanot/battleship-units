@@ -1,6 +1,6 @@
 package battleship.controller.turn.states;
 
-import it.units.battleship.controller.turn.TurnManager;
+import it.units.battleship.controller.turn.GameActions;
 import it.units.battleship.CellState;
 import it.units.battleship.Coordinate;
 import it.units.battleship.GameState;
@@ -16,7 +16,7 @@ import static org.mockito.Mockito.*;
 class TestActiveTurnState {
 
     @Mock
-    private TurnManager mockTurnManager;
+    private GameActions mockActions;
 
     private ActiveTurnState activeTurnState;
 
@@ -43,44 +43,44 @@ class TestActiveTurnState {
 
     @Test
     void testOnEnterSetsPlayerTurnTrue() {
-        activeTurnState.onEnter(mockTurnManager);
+        activeTurnState.onEnter(mockActions);
 
-        verify(mockTurnManager).setPlayerTurn(true);
-        verify(mockTurnManager).refreshUI();
+        verify(mockActions).setPlayerTurn(true);
+        verify(mockActions).refreshFleetUI();
     }
 
     @Test
     void testHandleOpponentGridClickSendsShotAndTransitions() {
         Coordinate coord = new Coordinate(0, 0);
-        when(mockTurnManager.getOpponentCellState(coord)).thenReturn(CellState.EMPTY);
+        when(mockActions.getOpponentCellState(coord)).thenReturn(CellState.EMPTY);
 
-        activeTurnState.handleOpponentGridClick(mockTurnManager, coord);
+        activeTurnState.handleOpponentGridClick(mockActions, coord);
 
-        verify(mockTurnManager).executeShot(coord);
-        verify(mockTurnManager).transitionToWaitingOpponent();
+        verify(mockActions).fireShot(coord);
+        verify(mockActions).transitionToWaitingOpponent();
     }
 
     @Test
     void testHandleOpponentGridClickWhenAlreadyShotBlocksShot() {
         Coordinate coord = new Coordinate(1, 1);
-        when(mockTurnManager.getOpponentCellState(coord)).thenReturn(CellState.HIT);
+        when(mockActions.getOpponentCellState(coord)).thenReturn(CellState.HIT);
 
-        activeTurnState.handleOpponentGridClick(mockTurnManager, coord);
+        activeTurnState.handleOpponentGridClick(mockActions, coord);
 
         // Should not send shot
-        verify(mockTurnManager, never()).executeShot(any());
+        verify(mockActions, never()).fireShot(any());
         // Should not transition
-        verify(mockTurnManager, never()).transitionToWaitingOpponent();
+        verify(mockActions, never()).transitionToWaitingOpponent();
         // Show error message
-        verify(mockTurnManager).notifyUser(contains("already shot"));
+        verify(mockActions).notifyUser(contains("already shot"));
     }
 
     @Test
     void testHandleOpponentGridHoverShowsShotPreview() {
         Coordinate coord = new Coordinate(3, 5);
 
-        activeTurnState.handleOpponentGridHover(mockTurnManager, coord);
+        activeTurnState.handleOpponentGridHover(mockActions, coord);
 
-        verify(mockTurnManager).renderShotPreview(coord);
+        verify(mockActions).showShotPreview(coord);
     }
 }

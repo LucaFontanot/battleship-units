@@ -1,6 +1,6 @@
 package it.units.battleship.controller.turn.states;
 
-import it.units.battleship.controller.turn.TurnManager;
+import it.units.battleship.controller.turn.GameActions;
 import it.units.battleship.Coordinate;
 import it.units.battleship.GameState;
 
@@ -9,20 +9,20 @@ import it.units.battleship.GameState;
  */
 public class SetupState extends BaseGameState {
     @Override
-    public void onEnter(TurnManager manager) {
-        super.onEnter(manager);
-        manager.refreshFleetUI();
-        manager.setPlayerTurn(true);
+    public void onEnter(GameActions actions) {
+        super.onEnter(actions);
+        actions.refreshFleetUI();
+        actions.setPlayerTurn(true);
     }
 
     @Override
-    public void handlePlayerGridClick(TurnManager manager, Coordinate coordinate) {
-        manager.tryPlaceShip(coordinate);
+    public void handlePlayerGridClick(GameActions actions, Coordinate coordinate) {
+        actions.placeShip(coordinate);
     }
 
     @Override
-    public void handlePlayerGridHover(TurnManager manager, Coordinate coordinate) {
-        manager.previewPlacement(coordinate);
+    public void handlePlayerGridHover(GameActions actions, Coordinate coordinate) {
+        actions.previewPlacement(coordinate);
     }
 
     @Override

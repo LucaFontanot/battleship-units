@@ -1,6 +1,6 @@
 package it.units.battleship.controller.turn.states;
 
-import it.units.battleship.controller.turn.TurnManager;
+import it.units.battleship.controller.turn.GameActions;
 import it.units.battleship.controller.turn.TurnState;
 import it.units.battleship.model.Ship;
 import it.units.battleship.Coordinate;
@@ -16,43 +16,43 @@ import java.util.List;
 public abstract class BaseGameState implements TurnState {
 
     @Override
-    public void onEnter(TurnManager manager) {
+    public void onEnter(GameActions actions) {
         Logger.debug("Entering state: " + getStateName());
-        manager.refreshUI();
+        actions.refreshFleetUI();
     }
 
     @Override
-    public void onExit(TurnManager manager) {
+    public void onExit() {
         Logger.debug("Exiting state: " + getStateName());
     }
 
     @Override
-    public void handleOpponentGridClick(TurnManager manager, Coordinate coordinate) {
+    public void handleOpponentGridClick(GameActions actions, Coordinate coordinate) {
     }
 
     @Override
-    public void handlePlayerGridClick(TurnManager manager, Coordinate coordinate) {
+    public void handlePlayerGridClick(GameActions actions, Coordinate coordinate) {
     }
 
     @Override
-    public void handleOpponentGridHover(TurnManager manager, Coordinate coordinate) {
+    public void handleOpponentGridHover(GameActions actions, Coordinate coordinate) {
     }
 
     @Override
-    public void handlePlayerGridHover(TurnManager manager, Coordinate coordinate) {
+    public void handlePlayerGridHover(GameActions actions, Coordinate coordinate) {
     }
 
     @Override
-    public void handleIncomingShot(TurnManager manager, Coordinate coordinate) {
+    public void handleIncomingShot(GameActions actions, Coordinate coordinate) {
     }
 
     @Override
-    public void handleOpponentGridUpdate(TurnManager manager, String grid, List<Ship> fleet) {
-        manager.updateOpponentGrid(grid, fleet);
+    public void handleOpponentGridUpdate(GameActions actions, String grid, List<Ship> fleet) {
+        actions.updateOpponentGrid(grid, fleet);
     }
 
     @Override
-    public void handleGameStatusReceived(TurnManager manager, GameState state) {
+    public void handleGameStatusReceived(GameActions actions, GameState state) {
     }
 
     @Override

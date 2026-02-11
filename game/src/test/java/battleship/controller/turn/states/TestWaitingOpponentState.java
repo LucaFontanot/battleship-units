@@ -1,6 +1,6 @@
 package battleship.controller.turn.states;
 
-import it.units.battleship.controller.turn.TurnManager;
+import it.units.battleship.controller.turn.GameActions;
 import it.units.battleship.controller.turn.states.WaitingOpponentState;
 import it.units.battleship.model.Ship;
 import it.units.battleship.Coordinate;
@@ -18,7 +18,7 @@ import static org.mockito.Mockito.*;
 class TestWaitingOpponentState {
 
     @Mock
-    private TurnManager mockTurnManager;
+    private GameActions mockActions;
 
     private WaitingOpponentState waitingOpponentState;
 
@@ -45,41 +45,41 @@ class TestWaitingOpponentState {
 
     @Test
     void testOnEnterSetsPlayerTurnFalse() {
-        waitingOpponentState.onEnter(mockTurnManager);
+        waitingOpponentState.onEnter(mockActions);
 
-        verify(mockTurnManager).setPlayerTurn(false);
-        verify(mockTurnManager).refreshUI();
+        verify(mockActions).setPlayerTurn(false);
+        verify(mockActions).refreshFleetUI();
     }
 
     @Test
-    void testHandleOpponentGridUpdateCallsManagerMethod() {
+    void testHandleOpponentGridUpdateCallsActions() {
         String gridSerialized = "grid_data";
         List<Ship> fleet = List.of();
 
-        waitingOpponentState.handleOpponentGridUpdate(mockTurnManager, gridSerialized, fleet);
+        waitingOpponentState.handleOpponentGridUpdate(mockActions, gridSerialized, fleet);
 
-        verify(mockTurnManager).updateOpponentGrid(gridSerialized, fleet);
+        verify(mockActions).updateOpponentGrid(gridSerialized, fleet);
     }
 
     @Test
     void testHandleIncomingShotWithGameOverTransitionsToGameOverState() {
         Coordinate coord = new Coordinate(0, 0);
-        when(mockTurnManager.processIncomingShot(coord)).thenReturn(true);
+        when(mockActions.processIncomingShot(coord)).thenReturn(true);
 
-        waitingOpponentState.handleIncomingShot(mockTurnManager, coord);
+        waitingOpponentState.handleIncomingShot(mockActions, coord);
 
-        verify(mockTurnManager).processIncomingShot(coord);
-        verify(mockTurnManager).transitionToGameOver(eq(false), anyString());
+        verify(mockActions).processIncomingShot(coord);
+        verify(mockActions).transitionToGameOver(eq(false), anyString());
     }
 
     @Test
     void testHandleIncomingShotWithoutGameOverTransitionsToActiveTurn() {
         Coordinate coord = new Coordinate(0, 0);
-        when(mockTurnManager.processIncomingShot(coord)).thenReturn(false);
+        when(mockActions.processIncomingShot(coord)).thenReturn(false);
 
-        waitingOpponentState.handleIncomingShot(mockTurnManager, coord);
+        waitingOpponentState.handleIncomingShot(mockActions, coord);
 
-        verify(mockTurnManager).processIncomingShot(coord);
-        verify(mockTurnManager).transitionToActiveTurn();
+        verify(mockActions).processIncomingShot(coord);
+        verify(mockActions).transitionToActiveTurn();
     }
 }

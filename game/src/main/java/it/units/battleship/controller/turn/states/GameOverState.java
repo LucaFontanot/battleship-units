@@ -1,6 +1,6 @@
 package it.units.battleship.controller.turn.states;
 
-import it.units.battleship.controller.turn.TurnManager;
+import it.units.battleship.controller.turn.GameActions;
 import it.units.battleship.GameState;
 import lombok.Getter;
 
@@ -19,13 +19,13 @@ public class GameOverState extends BaseGameState {
     }
 
     @Override
-    public void onEnter(TurnManager manager) {
-        super.onEnter(manager);
-        manager.setPlayerTurn(false);
-        manager.transitionToEndGamePhase(message);
+    public void onEnter(GameActions actions) {
+        super.onEnter(actions);
+        actions.setPlayerTurn(false);
+        actions.showEndGame(message);
 
         if (!won) {
-            manager.sendGameOverStatus(message);
+            actions.sendGameOver(message);
         }
     }
 

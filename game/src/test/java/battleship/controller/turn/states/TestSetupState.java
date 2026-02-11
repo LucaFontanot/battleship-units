@@ -1,6 +1,6 @@
 package battleship.controller.turn.states;
 
-import it.units.battleship.controller.turn.TurnManager;
+import it.units.battleship.controller.turn.GameActions;
 import it.units.battleship.controller.turn.states.SetupState;
 import it.units.battleship.Coordinate;
 import it.units.battleship.GameState;
@@ -15,7 +15,7 @@ import static org.mockito.Mockito.*;
 class TestSetupState {
 
     @Mock
-    private TurnManager mockTurnManager;
+    private GameActions mockActions;
 
     private SetupState setupState;
 
@@ -42,28 +42,27 @@ class TestSetupState {
 
     @Test
     void testOnEnterSetsPlayerTurnTrue() {
-        setupState.onEnter(mockTurnManager);
+        setupState.onEnter(mockActions);
 
-        verify(mockTurnManager).setPlayerTurn(true);
-        verify(mockTurnManager).refreshFleetUI();
-        verify(mockTurnManager).refreshUI();
+        verify(mockActions).setPlayerTurn(true);
+        verify(mockActions, atLeastOnce()).refreshFleetUI();
     }
 
     @Test
-    void testHandlePlayerGridClickDelegatesToManager() {
+    void testHandlePlayerGridClickDelegatesToActions() {
         Coordinate coord = new Coordinate(0, 0);
 
-        setupState.handlePlayerGridClick(mockTurnManager, coord);
+        setupState.handlePlayerGridClick(mockActions, coord);
 
-        verify(mockTurnManager).tryPlaceShip(coord);
+        verify(mockActions).placeShip(coord);
     }
 
     @Test
-    void testHandlePlayerGridHoverDelegatesToManager() {
+    void testHandlePlayerGridHoverDelegatesToActions() {
         Coordinate coord = new Coordinate(0, 0);
 
-        setupState.handlePlayerGridHover(mockTurnManager, coord);
+        setupState.handlePlayerGridHover(mockActions, coord);
 
-        verify(mockTurnManager).previewPlacement(coord);
+        verify(mockActions).previewPlacement(coord);
     }
 }

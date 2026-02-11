@@ -1,6 +1,6 @@
 package battleship.controller.turn.states;
 
-import it.units.battleship.controller.turn.TurnManager;
+import it.units.battleship.controller.turn.GameActions;
 import it.units.battleship.controller.turn.states.GameOverState;
 import it.units.battleship.GameState;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,7 +14,7 @@ import static org.mockito.Mockito.*;
 class TestGameOverState {
 
     @Mock
-    private TurnManager mockTurnManager;
+    private GameActions mockActions;
 
     private GameOverState gameOverState;
 
@@ -64,12 +64,12 @@ class TestGameOverState {
         String message = "You won!";
         gameOverState = new GameOverState(true, message);
 
-        gameOverState.onEnter(mockTurnManager);
+        gameOverState.onEnter(mockActions);
 
-        verify(mockTurnManager).setPlayerTurn(false);
-        verify(mockTurnManager).transitionToEndGamePhase(message);
-        verify(mockTurnManager, never()).sendGameOverStatus(anyString());
-        verify(mockTurnManager).refreshUI();
+        verify(mockActions).setPlayerTurn(false);
+        verify(mockActions).showEndGame(message);
+        verify(mockActions, never()).sendGameOver(anyString());
+        verify(mockActions).refreshFleetUI();
     }
 
     @Test
@@ -77,11 +77,11 @@ class TestGameOverState {
         String message = "You lost!";
         gameOverState = new GameOverState(false, message);
 
-        gameOverState.onEnter(mockTurnManager);
+        gameOverState.onEnter(mockActions);
 
-        verify(mockTurnManager).setPlayerTurn(false);
-        verify(mockTurnManager).transitionToEndGamePhase(message);
-        verify(mockTurnManager).sendGameOverStatus(message);
-        verify(mockTurnManager).refreshUI();
+        verify(mockActions).setPlayerTurn(false);
+        verify(mockActions).showEndGame(message);
+        verify(mockActions).sendGameOver(message);
+        verify(mockActions).refreshFleetUI();
     }
 }

@@ -1,16 +1,15 @@
 package battleship.controller.turn;
 
-import it.units.battleship.controller.mode.GameModeStrategy;
+import it.units.battleship.Coordinate;
+import it.units.battleship.GameState;
 import it.units.battleship.controller.turn.TurnManager;
-import it.units.battleship.controller.turn.TurnState;
+import it.units.battleship.controller.turn.GameActions;
 import it.units.battleship.controller.turn.states.ActiveTurnState;
 import it.units.battleship.controller.turn.states.GameOverState;
 import it.units.battleship.controller.turn.states.SetupState;
-import it.units.battleship.model.FleetManager;
+import it.units.battleship.controller.turn.states.WaitingOpponentState;
 import it.units.battleship.model.Ship;
-import it.units.battleship.view.core.BattleshipView;
-import it.units.battleship.Coordinate;
-import it.units.battleship.GameState;
+import it.units.battleship.CellState;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -24,48 +23,37 @@ import static org.mockito.Mockito.*;
 class TestTurnManager {
 
     @Mock
-    private FleetManager fleetManager;
-    @Mock
-    private BattleshipView view;
-    @Mock
-    private GameModeStrategy gameMode;
+    private GameActions mockActions;
 
     private TurnManager manager;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-
-        // Mock FleetManager methods needed by TurnManager constructor and onEnter
-        when(fleetManager.getGridRows()).thenReturn(10);
-        when(fleetManager.getGridCols()).thenReturn(10);
-        when(fleetManager.getFleet()).thenReturn(java.util.List.of());
-        when(fleetManager.getPlacedCounts()).thenReturn(java.util.Map.of());
-        when(fleetManager.getRequiredFleetConfiguration()).thenReturn(java.util.Map.of());
-        when(fleetManager.getSerializedGridState()).thenReturn("0".repeat(100));
-
-        manager = new TurnManager(fleetManager, view, gameMode);
+        manager = new TurnManager(mockActions);
     }
 
     @Test
     void constructor_startsInSetupState() {
-        //Manager should always start in setup
         assertNotNull(manager.getCurrentState());
-        assertTrue(manager.getCurrentState() instanceof SetupState);
+        assertInstanceOf(SetupState.class, manager.getCurrentState());
         assertEquals(GameState.SETUP.name(), manager.getCurrentStateName());
     }
 
     @Test
-    void start_setsPlayerTurnOnView() {
+    void start_entersInitialState() {
         manager.start();
-        verify(view).setPlayerTurn(true);
+
+        // SetupState.onEnter calls setPlayerTurn(true) and refreshFleetUI()
+        verify(mockActions).setPlayerTurn(true);
+        verify(mockActions, atLeastOnce()).refreshFleetUI();
     }
 
     @Test
-    void transitionTo_replacesCurrentState() {
+    void transitionToActiveTurn_replacesCurrentState() {
         manager.transitionToActiveTurn();
 
-        assertTrue(manager.getCurrentState() instanceof ActiveTurnState);
+        assertInstanceOf(ActiveTurnState.class, manager.getCurrentState());
         assertEquals(GameState.ACTIVE_TURN.name(), manager.getCurrentStateName());
     }
 
@@ -92,160 +80,93 @@ class TestTurnManager {
     }
 
     @Test
-    void playerGridClick_isDelegatedToState() {
-        TurnState state = mock(TurnState.class);
-        manager.transitionTo(state);
-
+    void playerGridClick_isDelegatedToCurrentState() {
+        // In SetupState, playerGridClick calls actions.placeShip()
         Coordinate c = new Coordinate(0, 0);
         manager.handlePlayerGridClick(c);
 
-        verify(state).handlePlayerGridClick(manager, c);
+        verify(mockActions).placeShip(c);
     }
 
     @Test
-    void opponentGridClick_isDelegatedToState() {
-        TurnState state = mock(TurnState.class);
-        manager.transitionTo(state);
+    void opponentGridClick_isDelegatedToCurrentState() {
+        // Transition to ActiveTurnState so opponentGridClick has effect
+        manager.transitionToActiveTurn();
 
         Coordinate c = new Coordinate(0, 0);
+        when(mockActions.getOpponentCellState(c)).thenReturn(CellState.EMPTY);
+
         manager.handleOpponentGridClick(c);
 
-        verify(state).handleOpponentGridClick(manager, c);
+        verify(mockActions).fireShot(c);
     }
 
     @Test
-    void playerGridHover_isDelegatedToState() {
-        TurnState state = mock(TurnState.class);
-        manager.transitionTo(state);
-
+    void playerGridHover_isDelegatedToCurrentState() {
+        // In SetupState, playerGridHover calls actions.previewPlacement()
         Coordinate c = new Coordinate(0, 0);
         manager.handlePlayerGridHover(c);
 
-        verify(state).handlePlayerGridHover(manager, c);
+        verify(mockActions).previewPlacement(c);
     }
 
     @Test
-    void opponentGridHover_isDelegatedToState() {
-        TurnState state = mock(TurnState.class);
-        manager.transitionTo(state);
+    void opponentGridHover_isDelegatedToCurrentState() {
+        // Transition to ActiveTurnState so opponentGridHover has effect
+        manager.transitionToActiveTurn();
 
-        Coordinate c = new Coordinate(0, 0);
+        Coordinate c = new Coordinate(3, 5);
         manager.handleOpponentGridHover(c);
 
-        verify(state).handleOpponentGridHover(manager, c);
+        verify(mockActions).showShotPreview(c);
     }
 
     @Test
-    void incomingShot_isHandledByState() {
-        TurnState state = mock(TurnState.class);
-        manager.transitionTo(state);
+    void incomingShot_isDelegatedToCurrentState() {
+        // Transition to WaitingOpponentState where incoming shots are handled
+        manager.transitionToWaitingOpponent();
 
         Coordinate c = new Coordinate(0, 0);
+        when(mockActions.processIncomingShot(c)).thenReturn(false);
+
         manager.handleIncomingShot(c);
 
-        verify(state).handleIncomingShot(manager, c);
+        verify(mockActions).processIncomingShot(c);
+        verify(mockActions).transitionToActiveTurn();
     }
 
     @Test
-    void opponentGridUpdate_isForwardedToState() {
-        TurnState state = mock(TurnState.class);
-        manager.transitionTo(state);
-
-        String serializedGrid = "grid_data"; // doesn't need to be realistic
+    void opponentGridUpdate_isForwardedToCurrentState() {
+        String serializedGrid = "grid_data";
         List<Ship> ships = List.of();
 
         manager.handleOpponentGridUpdate(serializedGrid, ships);
 
-        verify(state).handleOpponentGridUpdate(manager, serializedGrid, ships);
+        // BaseGameState.handleOpponentGridUpdate calls actions.updateOpponentGrid()
+        verify(mockActions).updateOpponentGrid(serializedGrid, ships);
     }
 
     @Test
     void gameOver_forcesGameOverState() {
-        manager.handleGameOver("You lost!"); // message currently ignored internally
+        manager.handleGameOver("You lost!");
 
-        assertTrue(manager.getCurrentState() instanceof GameOverState);
+        assertInstanceOf(GameOverState.class, manager.getCurrentState());
         assertEquals(GameState.GAME_OVER.name(), manager.getCurrentStateName());
     }
 
     @Test
-    void gameStatusReceived_isDelegatedToState() {
-        TurnState state = mock(TurnState.class);
-        manager.transitionTo(state);
+    void gameStatusReceived_isDelegatedToCurrentState() {
+        // Transition to WaitingSetupState to handle game status
+        manager.transitionToWaitingSetup();
 
         manager.handleGameStatusReceived(GameState.ACTIVE_TURN);
 
-        verify(state).handleGameStatusReceived(manager, GameState.ACTIVE_TURN);
+        verify(mockActions).transitionToGamePhase();
+        verify(mockActions).transitionToActiveTurn();
     }
 
     @Test
-    void setupComplete_callsCallbackIfPresent() {
-        TurnManager.SetupCompleteCallback callback =
-                mock(TurnManager.SetupCompleteCallback.class);
-
-        manager.setSetupCompleteCallback(callback);
-        manager.onSetupComplete();
-
-        verify(callback).onSetupComplete();
-    }
-
-    @Test
-    void setupComplete_withoutCallback_doesNotCrash() {
-        // defensive test: nothing should explode here
-        assertDoesNotThrow(() -> manager.onSetupComplete());
-    }
-
-    @Test
-    void requestShot_mapsToOpponentGridClick() {
-        TurnState state = mock(TurnState.class);
-        manager.transitionTo(state);
-
-        Coordinate c = new Coordinate(0, 0);
-        manager.requestShot(c);
-
-        verify(state).handleOpponentGridClick(manager, c);
-    }
-
-    @Test
-    void requestShipPlacement_mapsToPlayerGridClick() {
-        TurnState state = mock(TurnState.class);
-        manager.transitionTo(state);
-
-        Coordinate c = new Coordinate(0, 0);
-        manager.requestShipPlacement(c);
-
-        verify(state).handlePlayerGridClick(manager, c);
-    }
-
-    @Test
-    void requestPlacementPreview_mapsToPlayerHover() {
-        TurnState state = mock(TurnState.class);
-        manager.transitionTo(state);
-
-        Coordinate c = new Coordinate(0, 0);
-        manager.requestPlacementPreview(c);
-
-        verify(state).handlePlayerGridHover(manager, c);
-    }
-
-    @Test
-    void previewShot_mapsToOpponentHover() {
-        TurnState state = mock(TurnState.class);
-        manager.transitionTo(state);
-
-        Coordinate c = new Coordinate(0, 0);
-        manager.previewShot(c);
-
-        verify(state).handleOpponentGridHover(manager, c);
-    }
-
-    @Test
-    void getters_returnInjectedDependencies() {
-        // basic getters test – boring but useful when refactoring
-        assertNotNull(manager.getOpponentGrid());
-        assertEquals(10, manager.getOpponentGrid().getRow());
-        assertEquals(10, manager.getOpponentGrid().getCol());
-        assertEquals(fleetManager, manager.getFleetManager());
-        assertEquals(view, manager.getView());
-        assertEquals(gameMode, manager.getGameModeStrategy());
+    void getActions_returnsInjectedActions() {
+        assertEquals(mockActions, manager.getActions());
     }
 }

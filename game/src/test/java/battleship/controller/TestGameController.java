@@ -9,22 +9,21 @@ import it.units.battleship.view.core.BattleshipView;
 import it.units.battleship.CellState;
 import it.units.battleship.Coordinate;
 import it.units.battleship.GameState;
+import it.units.battleship.Orientation;
+import it.units.battleship.ShipType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-/**
- * Tests for {@link GameController}.
- * These are intentionally a bit high-level since TurnManager is created internally
- * and is hard to mock cleanly without refactoring the production code.
- */
 class TestGameController {
 
     @Mock
@@ -39,17 +38,14 @@ class TestGameController {
     @Mock
     private BattleshipView viewMock;
 
-    private GameController controller; // reused across tests when possible
+    private GameController controller;
 
     @BeforeEach
     void setUp() {
-        // Manually opening mocks instead of using an extension
         MockitoAnnotations.openMocks(this);
 
-        // Default stub so constructor logging doesn't explode
         when(modeMock.getModeName()).thenReturn("Test Mode");
 
-        // Mock FleetManager methods needed by BaseGameState.onEnter
         when(fleetMgrMock.getGrid()).thenReturn(gridMock);
         CellState[][] emptyGrid = new CellState[10][10];
         for (int i = 0; i < 10; i++) {
@@ -58,115 +54,221 @@ class TestGameController {
             }
         }
         when(gridMock.getGrid()).thenReturn(emptyGrid);
-        // TurnManager constructor creates opponentGrid using fleetManager.getGridRows() and fleetManager.getGridCols()
         when(fleetMgrMock.getGridRows()).thenReturn(10);
         when(fleetMgrMock.getGridCols()).thenReturn(10);
         when(gridMock.getRow()).thenReturn(10);
         when(gridMock.getCol()).thenReturn(10);
-        when(fleetMgrMock.getFleet()).thenReturn(java.util.List.of());
-        when(fleetMgrMock.getPlacedCounts()).thenReturn(java.util.Map.of());
-        when(fleetMgrMock.getRequiredFleetConfiguration()).thenReturn(java.util.Map.of());
+        when(fleetMgrMock.getFleet()).thenReturn(List.of());
+        when(fleetMgrMock.getPlacedCounts()).thenReturn(Map.of());
+        when(fleetMgrMock.getRequiredFleetConfiguration()).thenReturn(Map.of());
+        when(fleetMgrMock.getSerializedGridState()).thenReturn("0".repeat(100));
+
+        controller = new GameController(fleetMgrMock, modeMock, viewMock);
     }
+
+    // ===== Constructor and lifecycle =====
 
     @Test
     void gameController_isCreatedAndHooksViewListeners() {
-        controller = new GameController(fleetMgrMock, modeMock, viewMock);
-
-        assertNotNull(controller, "Controller should be created");
-
-        // These are side effects of the constructor
+        assertNotNull(controller);
         verify(viewMock).setOpponentGridListener(any());
         verify(viewMock).setPlayerGridListener(any());
     }
 
     @Test
     void startGame_initializesGameModeAndStartsFlow() {
-        controller = new GameController(fleetMgrMock, modeMock, viewMock);
-
         controller.startGame();
 
-        // We mainly care that initialize is called with some callback
         verify(modeMock).initialize(any(GameModeStrategy.GameModeCallback.class));
-
-        // This comes indirectly from TurnManager.start()
-        // Not ideal to test, but good enough for now
         verify(viewMock).setPlayerTurn(true);
     }
 
+    // ===== GameModeCallback =====
+
     @Test
     void onOpponentReady_doesNotCrash() {
-        controller = new GameController(fleetMgrMock, modeMock, viewMock);
-
-        // Currently this method only logs, so just make sure it’s safe
         assertDoesNotThrow(() -> controller.onOpponentReady());
     }
 
     @Test
     void onShotReceived_acceptsIncomingShot() {
-        controller = new GameController(fleetMgrMock, modeMock, viewMock);
         Coordinate coord = new Coordinate(0, 0);
-
-        // TurnManager is internal, so we can't verify delegation directly
         assertDoesNotThrow(() -> controller.onShotReceived(coord));
     }
 
     @Test
     void onGridUpdateReceived_acceptsSerializedGrid() {
-        controller = new GameController(fleetMgrMock, modeMock, viewMock);
-
-        String fakeGrid = "grid_data"; // not a real grid, but enough for the test
+        String fakeGrid = "0".repeat(100);
         List<Ship> emptyFleet = List.of();
 
-        assertDoesNotThrow(() ->
-                controller.onGridUpdateReceived(fakeGrid, emptyFleet)
-        );
+        assertDoesNotThrow(() -> controller.onGridUpdateReceived(fakeGrid, emptyFleet));
     }
 
     @Test
     void onGameStatusReceived_gameOverDoesNotThrow() {
-        controller = new GameController(fleetMgrMock, modeMock, viewMock);
-        String msg = "Game Over";
-
-        assertDoesNotThrow(() ->
-                controller.onGameStatusReceived(GameState.GAME_OVER, msg)
-        );
+        assertDoesNotThrow(() -> controller.onGameStatusReceived(GameState.GAME_OVER, "Game Over"));
     }
 
     @Test
     void onGameStatusReceived_activeTurnStateHandled() {
-        controller = new GameController(fleetMgrMock, modeMock, viewMock);
-
-        assertDoesNotThrow(() ->
-                controller.onGameStatusReceived(GameState.ACTIVE_TURN, "Game started")
-        );
+        assertDoesNotThrow(() -> controller.onGameStatusReceived(GameState.ACTIVE_TURN, "Game started"));
     }
 
     @Test
     void onGameStatusReceived_waitingForOpponentHandled() {
-        controller = new GameController(fleetMgrMock, modeMock, viewMock);
-
-        assertDoesNotThrow(() ->
-                controller.onGameStatusReceived(GameState.WAITING_FOR_OPPONENT, "Waiting")
-        );
+        assertDoesNotThrow(() -> controller.onGameStatusReceived(GameState.WAITING_FOR_OPPONENT, "Waiting"));
     }
 
     @Test
     void onConnectionError_showsEndGameScreen() {
-        controller = new GameController(fleetMgrMock, modeMock, viewMock);
-        String errorMsg = "Connection failed";
-
-        controller.onConnectionError(errorMsg);
-
-        // We don't care about the exact message, just that it mentions a connection error
+        controller.onConnectionError("Connection failed");
         verify(viewMock).showEndGamePhase(contains("Connection error"));
     }
 
-    @Test
-    void controller_canBeCreatedWithoutSpecialFlags() {
-        // This test is a bit redundant, but it documents that
-        // there is no hidden configuration required.
-        controller = new GameController(fleetMgrMock, modeMock, viewMock);
+    // ===== GameActions: view delegation =====
 
-        assertNotNull(controller);
+    @Test
+    void setPlayerTurn_delegatesToView() {
+        controller.setPlayerTurn(true);
+        verify(viewMock).setPlayerTurn(true);
+    }
+
+    @Test
+    void notifyUser_delegatesToView() {
+        controller.notifyUser("Hello");
+        verify(viewMock).showSystemMessage("Hello");
+    }
+
+    @Test
+    void refreshPlayerGrid_updatesViewWithModelState() {
+        controller.refreshPlayerGrid();
+
+        verify(fleetMgrMock).getSerializedGridState();
+        verify(fleetMgrMock).getFleet();
+        verify(viewMock).updatePlayerGrid(anyString(), anyList());
+    }
+
+    @Test
+    void refreshFleetUI_updatesViewWithFleetCounts() {
+        controller.refreshFleetUI();
+
+        verify(fleetMgrMock).getPlacedCounts();
+        verify(fleetMgrMock).getRequiredFleetConfiguration();
+        verify(viewMock).refreshFleetSelection(anyMap(), anyMap());
+    }
+
+    @Test
+    void showShotPreview_delegatesToView() {
+        Coordinate coord = new Coordinate(3, 5);
+        controller.showShotPreview(coord);
+        verify(viewMock).showShotPreview(coord);
+    }
+
+    @Test
+    void showEndGame_delegatesToView() {
+        controller.showEndGame("Game Over!");
+        verify(viewMock).showEndGamePhase("Game Over!");
+    }
+
+    @Test
+    void transitionToGamePhase_delegatesToView() {
+        controller.transitionToGamePhase();
+        verify(viewMock).transitionToGamePhase();
+    }
+
+    @Test
+    void playerErrorSound_delegatesToView() {
+        controller.playerErrorSound();
+        verify(viewMock).playerErrorSound();
+    }
+
+    // ===== GameActions: network =====
+
+    @Test
+    void fireShot_sendsShotViaGameMode() {
+        Coordinate coord = new Coordinate(2, 3);
+        controller.fireShot(coord);
+        verify(modeMock).sendShot(coord);
+    }
+
+    @Test
+    void sendGameOver_delegatesToGameMode() {
+        controller.sendGameOver("Game over message");
+        verify(modeMock).sendGameOver("Game over message");
+    }
+
+    // ===== GameActions: model query =====
+
+    @Test
+    void getOpponentCellState_returnsEmptyForNewGrid() {
+        Coordinate coord = new Coordinate(0, 0);
+        assertEquals(CellState.EMPTY, controller.getOpponentCellState(coord));
+    }
+
+    // ===== GameActions: processIncomingShot =====
+
+    @Test
+    void processIncomingShot_updatesModelAndSendsGridUpdate() {
+        Coordinate coord = new Coordinate(0, 0);
+        when(fleetMgrMock.handleIncomingShot(coord)).thenReturn(true);
+        when(fleetMgrMock.isGameOver()).thenReturn(false);
+
+        boolean gameOver = controller.processIncomingShot(coord);
+
+        assertFalse(gameOver);
+        verify(fleetMgrMock).handleIncomingShot(coord);
+        verify(modeMock).sendGridUpdate(eq(gridMock), anyList(), eq(true));
+        verify(viewMock).updatePlayerGrid(anyString(), anyList());
+    }
+
+    @Test
+    void processIncomingShot_returnsTrueWhenGameOver() {
+        Coordinate coord = new Coordinate(0, 0);
+        when(fleetMgrMock.handleIncomingShot(coord)).thenReturn(true);
+        when(fleetMgrMock.isGameOver()).thenReturn(true);
+
+        boolean gameOver = controller.processIncomingShot(coord);
+
+        assertTrue(gameOver);
+    }
+
+    // ===== GameActions: placeShip =====
+
+    @Test
+    void placeShip_withNullShipType_doesNothing() {
+        Coordinate coord = new Coordinate(0, 0);
+        when(viewMock.getSelectedShipType()).thenReturn(null);
+        when(viewMock.getSelectedOrientation()).thenReturn(Orientation.HORIZONTAL_RIGHT);
+
+        controller.placeShip(coord);
+
+        verify(fleetMgrMock, never()).addShip(any());
+    }
+
+    // ===== GameInteractionFacade =====
+
+    @Test
+    void requestShot_delegatesToTurnManager() {
+        Coordinate coord = new Coordinate(0, 0);
+        // Just verify it doesn't crash — the state machine handles the rest
+        assertDoesNotThrow(() -> controller.requestShot(coord));
+    }
+
+    @Test
+    void requestShipPlacement_delegatesToTurnManager() {
+        Coordinate coord = new Coordinate(0, 0);
+        assertDoesNotThrow(() -> controller.requestShipPlacement(coord));
+    }
+
+    @Test
+    void requestPlacementPreview_delegatesToTurnManager() {
+        Coordinate coord = new Coordinate(0, 0);
+        assertDoesNotThrow(() -> controller.requestPlacementPreview(coord));
+    }
+
+    @Test
+    void previewShot_delegatesToTurnManager() {
+        Coordinate coord = new Coordinate(0, 0);
+        assertDoesNotThrow(() -> controller.previewShot(coord));
     }
 }

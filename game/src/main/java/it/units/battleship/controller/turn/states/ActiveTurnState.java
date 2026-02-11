@@ -1,6 +1,6 @@
 package it.units.battleship.controller.turn.states;
 
-import it.units.battleship.controller.turn.TurnManager;
+import it.units.battleship.controller.turn.GameActions;
 import it.units.battleship.CellState;
 import it.units.battleship.Coordinate;
 import it.units.battleship.GameState;
@@ -13,26 +13,26 @@ import it.units.battleship.GameState;
 public class ActiveTurnState extends BaseGameState {
 
     @Override
-    public void onEnter(TurnManager manager) {
-        super.onEnter(manager);
-        manager.setPlayerTurn(true);
+    public void onEnter(GameActions actions) {
+        super.onEnter(actions);
+        actions.setPlayerTurn(true);
     }
 
     @Override
-    public void handleOpponentGridClick(TurnManager manager, Coordinate coordinate) {
-        CellState currentCellState = manager.getOpponentCellState(coordinate);
+    public void handleOpponentGridClick(GameActions actions, Coordinate coordinate) {
+        CellState currentCellState = actions.getOpponentCellState(coordinate);
 
         if (currentCellState != CellState.EMPTY) {
-            manager.notifyUser("You already shot here!");
+            actions.notifyUser("You already shot here!");
             return;
         }
-        manager.executeShot(coordinate);
-        manager.transitionToWaitingOpponent();
+        actions.fireShot(coordinate);
+        actions.transitionToWaitingOpponent();
     }
 
     @Override
-    public void handleOpponentGridHover(TurnManager manager, Coordinate coordinate) {
-        manager.renderShotPreview(coordinate);
+    public void handleOpponentGridHover(GameActions actions, Coordinate coordinate) {
+        actions.showShotPreview(coordinate);
     }
 
     @Override

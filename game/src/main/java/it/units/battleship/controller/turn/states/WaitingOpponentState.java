@@ -1,6 +1,6 @@
 package it.units.battleship.controller.turn.states;
 
-import it.units.battleship.controller.turn.TurnManager;
+import it.units.battleship.controller.turn.GameActions;
 import it.units.battleship.Coordinate;
 import it.units.battleship.GameState;
 
@@ -10,19 +10,19 @@ import it.units.battleship.GameState;
  */
 public class WaitingOpponentState extends BaseGameState {
     @Override
-    public void onEnter(TurnManager manager) {
-        super.onEnter(manager);
-        manager.setPlayerTurn(false);
+    public void onEnter(GameActions actions) {
+        super.onEnter(actions);
+        actions.setPlayerTurn(false);
     }
 
     @Override
-    public void handleIncomingShot(TurnManager manager, Coordinate coordinate) {
-        boolean gameOver = manager.processIncomingShot(coordinate);
+    public void handleIncomingShot(GameActions actions, Coordinate coordinate) {
+        boolean gameOver = actions.processIncomingShot(coordinate);
 
         if (gameOver) {
-            manager.transitionToGameOver(false, "You lost! All your ships are sunk.");
+            actions.transitionToGameOver(false, "You lost! All your ships are sunk.");
         } else {
-            manager.transitionToActiveTurn();
+            actions.transitionToActiveTurn();
         }
     }
 
