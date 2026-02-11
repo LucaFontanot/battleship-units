@@ -2,7 +2,7 @@ package it.units.battleship.view.grid;
 
 import it.units.battleship.controller.game.actions.GridInteractionObserver;
 import it.units.battleship.model.Ship;
-import it.units.battleship.utils.TextureLoader;
+import it.units.battleship.view.utils.TextureLoader;
 import it.units.battleship.CellState;
 import it.units.battleship.Coordinate;
 import it.units.battleship.GridMapper;

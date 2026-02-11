@@ -1,4 +1,4 @@
-package it.units.battleship.utils;
+package it.units.battleship.view.utils;
 
 import java.awt.*;
 

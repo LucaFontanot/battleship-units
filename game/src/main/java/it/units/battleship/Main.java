@@ -1,6 +1,6 @@
 package it.units.battleship;
 
-import it.units.battleship.utils.ThemeSelector;
+import it.units.battleship.view.utils.ThemeSelector;
 import it.units.battleship.view.welcome.WelcomeUi;
 import it.units.battleship.service.CommandLineService;
 import it.units.battleship.service.PathManager;
