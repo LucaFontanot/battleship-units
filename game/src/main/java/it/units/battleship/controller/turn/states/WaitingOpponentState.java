@@ -1,29 +1,47 @@
 package it.units.battleship.controller.turn.states;
 
-import it.units.battleship.controller.turn.GameActions;
 import it.units.battleship.Coordinate;
 import it.units.battleship.GameState;
+import it.units.battleship.controller.turn.GameContext;
 
 /**
  * Represents the state where the player is waiting for the opponent's next move.
  * The state handles opponent grid updates, incoming shots.
  */
 public class WaitingOpponentState extends BaseGameState {
-    @Override
-    public void onEnter(GameActions actions) {
-        super.onEnter(actions);
-        actions.setPlayerTurn(false);
+
+    public WaitingOpponentState(GameContext ctx) {
+        super(ctx);
     }
 
     @Override
-    public void handleIncomingShot(GameActions actions, Coordinate coordinate) {
-        boolean gameOver = actions.processIncomingShot(coordinate);
+    public void onEnter() {
+        super.onEnter();
+        view.setPlayerTurn(false);
+    }
+
+    @Override
+    public void handleIncomingShot(Coordinate coordinate) {
+        boolean gameOver = processIncomingShot(coordinate);
 
         if (gameOver) {
-            actions.transitionToGameOver(false, "You lost! All your ships are sunk.");
+            stateTransitions.transitionToGameOver(false, "You lost! All your ships are sunk.");
         } else {
-            actions.transitionToActiveTurn();
+            stateTransitions.transitionToActiveTurn();
         }
+    }
+
+    private boolean processIncomingShot(Coordinate coordinate) {
+        boolean hit = fleetManager.handleIncomingShot(coordinate);
+
+        network.sendGridUpdate(
+                fleetManager.getGrid(),
+                fleetManager.getFleet(),
+                hit
+        );
+
+        view.refreshPlayerGrid();
+        return fleetManager.isGameOver();
     }
 
     @Override

@@ -1,7 +1,7 @@
 package it.units.battleship.controller.turn.states;
 
-import it.units.battleship.controller.turn.GameActions;
 import it.units.battleship.GameState;
+import it.units.battleship.controller.turn.GameContext;
 import lombok.Getter;
 
 /**
@@ -13,19 +13,20 @@ public class GameOverState extends BaseGameState {
     private final String message;
     private final boolean won;
 
-    public GameOverState(boolean won, String message) {
+    public GameOverState(GameContext context, boolean won, String message) {
+        super(context);
         this.message = message;
         this.won = won;
     }
 
     @Override
-    public void onEnter(GameActions actions) {
-        super.onEnter(actions);
-        actions.setPlayerTurn(false);
-        actions.showEndGame(message);
+    public void onEnter() {
+        super.onEnter();
+        view.setPlayerTurn(false);
+        view.showEndGame(message);
 
         if (!won) {
-            actions.sendGameOver(message);
+            network.sendGameOver(message);
         }
     }
 

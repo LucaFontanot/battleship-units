@@ -1,7 +1,12 @@
 package it.units.battleship.controller.turn.states;
 
-import it.units.battleship.controller.turn.GameActions;
+import it.units.battleship.controller.turn.GameContext;
 import it.units.battleship.controller.turn.TurnState;
+import it.units.battleship.controller.turn.contracts.NetworkActions;
+import it.units.battleship.controller.turn.contracts.StateTransitions;
+import it.units.battleship.controller.turn.contracts.ViewActions;
+import it.units.battleship.model.FleetManager;
+import it.units.battleship.model.Grid;
 import it.units.battleship.model.Ship;
 import it.units.battleship.Coordinate;
 import it.units.battleship.GameState;
@@ -15,10 +20,26 @@ import java.util.List;
  */
 public abstract class BaseGameState implements TurnState {
 
+    protected final Grid opponentGrid;
+    protected final ViewActions view;
+    protected final StateTransitions stateTransitions;
+    protected final NetworkActions network;
+    protected final FleetManager fleetManager;
+
+
+    protected BaseGameState(GameContext ctx){
+        this.view = ctx.view();
+        this.stateTransitions = ctx.transitions();
+        this.network = ctx.network();
+        this.fleetManager = ctx.fleetManager();
+        this.opponentGrid = ctx.opponentGrid();
+    }
+
     @Override
-    public void onEnter(GameActions actions) {
+    public void onEnter() {
         Logger.debug("Entering state: " + getStateName());
-        actions.refreshFleetUI();
+        view.refreshPlayerGrid();
+        view.refreshFleetUI();
     }
 
     @Override
@@ -27,32 +48,32 @@ public abstract class BaseGameState implements TurnState {
     }
 
     @Override
-    public void handleOpponentGridClick(GameActions actions, Coordinate coordinate) {
+    public void handleOpponentGridClick( Coordinate coordinate) {
     }
 
     @Override
-    public void handlePlayerGridClick(GameActions actions, Coordinate coordinate) {
+    public void handlePlayerGridClick( Coordinate coordinate) {
     }
 
     @Override
-    public void handleOpponentGridHover(GameActions actions, Coordinate coordinate) {
+    public void handleOpponentGridHover( Coordinate coordinate) {
     }
 
     @Override
-    public void handlePlayerGridHover(GameActions actions, Coordinate coordinate) {
+    public void handlePlayerGridHover( Coordinate coordinate) {
     }
 
     @Override
-    public void handleIncomingShot(GameActions actions, Coordinate coordinate) {
+    public void handleIncomingShot( Coordinate coordinate) {
     }
 
     @Override
-    public void handleOpponentGridUpdate(GameActions actions, String grid, List<Ship> fleet) {
-        actions.updateOpponentGrid(grid, fleet);
+    public void handleOpponentGridUpdate( String grid, List<Ship> fleet) {
+        view.updateOpponentGrid(grid, fleet);
     }
 
     @Override
-    public void handleGameStatusReceived(GameActions actions, GameState state) {
+    public void handleGameStatusReceived( GameState state) {
     }
 
     @Override

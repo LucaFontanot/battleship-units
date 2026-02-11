@@ -1,7 +1,7 @@
 package it.units.battleship.controller.turn.states;
 
-import it.units.battleship.controller.turn.GameActions;
 import it.units.battleship.GameState;
+import it.units.battleship.controller.turn.GameContext;
 
 /**
  * State when the local player has completed setup but is waiting for the opponent to finish.
@@ -9,11 +9,15 @@ import it.units.battleship.GameState;
  */
 public class WaitingSetupState extends BaseGameState {
 
+    public WaitingSetupState(GameContext ctx) {
+        super(ctx);
+    }
+
     @Override
-    public void onEnter(GameActions actions) {
-        super.onEnter(actions);
-        actions.setPlayerTurn(false);
-        actions.notifyUser("Waiting for opponent setup...");
+    public void onEnter() {
+        super.onEnter();
+        view.setPlayerTurn(false);
+        view.notifyUser("Waiting for opponent setup...");
     }
 
     @Override
@@ -26,12 +30,12 @@ public class WaitingSetupState extends BaseGameState {
      * When both players are ready, the server sends the actual starting state.
      */
     @Override
-    public void handleGameStatusReceived(GameActions actions, GameState state) {
-        actions.transitionToGamePhase();
+    public void handleGameStatusReceived(GameState state) {
+        view.transitionToGamePhase();
         if (state == GameState.ACTIVE_TURN) {
-            actions.transitionToActiveTurn();
+            stateTransitions.transitionToActiveTurn();
         } else if (state == GameState.WAITING_FOR_OPPONENT) {
-            actions.transitionToWaitingOpponent();
+            stateTransitions.transitionToWaitingOpponent();
         }
     }
 }
