@@ -1,6 +1,5 @@
 package battleship.controller.turn.states;
 
-import it.units.battleship.controller.turn.GameActions;
 import it.units.battleship.controller.turn.states.WaitingOpponentState;
 import it.units.battleship.model.Ship;
 import it.units.battleship.Coordinate;

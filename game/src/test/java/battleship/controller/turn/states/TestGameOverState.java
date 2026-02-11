@@ -1,6 +1,5 @@
 package battleship.controller.turn.states;
 
-import it.units.battleship.controller.turn.GameActions;
 import it.units.battleship.controller.turn.states.GameOverState;
 import it.units.battleship.GameState;
 import org.junit.jupiter.api.BeforeEach;

@@ -1,6 +1,5 @@
 package battleship.controller.turn.states;
 
-import it.units.battleship.controller.turn.GameActions;
 import it.units.battleship.CellState;
 import it.units.battleship.Coordinate;
 import it.units.battleship.GameState;
