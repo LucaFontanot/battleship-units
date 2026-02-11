@@ -1,7 +1,7 @@
 package battleship.controller.handlers;
 
-import battleship.controller.game.network.AbstractPlayerCommunication;
-import battleship.controller.game.events.CommunicationEvents;
+import it.units.battleship.controller.game.network.AbstractPlayerCommunication;
+import it.units.battleship.controller.game.events.CommunicationEvents;
 import it.units.battleship.GameState;
 import it.units.battleship.data.socket.GameMessageType;
 import it.units.battleship.data.socket.payloads.GameConfigDTO;

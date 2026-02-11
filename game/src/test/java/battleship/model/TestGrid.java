@@ -3,6 +3,7 @@ package battleship.model;
 import it.units.battleship.CellState;
 import it.units.battleship.Coordinate;
 import it.units.battleship.GridMapper;
+import it.units.battleship.model.Grid;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

@@ -1,11 +1,7 @@
 package battleship.controller.turn.states;
 
-import battleship.controller.mode.GameModeStrategy;
-import battleship.controller.turn.TurnManager;
-import battleship.model.FleetManager;
-import battleship.model.Grid;
-import battleship.view.core.BattleshipView;
-import it.units.battleship.CellState;
+import it.units.battleship.controller.turn.TurnManager;
+import it.units.battleship.controller.turn.states.GameOverState;
 import it.units.battleship.GameState;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

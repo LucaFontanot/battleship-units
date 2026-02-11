@@ -5,6 +5,9 @@ import it.units.battleship.Coordinate;
 import it.units.battleship.GridMapper;
 import it.units.battleship.Orientation;
 import it.units.battleship.ShipType;
+import it.units.battleship.model.FleetManager;
+import it.units.battleship.model.Grid;
+import it.units.battleship.model.Ship;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

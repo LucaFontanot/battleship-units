@@ -1,11 +1,9 @@
 package battleship.ui;
 
-import battleship.model.FleetManager;
 import it.units.battleship.*;
-import battleship.model.Grid;
-import battleship.model.Ship;
-import battleship.view.grid.GridUI;
-import it.units.battleship.service.PathManager;
+import it.units.battleship.model.Grid;
+import it.units.battleship.model.Ship;
+import it.units.battleship.view.grid.GridUI;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,10 +11,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 import javax.swing.*;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 public class TestGridUI {
 

@@ -1,7 +1,7 @@
 package battleship.ui;
 
-import battleship.controller.lobby.LobbyController;
-import battleship.view.lobby.LobbySelector;
+import it.units.battleship.controller.lobby.LobbyController;
+import it.units.battleship.view.lobby.LobbySelector;
 import it.units.battleship.data.LobbiesResponseData;
 import it.units.battleship.data.LobbyData;
 import org.junit.jupiter.api.AfterEach;

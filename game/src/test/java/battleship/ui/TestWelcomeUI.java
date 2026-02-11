@@ -1,6 +1,6 @@
 package battleship.ui;
 
-import battleship.view.welcome.WelcomeUi;
+import it.units.battleship.view.welcome.WelcomeUi;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

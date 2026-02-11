@@ -1,8 +1,11 @@
 package battleship.controller;
 
-import battleship.controller.mode.GameModeStrategy;
-import battleship.model.*;
-import battleship.view.core.BattleshipView;
+import it.units.battleship.controller.GameController;
+import it.units.battleship.controller.mode.GameModeStrategy;
+import it.units.battleship.model.FleetManager;
+import it.units.battleship.model.Grid;
+import it.units.battleship.model.Ship;
+import it.units.battleship.view.core.BattleshipView;
 import it.units.battleship.CellState;
 import it.units.battleship.Coordinate;
 import it.units.battleship.GameState;

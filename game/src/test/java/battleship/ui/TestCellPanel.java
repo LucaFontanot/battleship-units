@@ -1,12 +1,10 @@
 package battleship.ui;
 
 import it.units.battleship.CellState;
-import battleship.view.grid.CellPanel;
+import it.units.battleship.view.grid.CellPanel;
 import it.units.battleship.Coordinate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import java.awt.*;
 
 public class TestCellPanel {
 

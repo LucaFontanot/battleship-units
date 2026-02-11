@@ -1,7 +1,7 @@
 package battleship.controller.handlers;
 
-import battleship.controller.game.events.CommunicationEvents;
-import battleship.controller.game.network.NetworkClient;
+import it.units.battleship.controller.game.events.CommunicationEvents;
+import it.units.battleship.controller.game.network.NetworkClient;
 import com.google.gson.Gson;
 import it.units.battleship.Coordinate;
 import it.units.battleship.GameState;

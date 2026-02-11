@@ -1,26 +1,23 @@
 package battleship.ui;
 
-import battleship.controller.game.actions.GridInteractionObserver;
-import battleship.model.Grid;
-import battleship.model.Ship;
-import battleship.view.core.setup.SetupPanel;
+import it.units.battleship.controller.game.actions.GridInteractionObserver;
+import it.units.battleship.model.Grid;
+import it.units.battleship.model.Ship;
+import it.units.battleship.view.core.setup.SetupPanel;
 import it.units.battleship.Coordinate;
 import it.units.battleship.Orientation;
 import it.units.battleship.ShipType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 import javax.swing.*;
 import java.awt.*;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.*;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 public class TestSetupPanel {
 

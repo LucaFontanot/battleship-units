@@ -1,7 +1,8 @@
 package battleship.controller.turn.states;
 
-import battleship.controller.turn.TurnManager;
+import it.units.battleship.controller.turn.TurnManager;
 import it.units.battleship.GameState;
+import it.units.battleship.controller.turn.states.WaitingSetupState;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;

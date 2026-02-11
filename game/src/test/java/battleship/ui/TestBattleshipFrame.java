@@ -1,9 +1,9 @@
 package battleship.ui;
 
-import battleship.controller.game.actions.GridInteractionObserver;
-import battleship.model.Grid;
-import battleship.model.Ship;
-import battleship.view.core.BattleshipFrame;
+import it.units.battleship.controller.game.actions.GridInteractionObserver;
+import it.units.battleship.model.Grid;
+import it.units.battleship.model.Ship;
+import it.units.battleship.view.core.BattleshipFrame;
 import it.units.battleship.Coordinate;
 import it.units.battleship.Orientation;
 import it.units.battleship.ShipType;
@@ -11,7 +11,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 import java.util.*;
 
