@@ -1,95 +1,133 @@
 package battleship.controller.turn.states;
 
+import battleship.testutil.FakeGameMode;
+import battleship.testutil.FakeView;
+import it.units.battleship.Coordinate;
 import it.units.battleship.GameState;
+import it.units.battleship.ShipType;
+import it.units.battleship.controller.turn.GameContext;
+import it.units.battleship.controller.turn.adapters.GameViewMediator;
+import it.units.battleship.controller.turn.adapters.NetworkAdapter;
+import it.units.battleship.controller.turn.contracts.StateTransitions;
 import it.units.battleship.controller.turn.states.WaitingSetupState;
+import it.units.battleship.model.FleetManager;
+import it.units.battleship.model.Grid;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 class TestWaitingSetupState {
 
-    @Mock
-    private GameActions mockActions;
+    // ===== Fake StateTransitions: records which transitions was called =====
+    private static class FakeTransitions implements StateTransitions {
+        boolean transitionedToActiveTurn;
+        boolean transitionedToWaitingOpponent;
+        boolean transitionedToWaitingSetup;
+        boolean transitionedToGameOver;
 
+        @Override
+        public void transitionToActiveTurn() { transitionedToActiveTurn = true; }
+        @Override
+        public void transitionToWaitingOpponent() { transitionedToWaitingOpponent = true; }
+        @Override
+        public void transitionToWaitingSetup() { transitionedToWaitingSetup = true; }
+        @Override
+        public void transitionToGameOver(boolean won, String message) { transitionedToGameOver = true; }
+    }
+
+    private FakeView fakeView;
+    private FakeGameMode fakeGameMode;
+    private FakeTransitions fakeTransitions;
+    private FleetManager fleetManager;
+    private Grid playerGrid;
+    private Grid opponentGrid;
     private WaitingSetupState waitingSetupState;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-        waitingSetupState = new WaitingSetupState();
+        fakeView = new FakeView();
+        fakeGameMode = new FakeGameMode();
+        fakeTransitions = new FakeTransitions();
+        playerGrid = new Grid(10, 10);
+        opponentGrid = new Grid(10, 10);
+        fleetManager = new FleetManager(playerGrid, Map.of(ShipType.DESTROYER, 1));
+
+        GameViewMediator viewActions = new GameViewMediator(fakeView, fleetManager, opponentGrid);
+        NetworkAdapter networkActions = new NetworkAdapter(fakeGameMode);
+        GameContext context = new GameContext(viewActions, fakeTransitions, networkActions, fleetManager, opponentGrid);
+        waitingSetupState = new WaitingSetupState(context);
     }
 
     @Test
-    void testGetStateNameReturnsWaitingSetup() {
+    void testGetStateName_returnsWaitingSetup() {
         assertEquals("WAITING_SETUP", waitingSetupState.getStateName());
     }
 
     @Test
-    void testCanShootReturnsFalse() {
+    void testCanShoot_returnsFalse() {
         assertFalse(waitingSetupState.canShoot());
     }
 
     @Test
-    void testCanPlaceShipReturnsFalse() {
+    void testCanPlaceShip_returnsFalse() {
         assertFalse(waitingSetupState.canPlaceShip());
     }
 
     @Test
-    void testOnEnterDisablesInteractionsAndShowsMessage() {
-        waitingSetupState.onEnter(mockActions);
+    void testOnEnter_disablesInteractionsAndShowMessage() {
+        waitingSetupState.onEnter();
 
-        verify(mockActions).setPlayerTurn(false);
-        verify(mockActions).notifyUser("Waiting for opponent setup...");
-        verify(mockActions).refreshFleetUI();
+        assertFalse(fakeView.playerTurn);
+        assertEquals("Waiting for opponent setup...", fakeView.lastSystemMessage);
+        assertNotNull(fakeView.lastPlacedCounts);
     }
 
     @Test
-    void testHandleGameStatusReceivedWithActiveTurnTransitionsToActiveState() {
-        waitingSetupState.handleGameStatusReceived(mockActions, GameState.ACTIVE_TURN);
+    void testHandleGameStatusReceived_activeTurn_transitionsToActiveState() {
+        waitingSetupState.handleGameStatusReceived(GameState.ACTIVE_TURN);
 
-        verify(mockActions).transitionToGamePhase();
-        verify(mockActions).transitionToActiveTurn();
+        assertTrue(fakeView.transitionToGamePhaseCalled);
+        assertTrue(fakeTransitions.transitionedToActiveTurn);
     }
 
     @Test
-    void testHandleGameStatusReceivedWithWaitingTransitionsToWaitingState() {
-        waitingSetupState.handleGameStatusReceived(mockActions, GameState.WAITING_FOR_OPPONENT);
+    void testHandleGameStatusReceived_waitingOpponent_transitionsToWaitingState() {
+        waitingSetupState.handleGameStatusReceived(GameState.WAITING_FOR_OPPONENT);
 
-        verify(mockActions).transitionToGamePhase();
-        verify(mockActions).transitionToWaitingOpponent();
+        assertTrue(fakeView.transitionToGamePhaseCalled);
+        assertTrue(fakeTransitions.transitionedToWaitingOpponent);
     }
 
     @Test
-    void testHandleGameStatusReceivedWithGameOverDoesNotTransition() {
-        waitingSetupState.handleGameStatusReceived(mockActions, GameState.GAME_OVER);
+    void testHandleGameStatusReceived_gameOver_doesNotTransition() {
+        waitingSetupState.handleGameStatusReceived(GameState.GAME_OVER);
 
-        verify(mockActions, never()).transitionToActiveTurn();
-        verify(mockActions, never()).transitionToWaitingOpponent();
+        assertFalse(fakeTransitions.transitionedToActiveTurn);
+        assertFalse(fakeTransitions.transitionedToWaitingOpponent);
     }
 
     @Test
-    void testHandleGameStatusReceivedWithSetupDoesNotTransition() {
-        waitingSetupState.handleGameStatusReceived(mockActions, GameState.SETUP);
+    void testHandleGameStatusReceived_setup_doesNotTransition() {
+        waitingSetupState.handleGameStatusReceived(GameState.SETUP);
 
-        verify(mockActions, never()).transitionToActiveTurn();
-        verify(mockActions, never()).transitionToWaitingOpponent();
+        assertFalse(fakeTransitions.transitionedToActiveTurn);
+        assertFalse(fakeTransitions.transitionedToWaitingOpponent);
     }
 
     @Test
-    void testPlayerCannotInteractWithGridsInWaitingSetup() {
-        // All grid interaction should do nothing
-        waitingSetupState.handlePlayerGridClick(mockActions, null);
-        waitingSetupState.handleOpponentGridClick(mockActions, null);
-        waitingSetupState.handlePlayerGridHover(mockActions, null);
-        waitingSetupState.handleOpponentGridHover(mockActions, null);
+    void testPlayerCannotInteract_withGridsInWaitingSetup() {
+        Coordinate coord = new Coordinate(0, 0);
+        waitingSetupState.handlePlayerGridClick(coord);
+        waitingSetupState.handleOpponentGridClick(coord);
+        waitingSetupState.handlePlayerGridHover(coord);
+        waitingSetupState.handleOpponentGridHover(coord);
 
-        // Verify no transition
-        verify(mockActions, never()).transitionToActiveTurn();
-        verify(mockActions, never()).transitionToWaitingOpponent();
-        verify(mockActions, never()).transitionToWaitingSetup();
+        // No transition should have been triggered
+        assertFalse(fakeTransitions.transitionedToActiveTurn);
+        assertFalse(fakeTransitions.transitionedToWaitingOpponent);
+        assertFalse(fakeTransitions.transitionedToWaitingSetup);
     }
 }
