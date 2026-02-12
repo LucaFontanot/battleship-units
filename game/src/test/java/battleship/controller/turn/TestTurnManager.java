@@ -210,7 +210,7 @@ class TestTurnManager {
 
     @Test
     void gameOver_forcesGameOverState() {
-        manager.handleGameOver("You lost!");
+        manager.handleGameStatusReceived(GameState.GAME_OVER,"You lost!");
 
         assertInstanceOf(GameOverState.class, manager.getCurrentState());
         assertEquals(GameState.GAME_OVER.name(), manager.getCurrentStateName());
@@ -218,7 +218,7 @@ class TestTurnManager {
 
     @Test
     void handleGameOver_showsEndGameMessage() {
-        manager.handleGameOver("Victory!");
+        manager.handleGameStatusReceived(GameState.GAME_OVER,"Victory!");
 
         assertEquals("Victory!", fakeView.lastEndGameMessage);
     }
@@ -227,7 +227,7 @@ class TestTurnManager {
     void gameStatusReceived_activeTurn_transitionCorrectly() {
         manager.transitionToWaitingSetup();
 
-        manager.handleGameStatusReceived(GameState.ACTIVE_TURN);
+        manager.handleGameStatusReceived(GameState.ACTIVE_TURN, "");
 
         assertTrue(fakeView.transitionToGamePhaseCalled);
         assertInstanceOf(ActiveTurnState.class, manager.getCurrentState());
@@ -237,7 +237,7 @@ class TestTurnManager {
     void gameStatusReceived_waitingOpponent_transitionCorrectly() {
         manager.transitionToWaitingSetup();
 
-        manager.handleGameStatusReceived(GameState.WAITING_FOR_OPPONENT);
+        manager.handleGameStatusReceived(GameState.WAITING_FOR_OPPONENT, "");
 
         assertTrue(fakeView.transitionToGamePhaseCalled);
         assertInstanceOf(WaitingOpponentState.class, manager.getCurrentState());

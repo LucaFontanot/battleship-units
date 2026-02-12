@@ -87,7 +87,7 @@ class TestWaitingSetupState {
 
     @Test
     void testHandleGameStatusReceived_activeTurn_transitionsToActiveState() {
-        waitingSetupState.handleGameStatusReceived(GameState.ACTIVE_TURN);
+        waitingSetupState.handleGameStatusReceived(GameState.ACTIVE_TURN, "");
 
         assertTrue(fakeView.transitionToGamePhaseCalled);
         assertTrue(fakeTransitions.transitionedToActiveTurn);
@@ -95,7 +95,7 @@ class TestWaitingSetupState {
 
     @Test
     void testHandleGameStatusReceived_waitingOpponent_transitionsToWaitingState() {
-        waitingSetupState.handleGameStatusReceived(GameState.WAITING_FOR_OPPONENT);
+        waitingSetupState.handleGameStatusReceived(GameState.WAITING_FOR_OPPONENT, "");
 
         assertTrue(fakeView.transitionToGamePhaseCalled);
         assertTrue(fakeTransitions.transitionedToWaitingOpponent);
@@ -103,7 +103,7 @@ class TestWaitingSetupState {
 
     @Test
     void testHandleGameStatusReceived_gameOver_doesNotTransition() {
-        waitingSetupState.handleGameStatusReceived(GameState.GAME_OVER);
+        waitingSetupState.handleGameStatusReceived(GameState.GAME_OVER, "");
 
         assertFalse(fakeTransitions.transitionedToActiveTurn);
         assertFalse(fakeTransitions.transitionedToWaitingOpponent);
@@ -111,7 +111,7 @@ class TestWaitingSetupState {
 
     @Test
     void testHandleGameStatusReceived_setup_doesNotTransition() {
-        waitingSetupState.handleGameStatusReceived(GameState.SETUP);
+        waitingSetupState.handleGameStatusReceived(GameState.SETUP, "");
 
         assertFalse(fakeTransitions.transitionedToActiveTurn);
         assertFalse(fakeTransitions.transitionedToWaitingOpponent);

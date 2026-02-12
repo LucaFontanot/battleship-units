@@ -106,12 +106,8 @@ public class TurnManager implements StateTransitions {
         currentState.handleOpponentGridUpdate(grid, fleet);
     }
 
-    public void handleGameStatusReceived(GameState state) {
-        currentState.handleGameStatusReceived(state);
-    }
-
-    public void handleGameOver(String message) {
-        transitionTo(new GameOverState(context,true, message));
+    public void handleGameStatusReceived(GameState state, String message) {
+        currentState.handleGameStatusReceived(state, message);
     }
 
     // ===== Query for the current state =====

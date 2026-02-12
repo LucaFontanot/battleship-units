@@ -73,7 +73,10 @@ public abstract class BaseGameState implements TurnState {
     }
 
     @Override
-    public void handleGameStatusReceived( GameState state) {
+    public void handleGameStatusReceived( GameState state, String message) {
+        if(state == GameState.GAME_OVER){
+            stateTransitions.transitionToGameOver(true, message);
+        }
     }
 
     @Override

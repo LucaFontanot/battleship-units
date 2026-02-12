@@ -75,12 +75,7 @@ public class GameController implements GameModeStrategy.GameModeCallback, GameIn
     @Override
     public void onGameStatusReceived(GameState state, String message) {
         Logger.log("GameController: game status -> " + state + " | " + message);
-
-        if (state == GameState.GAME_OVER) {
-            turnManager.handleGameOver(message);
-        } else if (state == GameState.ACTIVE_TURN || state == GameState.WAITING_FOR_OPPONENT) {
-            turnManager.handleGameStatusReceived(state);
-        }
+        turnManager.handleGameStatusReceived(state, message);
     }
 
     @Override

@@ -30,7 +30,11 @@ public class WaitingSetupState extends BaseGameState {
      * When both players are ready, the server sends the actual starting state.
      */
     @Override
-    public void handleGameStatusReceived(GameState state) {
+    public void handleGameStatusReceived(GameState state, String message) {
+        if (state == GameState.GAME_OVER) {
+            super.handleGameStatusReceived(state, message);
+            return;
+        }
         view.transitionToGamePhase();
         if (state == GameState.ACTIVE_TURN) {
             stateTransitions.transitionToActiveTurn();

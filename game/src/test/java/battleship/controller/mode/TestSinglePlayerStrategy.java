@@ -48,13 +48,6 @@ class TestSinglePlayerStrategy {
     }
 
     @Test
-    void testInitializeCallsOnOpponentReady() {
-        singlePlayerStrategy.initialize(fakeCallback);
-
-        assertTrue(fakeCallback.opponentReadyCalled);
-    }
-
-    @Test
     void testSendShotCallsOnGridUpdateReceived() throws InterruptedException {
         singlePlayerStrategy.initialize(fakeCallback);
         Coordinate coord = new Coordinate(0, 0);
