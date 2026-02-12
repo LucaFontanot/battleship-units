@@ -43,8 +43,6 @@ public class SinglePlayerStrategy implements GameModeStrategy {
         aiOpponent.placeShips();
 
         Logger.log("SinglePlayerStrategy initialized");
-
-        callback.onOpponentReady();
     }
 
     @Override

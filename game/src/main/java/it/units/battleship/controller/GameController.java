@@ -61,11 +61,6 @@ public class GameController implements GameModeStrategy.GameModeCallback, GameIn
     // ===== GameModeCallback implementation =====
 
     @Override
-    public void onOpponentReady() {
-        Logger.log("GameController: Opponent ready");
-    }
-
-    @Override
     public void onShotReceived(Coordinate coordinate) {
         Logger.log("GameController: Shot received at " + coordinate);
         turnManager.handleIncomingShot(coordinate);
