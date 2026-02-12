@@ -25,7 +25,6 @@ public class SetupState extends BaseGameState {
     @Override
     public void onEnter() {
         super.onEnter();
-        view.syncFleetAvailabilityUI();
         view.setPlayerTurn(true);
     }
 
