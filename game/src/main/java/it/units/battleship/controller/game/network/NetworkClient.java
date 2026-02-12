@@ -157,15 +157,6 @@ public class NetworkClient extends AbstractPlayerCommunication {
 
                 this.communicationEventsListeners.forEach(l -> l.onShotReceived(msg.getData()));
             }
-            case GAME_SETUP -> {
-                WebSocketMessage<GameConfigDTO> msg = gson.fromJson(
-                        json,
-                        new TypeToken<WebSocketMessage<GameConfigDTO>>() {
-                        }.getType()
-                );
-
-                this.communicationEventsListeners.forEach(l -> l.onGameSetupReceived(msg.getData()));
-            }
             case TURN_CHANGE -> {
                 WebSocketMessage<GameStatusDTO> msg = gson.fromJson(
                         json,

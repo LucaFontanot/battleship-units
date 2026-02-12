@@ -6,6 +6,7 @@ import it.units.battleship.Coordinate;
 import it.units.battleship.Orientation;
 import it.units.battleship.ShipType;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -31,7 +32,7 @@ public interface BattleshipView {
 
     Orientation getSelectedOrientation();
 
-    void showPlacementPreview(Set<Coordinate> coordinates, boolean valid, Ship previewShip);
+    void showPlacementPreview(LinkedHashSet<Coordinate> coordinates, boolean valid, Ship previewShip);
 
     void refreshFleetSelection(Map<ShipType, Integer> placedCounts, Map<ShipType, Integer> requiredCounts);
 

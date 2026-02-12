@@ -58,11 +58,6 @@ class TestGameController {
     // ===== GameModeCallback =====
 
     @Test
-    void onOpponentReady_doesNotCrash() {
-        assertDoesNotThrow(() -> controller.onOpponentReady());
-    }
-
-    @Test
     void onShotReceived_delegatesToTurnManager() {
         Coordinate coord = new Coordinate(0, 0);
         // Should not throw even if no ships is placed

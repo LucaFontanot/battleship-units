@@ -1,6 +1,7 @@
 package it.units.battleship.controller.turn;
 
 import it.units.battleship.controller.turn.contracts.NetworkActions;
+import it.units.battleship.controller.turn.contracts.SetupInputProvider;
 import it.units.battleship.controller.turn.contracts.StateTransitions;
 import it.units.battleship.controller.turn.contracts.ViewActions;
 import it.units.battleship.controller.turn.states.*;
@@ -24,11 +25,12 @@ public class TurnManager implements StateTransitions {
     private final GameContext context;
 
     public TurnManager(@NonNull ViewActions view,
+                       @NonNull SetupInputProvider setupInput,
                        @NonNull NetworkActions network,
                        @NonNull FleetManager fleetManager,
                        @NonNull Grid opponentGrid) {
         this.context = new GameContext(view, this, network, fleetManager, opponentGrid);
-        this.currentState = new SetupState(context);
+        this.currentState = new SetupState(context, setupInput);
     }
 
     /**
@@ -106,12 +108,8 @@ public class TurnManager implements StateTransitions {
         currentState.handleOpponentGridUpdate(grid, fleet);
     }
 
-    public void handleGameStatusReceived(GameState state) {
-        currentState.handleGameStatusReceived(state);
-    }
-
-    public void handleGameOver(String message) {
-        transitionTo(new GameOverState(context,true, message));
+    public void handleGameStatusReceived(GameState state, String message) {
+        currentState.handleGameStatusReceived(state, message);
     }
 
     // ===== Query for the current state =====

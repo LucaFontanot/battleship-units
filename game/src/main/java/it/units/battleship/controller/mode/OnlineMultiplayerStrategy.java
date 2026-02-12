@@ -12,6 +12,8 @@ import it.units.battleship.Logger;
 
 import java.util.List;
 
+import static it.units.battleship.Defaults.MSG_READY_TO_PLAY;
+
 /**
  * For online multiplayer gameplay.
  * This mode enable communication with an opponent over a network
@@ -49,7 +51,7 @@ public class OnlineMultiplayerStrategy implements GameModeStrategy {
 
     @Override
     public void notifySetupComplete() {
-        network.sendGameStatus(GameState.WAITING_SETUP, "Ready to play");
+        network.sendGameStatus(GameState.WAITING_SETUP, MSG_READY_TO_PLAY);
     }
 
     @Override

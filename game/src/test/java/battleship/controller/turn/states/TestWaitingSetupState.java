@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
+import static it.units.battleship.Defaults.MSG_WAITING_OPPONENT_SETUP;
 import static org.junit.jupiter.api.Assertions.*;
 
 class TestWaitingSetupState {
@@ -55,7 +56,7 @@ class TestWaitingSetupState {
         opponentGrid = new Grid(10, 10);
         fleetManager = new FleetManager(playerGrid, Map.of(ShipType.DESTROYER, 1));
 
-        GameViewMediator viewActions = new GameViewMediator(fakeView, fleetManager, opponentGrid);
+        GameViewMediator viewActions = new GameViewMediator(fakeView);
         NetworkAdapter networkActions = new NetworkAdapter(fakeGameMode);
         GameContext context = new GameContext(viewActions, fakeTransitions, networkActions, fleetManager, opponentGrid);
         waitingSetupState = new WaitingSetupState(context);
@@ -81,13 +82,13 @@ class TestWaitingSetupState {
         waitingSetupState.onEnter();
 
         assertFalse(fakeView.playerTurn);
-        assertEquals("Waiting for opponent setup...", fakeView.lastSystemMessage);
+        assertEquals(MSG_WAITING_OPPONENT_SETUP, fakeView.lastSystemMessage);
         assertNotNull(fakeView.lastPlacedCounts);
     }
 
     @Test
     void testHandleGameStatusReceived_activeTurn_transitionsToActiveState() {
-        waitingSetupState.handleGameStatusReceived(GameState.ACTIVE_TURN);
+        waitingSetupState.handleGameStatusReceived(GameState.ACTIVE_TURN, "");
 
         assertTrue(fakeView.transitionToGamePhaseCalled);
         assertTrue(fakeTransitions.transitionedToActiveTurn);
@@ -95,7 +96,7 @@ class TestWaitingSetupState {
 
     @Test
     void testHandleGameStatusReceived_waitingOpponent_transitionsToWaitingState() {
-        waitingSetupState.handleGameStatusReceived(GameState.WAITING_FOR_OPPONENT);
+        waitingSetupState.handleGameStatusReceived(GameState.WAITING_FOR_OPPONENT, "");
 
         assertTrue(fakeView.transitionToGamePhaseCalled);
         assertTrue(fakeTransitions.transitionedToWaitingOpponent);
@@ -103,7 +104,7 @@ class TestWaitingSetupState {
 
     @Test
     void testHandleGameStatusReceived_gameOver_doesNotTransition() {
-        waitingSetupState.handleGameStatusReceived(GameState.GAME_OVER);
+        waitingSetupState.handleGameStatusReceived(GameState.GAME_OVER, "");
 
         assertFalse(fakeTransitions.transitionedToActiveTurn);
         assertFalse(fakeTransitions.transitionedToWaitingOpponent);
@@ -111,7 +112,7 @@ class TestWaitingSetupState {
 
     @Test
     void testHandleGameStatusReceived_setup_doesNotTransition() {
-        waitingSetupState.handleGameStatusReceived(GameState.SETUP);
+        waitingSetupState.handleGameStatusReceived(GameState.SETUP, "");
 
         assertFalse(fakeTransitions.transitionedToActiveTurn);
         assertFalse(fakeTransitions.transitionedToWaitingOpponent);

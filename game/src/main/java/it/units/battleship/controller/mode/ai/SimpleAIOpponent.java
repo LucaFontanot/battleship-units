@@ -9,6 +9,8 @@ import it.units.battleship.ShipType;
 
 import java.util.*;
 
+import static it.units.battleship.Defaults.MAX_ATTEMPTS;
+
 /**
  * Implementation of an AI opponent.
  * Search randomly for a ship, then it focuses on sunk the found ship
@@ -40,7 +42,7 @@ public class SimpleAIOpponent implements AIOpponent {
                 boolean placed = false;
                 int attempts = 0;
 
-                while (!placed && attempts < 100) {
+                while (!placed && attempts < MAX_ATTEMPTS) {
                     int row = random.nextInt(grid.getRow());
                     int col = random.nextInt(grid.getCol());
                     Orientation orientation = random.nextBoolean()
@@ -117,7 +119,7 @@ public class SimpleAIOpponent implements AIOpponent {
     }
 
     private boolean isValidCoordinate(Coordinate coord) {
-        return coord.row() >= 0 && coord.row() < 10
-                && coord.col() >= 0 && coord.col() < 10;
+        return coord.row() >= 0 && coord.row() < grid.getRow()
+                && coord.col() >= 0 && coord.col() < grid.getCol();
     }
 }

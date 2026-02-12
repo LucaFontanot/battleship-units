@@ -50,10 +50,10 @@ class TestSetupState {
         // Using a small fleet for testing
         fleetManager = new FleetManager(playerGrid, Map.of(ShipType.DESTROYER, 1));
 
-        GameViewMediator viewActions = new GameViewMediator(fakeView, fleetManager, opponentGrid);
+        GameViewMediator viewActions = new GameViewMediator(fakeView);
         NetworkAdapter networkActions = new NetworkAdapter(fakeGameMode);
         GameContext context = new GameContext(viewActions, fakeTransitions, networkActions, fleetManager, opponentGrid);
-        setupState = new SetupState(context);
+        setupState = new SetupState(context, viewActions);
     }
 
     @Test
@@ -110,10 +110,10 @@ class TestSetupState {
 
     private void setUpStateWithFleetManager(FleetManager fm) {
         Grid opponentGrid = new Grid(10, 10);
-        GameViewMediator viewActions = new GameViewMediator(fakeView, fm, opponentGrid);
+        GameViewMediator viewActions = new GameViewMediator(fakeView);
         NetworkAdapter networkActions = new NetworkAdapter(fakeGameMode);
         GameContext context = new GameContext(viewActions, fakeTransitions, networkActions, fm, opponentGrid);
-        setupState = new SetupState(context);
+        setupState = new SetupState(context, viewActions);
     }
 
     @Test

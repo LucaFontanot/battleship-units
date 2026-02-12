@@ -54,7 +54,7 @@ public interface TurnState {
     /**
      * Handle game status updates from server (e.g., game start signal).
      */
-    void handleGameStatusReceived(GameState state);
+    void handleGameStatusReceived(GameState state, String message);
 
     /**
      * Return the name of the state.

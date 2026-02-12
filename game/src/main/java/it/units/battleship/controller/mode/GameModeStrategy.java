@@ -55,7 +55,6 @@ public interface GameModeStrategy {
      * Callback interface for game mode events.
      */
     interface GameModeCallback {
-        void onOpponentReady();
 
         void onShotReceived(Coordinate coordinate);
 

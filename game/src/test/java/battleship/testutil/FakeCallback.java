@@ -21,9 +21,6 @@ public class FakeCallback implements GameModeStrategy.GameModeCallback {
     public String lastConnectionError;
 
     @Override
-    public void onOpponentReady() { opponentReadyCalled = true; }
-
-    @Override
     public void onShotReceived(Coordinate coordinate) { lastShotReceived = coordinate; }
 
     @Override

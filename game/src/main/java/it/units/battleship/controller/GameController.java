@@ -16,6 +16,7 @@ import it.units.battleship.view.core.BattleshipView;
 import it.units.battleship.Coordinate;
 import it.units.battleship.GameState;
 import it.units.battleship.Logger;
+import it.units.battleship.view.core.game.GameView;
 import lombok.NonNull;
 
 import java.util.List;
@@ -38,10 +39,10 @@ public class GameController implements GameModeStrategy.GameModeCallback, GameIn
 
         Grid opponentGrid = new Grid(fleetManager.getGridRows(), fleetManager.getGridCols());
 
-        ViewActions viewActions = new GameViewMediator(view, fleetManager, opponentGrid);
+        GameViewMediator viewMediator = new GameViewMediator(view);
         NetworkActions networkActions = new NetworkAdapter(gameMode);
 
-        this.turnManager = new TurnManager(viewActions, networkActions, fleetManager, opponentGrid);
+        this.turnManager = new TurnManager(viewMediator, viewMediator, networkActions, fleetManager, opponentGrid);
 
         view.setOpponentGridListener(new OpponentGridHandler(this));
         view.setPlayerGridListener(new PlayerGridHandler(this));
@@ -61,11 +62,6 @@ public class GameController implements GameModeStrategy.GameModeCallback, GameIn
     // ===== GameModeCallback implementation =====
 
     @Override
-    public void onOpponentReady() {
-        Logger.log("GameController: Opponent ready");
-    }
-
-    @Override
     public void onShotReceived(Coordinate coordinate) {
         Logger.log("GameController: Shot received at " + coordinate);
         turnManager.handleIncomingShot(coordinate);
@@ -80,12 +76,7 @@ public class GameController implements GameModeStrategy.GameModeCallback, GameIn
     @Override
     public void onGameStatusReceived(GameState state, String message) {
         Logger.log("GameController: game status -> " + state + " | " + message);
-
-        if (state == GameState.GAME_OVER) {
-            turnManager.handleGameOver(message);
-        } else if (state == GameState.ACTIVE_TURN || state == GameState.WAITING_FOR_OPPONENT) {
-            turnManager.handleGameStatusReceived(state);
-        }
+        turnManager.handleGameStatusReceived(state, message);
     }
 
     @Override

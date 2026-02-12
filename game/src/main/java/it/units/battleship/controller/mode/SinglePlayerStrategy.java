@@ -43,8 +43,6 @@ public class SinglePlayerStrategy implements GameModeStrategy {
         aiOpponent.placeShips();
 
         Logger.log("SinglePlayerStrategy initialized");
-
-        callback.onOpponentReady();
     }
 
     @Override
@@ -54,7 +52,7 @@ public class SinglePlayerStrategy implements GameModeStrategy {
             processPlayerShot(coordinate);
 
             if (aiFleetManager.isGameOver()) {
-                callback.onGameStatusReceived(GameState.GAME_OVER, "You win! All enemy ships destroyed!");
+                callback.onGameStatusReceived(GameState.GAME_OVER, MSG_VICTORY);
                 return;
             }
 
@@ -94,7 +92,7 @@ public class SinglePlayerStrategy implements GameModeStrategy {
     @Override
     public void notifySetupComplete() {
         Logger.log("SinglePlayerStrategy: Player setup complete, starting game");
-        callback.onGameStatusReceived(GameState.ACTIVE_TURN, "Ready to play");
+        callback.onGameStatusReceived(GameState.ACTIVE_TURN, MSG_READY_TO_PLAY);
     }
 
     @Override

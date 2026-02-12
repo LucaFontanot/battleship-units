@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 
+import static it.units.battleship.Defaults.MSG_ALREADY_SHOT;
 import static org.junit.jupiter.api.Assertions.*;
 
 class TestTurnManager {
@@ -39,9 +40,9 @@ class TestTurnManager {
         opponentGrid = new Grid(10, 10);
         fleetManager = new FleetManager(playerGrid, Map.of(ShipType.DESTROYER, 2));
 
-        GameViewMediator viewActions = new GameViewMediator(fakeView, fleetManager, opponentGrid);
+        GameViewMediator viewActions = new GameViewMediator(fakeView);
         NetworkAdapter networkActions = new NetworkAdapter(fakeGameMode);
-        manager = new TurnManager(viewActions, networkActions, fleetManager, opponentGrid);
+        manager = new TurnManager(viewActions, viewActions, networkActions, fleetManager, opponentGrid);
     }
 
     @Test
@@ -131,7 +132,7 @@ class TestTurnManager {
 
         manager.handleOpponentGridClick(target);
 
-        assertEquals("You already shot here!", fakeView.lastSystemMessage);
+        assertEquals(MSG_ALREADY_SHOT, fakeView.lastSystemMessage);
         // No shot should been fired
         assertNull(fakeGameMode.lastShotSent);
     }
@@ -210,7 +211,7 @@ class TestTurnManager {
 
     @Test
     void gameOver_forcesGameOverState() {
-        manager.handleGameOver("You lost!");
+        manager.handleGameStatusReceived(GameState.GAME_OVER,"You lost!");
 
         assertInstanceOf(GameOverState.class, manager.getCurrentState());
         assertEquals(GameState.GAME_OVER.name(), manager.getCurrentStateName());
@@ -218,7 +219,7 @@ class TestTurnManager {
 
     @Test
     void handleGameOver_showsEndGameMessage() {
-        manager.handleGameOver("Victory!");
+        manager.handleGameStatusReceived(GameState.GAME_OVER,"Victory!");
 
         assertEquals("Victory!", fakeView.lastEndGameMessage);
     }
@@ -227,7 +228,7 @@ class TestTurnManager {
     void gameStatusReceived_activeTurn_transitionCorrectly() {
         manager.transitionToWaitingSetup();
 
-        manager.handleGameStatusReceived(GameState.ACTIVE_TURN);
+        manager.handleGameStatusReceived(GameState.ACTIVE_TURN, "");
 
         assertTrue(fakeView.transitionToGamePhaseCalled);
         assertInstanceOf(ActiveTurnState.class, manager.getCurrentState());
@@ -237,7 +238,7 @@ class TestTurnManager {
     void gameStatusReceived_waitingOpponent_transitionCorrectly() {
         manager.transitionToWaitingSetup();
 
-        manager.handleGameStatusReceived(GameState.WAITING_FOR_OPPONENT);
+        manager.handleGameStatusReceived(GameState.WAITING_FOR_OPPONENT, "");
 
         assertTrue(fakeView.transitionToGamePhaseCalled);
         assertInstanceOf(WaitingOpponentState.class, manager.getCurrentState());

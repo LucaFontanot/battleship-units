@@ -41,18 +41,6 @@ public abstract class AbstractPlayerCommunication implements CommunicationEvents
         communicationEventsListeners.remove(listener);
     }
 
-    /**
-     * Notifies listeners of a player message.
-     *
-     * @param playerName the name of the player
-     * @param message    the message sent by the player
-     */
-    public void onPlayerMessage(String playerName, String message) {
-        for (CommunicationEvents listener : communicationEventsListeners) {
-            listener.onPlayerMessage(playerName, message);
-        }
-    }
-
     public void onOpponentGridUpdate(GridUpdateDTO gridUpdateDTO) {
         for (CommunicationEvents listener : communicationEventsListeners) {
             listener.onOpponentGridUpdate(gridUpdateDTO);
@@ -62,12 +50,6 @@ public abstract class AbstractPlayerCommunication implements CommunicationEvents
     public void onShotReceived(ShotRequestDTO shotRequestDTO) {
         for (CommunicationEvents listener : communicationEventsListeners) {
             listener.onShotReceived(shotRequestDTO);
-        }
-    }
-
-    public void onGameSetupReceived(GameConfigDTO gameConfigDTO) {
-        for (CommunicationEvents listener : communicationEventsListeners) {
-            listener.onGameSetupReceived(gameConfigDTO);
         }
     }
 

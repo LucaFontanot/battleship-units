@@ -22,12 +22,6 @@ public class NetworkEventsHandler implements CommunicationEvents {
         this.networkActions = networkActions;
     }
 
-
-    @Override
-    public void onPlayerMessage(String playerName, String message) {
-
-    }
-
     @Override
     public void onOpponentGridUpdate(GridUpdateDTO gridUpdateDTO) {
         Logger.log("Grid update");
@@ -44,11 +38,6 @@ public class NetworkEventsHandler implements CommunicationEvents {
 
         Coordinate shotCoord = GameDataMapper.toCoordinate(shotRequestDTO);
         networkActions.processIncomingShot(shotCoord);
-    }
-
-    @Override
-    public void onGameSetupReceived(GameConfigDTO gameConfigDTO) {
-
     }
 
     @Override

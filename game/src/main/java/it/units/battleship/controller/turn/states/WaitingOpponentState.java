@@ -4,6 +4,8 @@ import it.units.battleship.Coordinate;
 import it.units.battleship.GameState;
 import it.units.battleship.controller.turn.GameContext;
 
+import static it.units.battleship.Defaults.MSG_DEFEAT;
+
 /**
  * Represents the state where the player is waiting for the opponent's next move.
  * The state handles opponent grid updates, incoming shots.
@@ -25,7 +27,7 @@ public class WaitingOpponentState extends BaseGameState {
         boolean gameOver = processIncomingShot(coordinate);
 
         if (gameOver) {
-            stateTransitions.transitionToGameOver(false, "You lost! All your ships are sunk.");
+            stateTransitions.transitionToGameOver(false, MSG_DEFEAT);
         } else {
             stateTransitions.transitionToActiveTurn();
         }
@@ -40,7 +42,10 @@ public class WaitingOpponentState extends BaseGameState {
                 hit
         );
 
-        view.refreshPlayerGrid();
+        view.refreshPlayerGrid(
+                fleetManager.getSerializedGridState(),
+                fleetManager.getFleet()
+        );
         return fleetManager.isGameOver();
     }
 

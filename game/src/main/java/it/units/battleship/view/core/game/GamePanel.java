@@ -10,6 +10,7 @@ import lombok.Setter;
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
+import java.util.Set;
 
 /**
  * The main Swing application window (JFrame) for the Battleship game.
@@ -144,9 +145,5 @@ public class GamePanel extends JPanel implements GameView {
     @Override
     public void playerErrorSound() {
         Toolkit.getDefaultToolkit().beep();
-    }
-
-    public void showStatusMessage(String message) {
-        systemMessage.setText(message);
     }
 }

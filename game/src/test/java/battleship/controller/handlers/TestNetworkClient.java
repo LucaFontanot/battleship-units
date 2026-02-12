@@ -105,33 +105,6 @@ public class TestNetworkClient {
     }
 
     /**
-     * Tests that incoming GAME_SETUP messages are correctly parsed and listeners are notified.
-     */
-    @Test
-    void testHandleIncomingMessage_GameSetup() throws Exception {
-        Map<ShipType, Integer> fleetRules = Map.of(
-            ShipType.CARRIER, 1,
-            ShipType.BATTLESHIP, 2
-        );
-        GameConfigDTO gameConfig = new GameConfigDTO(10, 10, fleetRules);
-        WebSocketMessage<GameConfigDTO> message = new WebSocketMessage<>(
-            GameMessageType.GAME_SETUP.getType(),
-            gameConfig
-        );
-        String json = gson.toJson(message);
-
-        java.lang.reflect.Method method = NetworkClient.class.getDeclaredMethod("handleIncomingMessage", String.class);
-        method.setAccessible(true);
-        method.invoke(networkClient, json);
-
-        assertTrue(mockListener.gameSetupReceived);
-        assertNotNull(mockListener.lastGameConfig);
-        assertEquals(10, mockListener.lastGameConfig.rows());
-        assertEquals(10, mockListener.lastGameConfig.cols());
-        assertEquals(2, mockListener.lastGameConfig.fleetRules().size());
-    }
-
-    /**
      * Tests that incoming TURN_CHANGE messages are correctly parsed and listeners are notified.
      */
     @Test
@@ -166,7 +139,6 @@ public class TestNetworkClient {
 
         assertFalse(mockListener.gridUpdateReceived);
         assertFalse(mockListener.shotRequestReceived);
-        assertFalse(mockListener.gameSetupReceived);
         assertFalse(mockListener.gameStatusReceived);
     }
 
@@ -236,18 +208,11 @@ public class TestNetworkClient {
     private static class MockCommunicationEventsListener implements CommunicationEvents {
         boolean gridUpdateReceived = false;
         boolean shotRequestReceived = false;
-        boolean gameSetupReceived = false;
         boolean gameStatusReceived = false;
 
         GridUpdateDTO lastGridUpdate = null;
         ShotRequestDTO lastShotRequest = null;
-        GameConfigDTO lastGameConfig = null;
         GameStatusDTO lastGameStatus = null;
-
-        @Override
-        public void onPlayerMessage(String playerName, String message) {
-            // Not tested in this suite
-        }
 
         @Override
         public void onOpponentGridUpdate(GridUpdateDTO gridUpdateDTO) {
@@ -259,12 +224,6 @@ public class TestNetworkClient {
         public void onShotReceived(ShotRequestDTO shotRequestDTO) {
             this.shotRequestReceived = true;
             this.lastShotRequest = shotRequestDTO;
-        }
-
-        @Override
-        public void onGameSetupReceived(GameConfigDTO gameConfigDTO) {
-            this.gameSetupReceived = true;
-            this.lastGameConfig = gameConfigDTO;
         }
 
         @Override

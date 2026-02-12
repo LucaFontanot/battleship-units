@@ -12,6 +12,7 @@ import it.units.battleship.ShipType;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -96,9 +97,9 @@ public class BattleshipFrame extends JFrame implements BattleshipView {
     }
 
     @Override
-    public void showPlacementPreview(Set<Coordinate> coordinates, boolean valid, Ship previewShip) {
+    public void showPlacementPreview(LinkedHashSet<Coordinate> coordinates, boolean valid, Ship previewShip) {
         if (!inGamePhase) {
-            setupPanel.getPlayerGridUI().showPlacementPreview(coordinates, valid, previewShip);
+            setupPanel.showPlacementPreview(coordinates, valid, previewShip);
         }
     }
 
@@ -110,9 +111,9 @@ public class BattleshipFrame extends JFrame implements BattleshipView {
     @Override
     public void updatePlayerGrid(String gridSerialized, List<Ship> fleet) {
         if (inGamePhase) {
-            gamePanel.getPlayerGridUI().displayData(gridSerialized, fleet);
+            gamePanel.updatePlayerGrid(gridSerialized, fleet);
         } else {
-            setupPanel.getPlayerGridUI().displayData(gridSerialized, fleet);
+            setupPanel.updateSetupGrid(gridSerialized, fleet);
         }
     }
 
@@ -120,7 +121,7 @@ public class BattleshipFrame extends JFrame implements BattleshipView {
 
     @Override
     public void updateOpponentGrid(String gridSerialized, List<Ship> fleet) {
-        gamePanel.getOpponentGridUI().displayData(gridSerialized, fleet);
+        gamePanel.updateOpponentGrid(gridSerialized, fleet);
     }
 
     @Override
@@ -130,8 +131,7 @@ public class BattleshipFrame extends JFrame implements BattleshipView {
 
     @Override
     public void showShotPreview(Coordinate coordinate) {
-        gamePanel.getOpponentGridUI().clearPlacementPreview();
-        gamePanel.getOpponentGridUI().showPlacementPreview(Set.of(coordinate), true, null);
+        gamePanel.showShotPreview(coordinate);
     }
 
     @Override

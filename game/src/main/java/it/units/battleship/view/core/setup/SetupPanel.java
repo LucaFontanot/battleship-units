@@ -95,7 +95,7 @@ public class SetupPanel extends JPanel implements PlacementContext, SetupView {
 
     @Override
     public void showPlacementPreview(LinkedHashSet<Coordinate> coord, boolean validShip, Ship ship) {
-        getPlayerGridUI().showPlacementPreview(coord, validShip, ship);
+        playerGridUI.showPlacementPreview(coord, validShip, ship);
     }
 
     @Override
@@ -166,13 +166,6 @@ public class SetupPanel extends JPanel implements PlacementContext, SetupView {
         selectedShipType = null;
         for (JButton btn : shipButtons.values()) {
             btn.setBorder(UIManager.getBorder("Button.border"));
-        }
-    }
-
-    @Override
-    public void close() {
-        if (mainFrame != null) {
-            mainFrame.dispose();
         }
     }
 }

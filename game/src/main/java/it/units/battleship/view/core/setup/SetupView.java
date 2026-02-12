@@ -56,6 +56,4 @@ public interface SetupView {
                            Map<ShipType, Integer> fleetConfiguration);
 
     void updateSetupGrid(String gridSerialized, List<Ship> fleetToRender);
-
-    void close();
 }

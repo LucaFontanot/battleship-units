@@ -5,6 +5,7 @@ import it.units.battleship.ShipType;
 import it.units.battleship.Coordinate;
 import it.units.battleship.GameState;
 import it.units.battleship.controller.turn.GameContext;
+import it.units.battleship.controller.turn.contracts.SetupInputProvider;
 import it.units.battleship.model.Ship;
 
 import java.util.LinkedHashSet;
@@ -14,21 +15,23 @@ import java.util.LinkedHashSet;
  */
 public class SetupState extends BaseGameState {
 
-    public SetupState(GameContext ctx) {
+    private final SetupInputProvider setupInput;
+
+    public SetupState(GameContext ctx, SetupInputProvider setupInput) {
         super(ctx);
+        this.setupInput = setupInput;
     }
 
     @Override
     public void onEnter() {
         super.onEnter();
-        view.syncFleetAvailabilityUI();
         view.setPlayerTurn(true);
     }
 
     @Override
     public void handlePlayerGridClick(Coordinate coordinate) {
-        Orientation orientation = view.getSelectedOrientation();
-        ShipType shipType = view.getSelectedShipType();
+        Orientation orientation = setupInput.getSelectedOrientation();
+        ShipType shipType = setupInput.getSelectedShipType();
 
         if (shipType == null) return;
 
@@ -37,8 +40,14 @@ public class SetupState extends BaseGameState {
             boolean placed = fleetManager.addShip(ship);
 
             if (placed) {
-                view.refreshPlayerGrid();
-                view.syncFleetAvailabilityUI();
+                view.refreshPlayerGrid(
+                        fleetManager.getSerializedGridState(),
+                        fleetManager.getFleet()
+                );
+                view.syncFleetAvailabilityUI(
+                        fleetManager.getPlacedCounts(),
+                        fleetManager.getRequiredFleetConfiguration()
+                );
 
                 if (fleetManager.isFleetComplete()) {
                     stateTransitions.transitionToWaitingSetup();
@@ -50,15 +59,14 @@ public class SetupState extends BaseGameState {
             }
         } catch (IllegalArgumentException ex) {
             view.playerErrorSound();
-            LinkedHashSet<Coordinate> coords = shipType.getShipCoordinates(coordinate, orientation);
-            view.showPlacementPreview(coords, false, null);
+            showInvalidPlacement(coordinate, orientation, shipType);
         }
     }
 
     @Override
     public void handlePlayerGridHover(Coordinate coordinate) {
-        Orientation orientation = view.getSelectedOrientation();
-        ShipType shipType = view.getSelectedShipType();
+        Orientation orientation = setupInput.getSelectedOrientation();
+        ShipType shipType = setupInput.getSelectedShipType();
 
         if (shipType == null) return;
 
@@ -67,9 +75,13 @@ public class SetupState extends BaseGameState {
             boolean valid = fleetManager.canPlaceShip(ship);
             view.showPlacementPreview(ship.getCoordinates(), valid, ship);
         } catch (IllegalArgumentException ex) {
-            LinkedHashSet<Coordinate> coords = shipType.getShipCoordinates(coordinate, orientation);
-            view.showPlacementPreview(coords, false, null);
+            showInvalidPlacement(coordinate, orientation, shipType);
         }
+    }
+
+    private void showInvalidPlacement(Coordinate coordinate, Orientation orientation, ShipType shipType){
+        LinkedHashSet<Coordinate> coords = shipType.getShipCoordinates(coordinate, orientation);
+        view.showPlacementPreview(coords, false, null);
     }
 
     @Override
