@@ -45,7 +45,7 @@ public class GameViewMediator implements ViewActions {
     }
 
     @Override
-    public void refreshFleetUI() {
+    public void syncFleetAvailabilityUI() {
         Map<ShipType, Integer> placedCounts = fleetManager.getPlacedCounts();
         Map<ShipType, Integer> requiredCounts = fleetManager.getRequiredFleetConfiguration();
         view.refreshFleetSelection(placedCounts, requiredCounts);

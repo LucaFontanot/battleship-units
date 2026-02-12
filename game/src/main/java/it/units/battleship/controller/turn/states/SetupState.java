@@ -21,7 +21,7 @@ public class SetupState extends BaseGameState {
     @Override
     public void onEnter() {
         super.onEnter();
-        view.refreshFleetUI();
+        view.syncFleetAvailabilityUI();
         view.setPlayerTurn(true);
     }
 
@@ -38,7 +38,7 @@ public class SetupState extends BaseGameState {
 
             if (placed) {
                 view.refreshPlayerGrid();
-                view.refreshFleetUI();
+                view.syncFleetAvailabilityUI();
 
                 if (fleetManager.isFleetComplete()) {
                     stateTransitions.transitionToWaitingSetup();

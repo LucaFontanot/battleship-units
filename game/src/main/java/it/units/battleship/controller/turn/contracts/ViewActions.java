@@ -18,8 +18,8 @@ public interface ViewActions {
     void notifyUser(String message);
     /** repaint the player board */
     void refreshPlayerGrid();
-    /** update the fleet list view */
-    void refreshFleetUI();
+    /** update the fleet list view during the setup phase */
+    void syncFleetAvailabilityUI();
     /** show where shot will land */
     void showShotPreview(Coordinate coordinate);
     /** display final game result screen */

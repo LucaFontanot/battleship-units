@@ -39,7 +39,7 @@ public abstract class BaseGameState implements TurnState {
     public void onEnter() {
         Logger.debug("Entering state: " + getStateName());
         view.refreshPlayerGrid();
-        view.refreshFleetUI();
+        view.syncFleetAvailabilityUI();
     }
 
     @Override
