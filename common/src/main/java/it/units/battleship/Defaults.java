@@ -30,4 +30,5 @@ public class Defaults {
     public static final int MIN_DISTANCE_THRESHOLD = 1;
 
     public static final long DELAY_MS = 500;
+    public static final int MAX_ATTEMPTS = 100;
 }

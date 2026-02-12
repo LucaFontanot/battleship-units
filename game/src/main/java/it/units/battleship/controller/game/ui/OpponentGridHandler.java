@@ -7,7 +7,7 @@ import lombok.NonNull;
 
 public class OpponentGridHandler implements GridInteractionObserver {
 
-    public final GameInteractionFacade actions;
+    private final GameInteractionFacade actions;
 
     public OpponentGridHandler(@NonNull GameInteractionFacade actions) {
         this.actions = actions;
