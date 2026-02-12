@@ -3,7 +3,7 @@
 ![Top Language](https://img.shields.io/github/languages/top/LucaFontanot/battleship-units)
 ![Checks](https://img.shields.io/github/check-runs/LucaFontanot/battleship-units/master)
 ![Github All Releases](https://img.shields.io/github/downloads/LucaFontanot/battleship-units/total.svg)
-![Github Release Version](https://img.shields.io/github/package-json/v/LucaFontanot/battleship-units)
+![Github Release Version](https://img.shields.io/github/v/release/LucaFontanot/battleship-units)
 ![GitHub Release Date](https://img.shields.io/github/release-date/LucaFontanot/battleship-units)
 ![GitHub License](https://img.shields.io/github/license/LucaFontanot/battleship-units)
 
