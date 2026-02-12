@@ -13,14 +13,6 @@ import it.units.battleship.data.socket.payloads.ShotRequestDTO;
 public interface CommunicationEvents {
 
     /**
-     * Triggered when a chat message or a generic text message is received.
-     *
-     * @param playerName the name of the sender
-     * @param message    the content of the message
-     */
-    void onPlayerMessage(String playerName, String message);
-
-    /**
      * Triggered when an update about the opponent's grid state is received.
      *
      * @param gridUpdateDTO the data transfer object containing the new grid state and sunk ships
@@ -33,13 +25,6 @@ public interface CommunicationEvents {
      * @param shotRequestDTO the data transfer object containing the targeted coordinates
      */
     void onShotReceived(ShotRequestDTO shotRequestDTO);
-
-    /**
-     * Triggered when game configuration/setup data is received.
-     *
-     * @param gameConfigDTO the data transfer object containing initial game settings
-     */
-    void onGameSetupReceived(GameConfigDTO gameConfigDTO);
 
     /**
      * Triggered when a general game status update (e.g., turn change, game over) is received.
