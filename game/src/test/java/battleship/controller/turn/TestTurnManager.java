@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 
+import static it.units.battleship.Defaults.MSG_ALREADY_SHOT;
 import static org.junit.jupiter.api.Assertions.*;
 
 class TestTurnManager {
@@ -131,7 +132,7 @@ class TestTurnManager {
 
         manager.handleOpponentGridClick(target);
 
-        assertEquals("You already shot here!", fakeView.lastSystemMessage);
+        assertEquals(MSG_ALREADY_SHOT, fakeView.lastSystemMessage);
         // No shot should been fired
         assertNull(fakeGameMode.lastShotSent);
     }

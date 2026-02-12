@@ -31,4 +31,11 @@ public class Defaults {
 
     public static final long DELAY_MS = 500;
     public static final int MAX_ATTEMPTS = 100;
+
+    // --- Game Messages ---
+    public static final String MSG_WAITING_OPPONENT_SETUP = "Waiting for opponent setup...";
+    public static final String MSG_ALREADY_SHOT = "You already shot here!";
+    public static final String MSG_DEFEAT = "You lost! All your ships are sunk.";
+    public static final String MSG_VICTORY = "You win! All enemy ships destroyed!";
+    public static final String MSG_READY_TO_PLAY = "Ready to play";
 }

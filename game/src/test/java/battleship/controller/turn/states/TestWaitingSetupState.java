@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
+import static it.units.battleship.Defaults.MSG_WAITING_OPPONENT_SETUP;
 import static org.junit.jupiter.api.Assertions.*;
 
 class TestWaitingSetupState {
@@ -81,7 +82,7 @@ class TestWaitingSetupState {
         waitingSetupState.onEnter();
 
         assertFalse(fakeView.playerTurn);
-        assertEquals("Waiting for opponent setup...", fakeView.lastSystemMessage);
+        assertEquals(MSG_WAITING_OPPONENT_SETUP, fakeView.lastSystemMessage);
         assertNotNull(fakeView.lastPlacedCounts);
     }
 

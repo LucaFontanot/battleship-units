@@ -5,6 +5,8 @@ import it.units.battleship.Coordinate;
 import it.units.battleship.GameState;
 import it.units.battleship.controller.turn.GameContext;
 
+import static it.units.battleship.Defaults.MSG_ALREADY_SHOT;
+
 /**
  * Represents the state where a player's turn is active in the game.
  * This state allows the player to interact with the game board by firing shots
@@ -27,7 +29,7 @@ public class ActiveTurnState extends BaseGameState {
         CellState currentCellState = opponentGrid.getState(coordinate);
 
         if (currentCellState != CellState.EMPTY) {
-            view.notifyUser("You already shot here!");
+            view.notifyUser(MSG_ALREADY_SHOT);
             return;
         }
         network.fireShot(coordinate);
