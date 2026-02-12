@@ -40,8 +40,14 @@ public class SetupState extends BaseGameState {
             boolean placed = fleetManager.addShip(ship);
 
             if (placed) {
-                view.refreshPlayerGrid();
-                view.syncFleetAvailabilityUI();
+                view.refreshPlayerGrid(
+                        fleetManager.getSerializedGridState(),
+                        fleetManager.getFleet()
+                );
+                view.syncFleetAvailabilityUI(
+                        fleetManager.getPlacedCounts(),
+                        fleetManager.getRequiredFleetConfiguration()
+                );
 
                 if (fleetManager.isFleetComplete()) {
                     stateTransitions.transitionToWaitingSetup();

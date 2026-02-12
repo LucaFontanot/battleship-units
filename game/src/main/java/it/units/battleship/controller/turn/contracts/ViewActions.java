@@ -7,6 +7,7 @@ import it.units.battleship.model.Ship;
 
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Responsibility: Manage the UI and what user see on screen.
@@ -17,9 +18,9 @@ public interface ViewActions {
     /** show a pop up or text message */
     void notifyUser(String message);
     /** repaint the player board */
-    void refreshPlayerGrid();
+    void refreshPlayerGrid(String gridSerialized, List<Ship> fleet);
     /** update the fleet list view during the setup phase */
-    void syncFleetAvailabilityUI();
+    void syncFleetAvailabilityUI(Map<ShipType, Integer> placed, Map<ShipType, Integer> required);
     /** show where shot will land */
     void showShotPreview(Coordinate coordinate);
     /** display final game result screen */

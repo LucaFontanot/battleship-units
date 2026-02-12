@@ -40,7 +40,7 @@ class TestTurnManager {
         opponentGrid = new Grid(10, 10);
         fleetManager = new FleetManager(playerGrid, Map.of(ShipType.DESTROYER, 2));
 
-        GameViewMediator viewActions = new GameViewMediator(fakeView, fleetManager, opponentGrid);
+        GameViewMediator viewActions = new GameViewMediator(fakeView);
         NetworkAdapter networkActions = new NetworkAdapter(fakeGameMode);
         manager = new TurnManager(viewActions, viewActions, networkActions, fleetManager, opponentGrid);
     }

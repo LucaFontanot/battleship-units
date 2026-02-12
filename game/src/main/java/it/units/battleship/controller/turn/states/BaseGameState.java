@@ -38,8 +38,14 @@ public abstract class BaseGameState implements TurnState {
     @Override
     public void onEnter() {
         Logger.debug("Entering state: " + getStateName());
-        view.refreshPlayerGrid();
-        view.syncFleetAvailabilityUI();
+        view.refreshPlayerGrid(
+                fleetManager.getSerializedGridState(),
+                fleetManager.getFleet()
+        );
+        view.syncFleetAvailabilityUI(
+                fleetManager.getPlacedCounts(),
+                fleetManager.getRequiredFleetConfiguration()
+        );
     }
 
     @Override
@@ -69,6 +75,7 @@ public abstract class BaseGameState implements TurnState {
 
     @Override
     public void handleOpponentGridUpdate( String grid, List<Ship> fleet) {
+        opponentGrid.updateGridState(grid);
         view.updateOpponentGrid(grid, fleet);
     }
 

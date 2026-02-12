@@ -42,7 +42,10 @@ public class WaitingOpponentState extends BaseGameState {
                 hit
         );
 
-        view.refreshPlayerGrid();
+        view.refreshPlayerGrid(
+                fleetManager.getSerializedGridState(),
+                fleetManager.getFleet()
+        );
         return fleetManager.isGameOver();
     }
 

@@ -39,7 +39,7 @@ public class GameController implements GameModeStrategy.GameModeCallback, GameIn
 
         Grid opponentGrid = new Grid(fleetManager.getGridRows(), fleetManager.getGridCols());
 
-        GameViewMediator viewMediator = new GameViewMediator(view, fleetManager, opponentGrid);
+        GameViewMediator viewMediator = new GameViewMediator(view);
         NetworkActions networkActions = new NetworkAdapter(gameMode);
 
         this.turnManager = new TurnManager(viewMediator, viewMediator, networkActions, fleetManager, opponentGrid);

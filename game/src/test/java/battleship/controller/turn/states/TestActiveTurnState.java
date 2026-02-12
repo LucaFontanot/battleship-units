@@ -54,7 +54,7 @@ class TestActiveTurnState {
         opponentGrid = new Grid(10, 10);
         fleetManager = new FleetManager(playerGrid, Map.of(ShipType.DESTROYER, 1));
 
-        GameViewMediator viewActions = new GameViewMediator(fakeView, fleetManager, opponentGrid);
+        GameViewMediator viewActions = new GameViewMediator(fakeView);
         NetworkAdapter networkActions = new NetworkAdapter(fakeGameMode);
         GameContext context = new GameContext(viewActions, fakeTransitions, networkActions, fleetManager, opponentGrid);
         activeTurnState = new ActiveTurnState(context);
