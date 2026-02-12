@@ -14,47 +14,47 @@ public interface TurnState {
     /**
      * Called when the state is entered.
      */
-    void onEnter(TurnManager manager);
+    void onEnter();
 
     /**
      * Called when the state is exited.
      */
-    void onExit(TurnManager manager);
+    void onExit();
 
     /**
      * Handle the click on the opponent's grid.
      */
-    void handleOpponentGridClick(TurnManager manager, Coordinate coordinate);
+    void handleOpponentGridClick(Coordinate coordinate);
 
     /**
      * Handle the click on the player's grid.
      */
-    void handlePlayerGridClick(TurnManager manager, Coordinate coordinate);
+    void handlePlayerGridClick(Coordinate coordinate);
 
     /**
      * Handle the hover on the opponent's grid.
      */
-    void handleOpponentGridHover(TurnManager manager, Coordinate coordinate);
+    void handleOpponentGridHover(Coordinate coordinate);
 
     /**
      * Handle the hover on the player's grid.
      */
-    void handlePlayerGridHover(TurnManager manager, Coordinate coordinate);
+    void handlePlayerGridHover(Coordinate coordinate);
 
     /**
      * Handle incoming shots.
      */
-    void handleIncomingShot(TurnManager manager, Coordinate coordinate);
+    void handleIncomingShot(Coordinate coordinate);
 
     /**
      * Handle update for the opponent's grid.
      */
-    void handleOpponentGridUpdate(TurnManager manager, String grid, List<Ship> fleet);
+    void handleOpponentGridUpdate(String grid, List<Ship> fleet);
 
     /**
      * Handle game status updates from server (e.g., game start signal).
      */
-    void handleGameStatusReceived(TurnManager manager, GameState state);
+    void handleGameStatusReceived(GameState state);
 
     /**
      * Return the name of the state.

@@ -1,72 +1,77 @@
 package battleship.controller.turn;
 
-import it.units.battleship.controller.mode.GameModeStrategy;
-import it.units.battleship.controller.turn.TurnManager;
-import it.units.battleship.controller.turn.TurnState;
-import it.units.battleship.controller.turn.states.ActiveTurnState;
-import it.units.battleship.controller.turn.states.GameOverState;
-import it.units.battleship.controller.turn.states.SetupState;
-import it.units.battleship.model.FleetManager;
-import it.units.battleship.model.Ship;
-import it.units.battleship.view.core.BattleshipView;
+import battleship.testutil.FakeGameMode;
+import battleship.testutil.FakeView;
 import it.units.battleship.Coordinate;
+import it.units.battleship.CellState;
 import it.units.battleship.GameState;
+import it.units.battleship.Orientation;
+import it.units.battleship.ShipType;
+import it.units.battleship.controller.turn.TurnManager;
+import it.units.battleship.controller.turn.adapters.GameViewMediator;
+import it.units.battleship.controller.turn.adapters.NetworkAdapter;
+import it.units.battleship.controller.turn.states.*;
+import it.units.battleship.model.FleetManager;
+import it.units.battleship.model.Grid;
+import it.units.battleship.model.Ship;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 class TestTurnManager {
 
-    @Mock
+    private FakeView fakeView;
+    private FakeGameMode fakeGameMode;
     private FleetManager fleetManager;
-    @Mock
-    private BattleshipView view;
-    @Mock
-    private GameModeStrategy gameMode;
-
+    private Grid playerGrid;
+    private Grid opponentGrid;
     private TurnManager manager;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
+        fakeView = new FakeView();
+        fakeGameMode = new FakeGameMode();
+        playerGrid = new Grid(10, 10);
+        opponentGrid = new Grid(10, 10);
+        fleetManager = new FleetManager(playerGrid, Map.of(ShipType.DESTROYER, 2));
 
-        // Mock FleetManager methods needed by TurnManager constructor and onEnter
-        when(fleetManager.getGridRows()).thenReturn(10);
-        when(fleetManager.getGridCols()).thenReturn(10);
-        when(fleetManager.getFleet()).thenReturn(java.util.List.of());
-        when(fleetManager.getPlacedCounts()).thenReturn(java.util.Map.of());
-        when(fleetManager.getRequiredFleetConfiguration()).thenReturn(java.util.Map.of());
-        when(fleetManager.getSerializedGridState()).thenReturn("0".repeat(100));
-
-        manager = new TurnManager(fleetManager, view, gameMode);
+        GameViewMediator viewActions = new GameViewMediator(fakeView, fleetManager, opponentGrid);
+        NetworkAdapter networkActions = new NetworkAdapter(fakeGameMode);
+        manager = new TurnManager(viewActions, networkActions, fleetManager, opponentGrid);
     }
 
     @Test
     void constructor_startsInSetupState() {
-        //Manager should always start in setup
         assertNotNull(manager.getCurrentState());
-        assertTrue(manager.getCurrentState() instanceof SetupState);
+        assertInstanceOf(SetupState.class, manager.getCurrentState());
         assertEquals(GameState.SETUP.name(), manager.getCurrentStateName());
     }
 
     @Test
-    void start_setsPlayerTurnOnView() {
+    void start_entersInitialState_andNotifyView() {
         manager.start();
-        verify(view).setPlayerTurn(true);
+
+        assertTrue(fakeView.playerTurn);
+        assertNotNull(fakeView.lastPlacedCounts);
     }
 
     @Test
-    void transitionTo_replacesCurrentState() {
+    void transitionToActiveTurn_replacesCurrentState() {
         manager.transitionToActiveTurn();
 
-        assertTrue(manager.getCurrentState() instanceof ActiveTurnState);
+        assertInstanceOf(ActiveTurnState.class, manager.getCurrentState());
         assertEquals(GameState.ACTIVE_TURN.name(), manager.getCurrentStateName());
+    }
+
+    @Test
+    void transitionToActiveTurn_setsPlayerTurnTrue() {
+        manager.transitionToActiveTurn();
+
+        assertTrue(fakeView.playerTurn);
     }
 
     @Test
@@ -92,160 +97,168 @@ class TestTurnManager {
     }
 
     @Test
-    void playerGridClick_isDelegatedToState() {
-        TurnState state = mock(TurnState.class);
-        manager.transitionTo(state);
+    void playerGridClick_inSetup_placesShipOnRealGrid() {
+        fakeView.selectedShipType = ShipType.DESTROYER;
+        fakeView.selectedOrientation = Orientation.HORIZONTAL_RIGHT;
 
-        Coordinate c = new Coordinate(0, 0);
-        manager.handlePlayerGridClick(c);
+        manager.start();
+        manager.handlePlayerGridClick(new Coordinate(0, 0));
 
-        verify(state).handlePlayerGridClick(manager, c);
+        // The ship was actually placed in the FleetManager
+        assertEquals(1, fleetManager.getFleet().size());
+        assertNotNull(fakeView.lastPlayerGridSerialized);
     }
 
     @Test
-    void opponentGridClick_isDelegatedToState() {
-        TurnState state = mock(TurnState.class);
-        manager.transitionTo(state);
+    void opponentGridClick_inActiveTurn_firesRealShot() {
+        manager.transitionToActiveTurn();
 
-        Coordinate c = new Coordinate(0, 0);
-        manager.handleOpponentGridClick(c);
+        Coordinate target = new Coordinate(3, 3);
+        manager.handleOpponentGridClick(target);
 
-        verify(state).handleOpponentGridClick(manager, c);
+        // Shot was sended through the FakeGameMode
+        assertEquals(target, fakeGameMode.lastShotSent);
+        // State transitioned to WaitingOpponent
+        assertInstanceOf(WaitingOpponentState.class, manager.getCurrentState());
     }
 
     @Test
-    void playerGridHover_isDelegatedToState() {
-        TurnState state = mock(TurnState.class);
-        manager.transitionTo(state);
+    void opponentGridClick_onAlreadyShotCell_notifiesUser() {
+        manager.transitionToActiveTurn();
 
-        Coordinate c = new Coordinate(0, 0);
-        manager.handlePlayerGridHover(c);
+        Coordinate target = new Coordinate(3, 3);
+        opponentGrid.changeState(target, CellState.MISS);
 
-        verify(state).handlePlayerGridHover(manager, c);
+        manager.handleOpponentGridClick(target);
+
+        assertEquals("You already shot here!", fakeView.lastSystemMessage);
+        // No shot should been fired
+        assertNull(fakeGameMode.lastShotSent);
     }
 
     @Test
-    void opponentGridHover_isDelegatedToState() {
-        TurnState state = mock(TurnState.class);
-        manager.transitionTo(state);
+    void opponentGridHover_inActiveTurn_showPreview() {
+        manager.transitionToActiveTurn();
 
-        Coordinate c = new Coordinate(0, 0);
+        Coordinate c = new Coordinate(3, 5);
         manager.handleOpponentGridHover(c);
 
-        verify(state).handleOpponentGridHover(manager, c);
+        assertEquals(c, fakeView.lastShotPreview);
     }
 
     @Test
-    void incomingShot_isHandledByState() {
-        TurnState state = mock(TurnState.class);
-        manager.transitionTo(state);
+    void incomingShot_miss_transitionsToActiveTurn() {
+        // Place a ship and go into WaitingOpponent
+        Ship ship = Ship.createShip(new Coordinate(0, 0), Orientation.HORIZONTAL_RIGHT, ShipType.DESTROYER, playerGrid);
+        fleetManager.addShip(ship);
+        manager.transitionToWaitingOpponent();
 
-        Coordinate c = new Coordinate(0, 0);
-        manager.handleIncomingShot(c);
+        // Missed shot
+        manager.handleIncomingShot(new Coordinate(5, 5));
 
-        verify(state).handleIncomingShot(manager, c);
+        // FleetManager updated the real grid
+        assertEquals(CellState.MISS, playerGrid.getState(new Coordinate(5, 5)));
+        // Network received the grid update
+        assertNotNull(fakeGameMode.lastSentGrid);
+        assertFalse(fakeGameMode.lastSentShotOutcome);
+        // Transition to ActiveTurn (is our turn now)
+        assertInstanceOf(ActiveTurnState.class, manager.getCurrentState());
     }
 
     @Test
-    void opponentGridUpdate_isForwardedToState() {
-        TurnState state = mock(TurnState.class);
-        manager.transitionTo(state);
+    void incomingShot_hit_transitionsToActiveTurn() {
+        Ship ship = Ship.createShip(new Coordinate(0, 0), Orientation.HORIZONTAL_RIGHT, ShipType.DESTROYER, playerGrid);
+        fleetManager.addShip(ship);
+        Ship ship2 = Ship.createShip(new Coordinate(5, 5), Orientation.HORIZONTAL_RIGHT, ShipType.DESTROYER, playerGrid);
+        fleetManager.addShip(ship2);
+        manager.transitionToWaitingOpponent();
 
-        String serializedGrid = "grid_data"; // doesn't need to be realistic
-        List<Ship> ships = List.of();
+        // Shot on the ship
+        manager.handleIncomingShot(new Coordinate(0, 0));
 
-        manager.handleOpponentGridUpdate(serializedGrid, ships);
+        assertEquals(CellState.HIT, playerGrid.getState(new Coordinate(0, 0)));
+        assertTrue(fakeGameMode.lastSentShotOutcome);
+        // Game is not over because there is still another ship
+        assertInstanceOf(ActiveTurnState.class, manager.getCurrentState());
+    }
 
-        verify(state).handleOpponentGridUpdate(manager, serializedGrid, ships);
+    @Test
+    void incomingShot_sinksAllShips_transitionsToGameOver() {
+        Ship ship = Ship.createShip(new Coordinate(0, 0), Orientation.HORIZONTAL_RIGHT, ShipType.DESTROYER, playerGrid);
+        fleetManager.addShip(ship);
+        manager.transitionToWaitingOpponent();
+
+        // Sinks the entire fleet
+        for (Coordinate coord: ship.getCoordinates()){
+            manager.transitionToWaitingOpponent();
+            manager.handleIncomingShot(coord);
+        }
+
+        assertInstanceOf(GameOverState.class, manager.getCurrentState());
+    }
+
+    @Test
+    void opponentGridUpdate_isForwardedToView() {
+        String gridData = "0".repeat(100);
+        List<Ship> fleet = List.of();
+
+        manager.handleOpponentGridUpdate(gridData, fleet);
+
+        assertEquals(gridData, fakeView.lastOpponentGridSerialized);
+        assertEquals(fleet, fakeView.lastOpponentFleet);
     }
 
     @Test
     void gameOver_forcesGameOverState() {
-        manager.handleGameOver("You lost!"); // message currently ignored internally
+        manager.handleGameOver("You lost!");
 
-        assertTrue(manager.getCurrentState() instanceof GameOverState);
+        assertInstanceOf(GameOverState.class, manager.getCurrentState());
         assertEquals(GameState.GAME_OVER.name(), manager.getCurrentStateName());
     }
 
     @Test
-    void gameStatusReceived_isDelegatedToState() {
-        TurnState state = mock(TurnState.class);
-        manager.transitionTo(state);
+    void handleGameOver_showsEndGameMessage() {
+        manager.handleGameOver("Victory!");
+
+        assertEquals("Victory!", fakeView.lastEndGameMessage);
+    }
+
+    @Test
+    void gameStatusReceived_activeTurn_transitionCorrectly() {
+        manager.transitionToWaitingSetup();
 
         manager.handleGameStatusReceived(GameState.ACTIVE_TURN);
 
-        verify(state).handleGameStatusReceived(manager, GameState.ACTIVE_TURN);
+        assertTrue(fakeView.transitionToGamePhaseCalled);
+        assertInstanceOf(ActiveTurnState.class, manager.getCurrentState());
     }
 
     @Test
-    void setupComplete_callsCallbackIfPresent() {
-        TurnManager.SetupCompleteCallback callback =
-                mock(TurnManager.SetupCompleteCallback.class);
+    void gameStatusReceived_waitingOpponent_transitionCorrectly() {
+        manager.transitionToWaitingSetup();
 
-        manager.setSetupCompleteCallback(callback);
-        manager.onSetupComplete();
+        manager.handleGameStatusReceived(GameState.WAITING_FOR_OPPONENT);
 
-        verify(callback).onSetupComplete();
+        assertTrue(fakeView.transitionToGamePhaseCalled);
+        assertInstanceOf(WaitingOpponentState.class, manager.getCurrentState());
     }
 
     @Test
-    void setupComplete_withoutCallback_doesNotCrash() {
-        // defensive test: nothing should explode here
-        assertDoesNotThrow(() -> manager.onSetupComplete());
-    }
+    void placingAllShips_completesFleet_andTransitionToWaitingSetup() {
+        fakeView.selectedShipType = ShipType.DESTROYER;
+        fakeView.selectedOrientation = Orientation.HORIZONTAL_RIGHT;
+        manager.start();
 
-    @Test
-    void requestShot_mapsToOpponentGridClick() {
-        TurnState state = mock(TurnState.class);
-        manager.transitionTo(state);
+        // Place the first DESTROYER
+        manager.handlePlayerGridClick(new Coordinate(0, 0));
+        assertInstanceOf(SetupState.class, manager.getCurrentState());
 
-        Coordinate c = new Coordinate(0, 0);
-        manager.requestShot(c);
+        // Place second DESTROYER -> fleet is completed
+        manager.handlePlayerGridClick(new Coordinate(3, 3));
 
-        verify(state).handleOpponentGridClick(manager, c);
-    }
-
-    @Test
-    void requestShipPlacement_mapsToPlayerGridClick() {
-        TurnState state = mock(TurnState.class);
-        manager.transitionTo(state);
-
-        Coordinate c = new Coordinate(0, 0);
-        manager.requestShipPlacement(c);
-
-        verify(state).handlePlayerGridClick(manager, c);
-    }
-
-    @Test
-    void requestPlacementPreview_mapsToPlayerHover() {
-        TurnState state = mock(TurnState.class);
-        manager.transitionTo(state);
-
-        Coordinate c = new Coordinate(0, 0);
-        manager.requestPlacementPreview(c);
-
-        verify(state).handlePlayerGridHover(manager, c);
-    }
-
-    @Test
-    void previewShot_mapsToOpponentHover() {
-        TurnState state = mock(TurnState.class);
-        manager.transitionTo(state);
-
-        Coordinate c = new Coordinate(0, 0);
-        manager.previewShot(c);
-
-        verify(state).handleOpponentGridHover(manager, c);
-    }
-
-    @Test
-    void getters_returnInjectedDependencies() {
-        // basic getters test – boring but useful when refactoring
-        assertNotNull(manager.getOpponentGrid());
-        assertEquals(10, manager.getOpponentGrid().getRow());
-        assertEquals(10, manager.getOpponentGrid().getCol());
-        assertEquals(fleetManager, manager.getFleetManager());
-        assertEquals(view, manager.getView());
-        assertEquals(gameMode, manager.getGameModeStrategy());
+        // Fleet is complete: transition to WaitingSetup
+        assertInstanceOf(WaitingSetupState.class, manager.getCurrentState());
+        assertTrue(fakeGameMode.setupCompleteNotified);
+        assertEquals(2, fleetManager.getFleet().size());
     }
 }

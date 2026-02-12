@@ -21,7 +21,7 @@ public class SimpleAIOpponent implements AIOpponent {
 
     private final Set<Coordinate> shotsFired = new HashSet<>();
 
-    private List<Ship> opponentFleetManager = new ArrayList<>();
+    private List<Ship> opponentFleet = new ArrayList<>();
 
     public SimpleAIOpponent(Grid grid, FleetManager fleetManager) {
         this.grid = grid;
@@ -64,7 +64,7 @@ public class SimpleAIOpponent implements AIOpponent {
     public Coordinate calculateNextShot() {
 
         // Check if we have hit but not sunk a ship, if so we can try to find the rest of the ship
-        for (Ship ship : opponentFleetManager) {
+        for (Ship ship : opponentFleet) {
             if (!ship.isSunk() && !ship.getHitCoordinates().isEmpty()) {
                 for (Coordinate hitCoord : ship.getHitCoordinates()) {
                     shotsFired.add(hitCoord);
@@ -80,8 +80,8 @@ public class SimpleAIOpponent implements AIOpponent {
         // Otherwise shoot randomly
         Coordinate shot;
         do {
-            int row = random.nextInt(10);
-            int col = random.nextInt(10);
+            int row = random.nextInt(grid.getRow());
+            int col = random.nextInt(grid.getCol());
             shot = new Coordinate(row, col);
         } while (shotsFired.contains(shot));
 
@@ -91,7 +91,7 @@ public class SimpleAIOpponent implements AIOpponent {
 
     @Override
     public void processLastShotResult(Grid grid, List<Ship> fleet, boolean shotOutcome) {
-        this.opponentFleetManager = fleet;
+        this.opponentFleet = fleet;
     }
 
     private Coordinate getRandomAdjacentCoordinate(Coordinate coord) {
