@@ -14,12 +14,12 @@ public class Main {
         System.setProperty("programPath", PathManager.getProgramPath().resolve("logs").toAbsolutePath().normalize().toString());
         try {
             CommandLineService cls = new CommandLineService(args);
+            Logger.setDebugEnabled(cls.isDebugEnabled());
             if (cls.isHelpRequested()) {
                 cls.printHelp();
             } else if (cls.isVersionRequested()) {
                 System.out.println("Battleship Server Version: " + BuildConstants.VERSION);
             } else {
-                Logger.setDebugEnabled(true);
                 ThemeSelector.selectAutomaticTheme();
                 new WelcomeUi().show();
             }

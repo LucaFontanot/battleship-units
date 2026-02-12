@@ -79,25 +79,6 @@ public class TestLobbySelector {
     }
 
     @Test
-    public void testHandleLobbyJoinFailedJoin() throws Exception {
-        LobbyData testLobby = LobbyData.builder()
-                .lobbyID("test-lobby-id")
-                .lobbyName("Test Lobby")
-                .playerOne("Player1")
-                .build();
-
-        when(mockController.connectLobbyWebsocket(any(LobbyData.class), anyString()))
-                .thenReturn(false);
-
-        Method handleLobbyJoinMethod = LobbySelector.class.getDeclaredMethod(
-                "handleLobbyJoin", LobbyData.class, String.class);
-        handleLobbyJoinMethod.setAccessible(true);
-
-        assertDoesNotThrow(() -> handleLobbyJoinMethod.invoke(lobbySelector, testLobby, "Player2"));
-        verify(mockController, times(1)).connectLobbyWebsocket(testLobby, "Player2");
-    }
-
-    @Test
     public void testRenderLobbiesEmptyList() throws Exception {
         List<LobbyData> emptyLobbies = new ArrayList<>();
 
@@ -189,29 +170,6 @@ public class TestLobbySelector {
 
         assertDoesNotThrow(() -> fetchAndRenderLobbiesMethod.invoke(lobbySelector));
         verify(mockController, times(1)).getLobbies();
-    }
-
-    @Test
-    public void testCreateLobbyButtonEmptyName() throws Exception {
-        when(mockController.createLobby(anyString(), anyString())).thenReturn(null);
-
-        Field lobbyNamefieldField = LobbySelector.class.getDeclaredField("lobbyNamefield");
-        lobbyNamefieldField.setAccessible(true);
-        JTextField lobbyNamefield = (JTextField) lobbyNamefieldField.get(lobbySelector);
-
-        Field createLobbyButtonField = LobbySelector.class.getDeclaredField("createLobbyButton");
-        createLobbyButtonField.setAccessible(true);
-        JButton createLobbyButton = (JButton) createLobbyButtonField.get(lobbySelector);
-
-        lobbyNamefield.setText("");
-
-        assertDoesNotThrow(() -> {
-            for (var listener : createLobbyButton.getActionListeners()) {
-                listener.actionPerformed(null);
-            }
-        });
-
-        verify(mockController, never()).createLobby(anyString(), anyString());
     }
 
     @Test

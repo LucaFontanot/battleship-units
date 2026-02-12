@@ -16,6 +16,7 @@ public class CommandLineService {
 
     /**
      * Constructs a CommandLineService and parses the provided arguments.
+     *
      * @param args the command-line arguments
      * @throws ParseException if there is an error parsing the arguments
      */
@@ -31,18 +32,21 @@ public class CommandLineService {
         options.addOption("h", "help", false, "Show help");
         options.addOption("p", "port", true, "Webserver port number");
         options.addOption("v", "version", false, "Show version");
+        options.addOption("d", "debug", false, "Enable debug mode");
     }
 
     /**
      * Checks if help was requested.
+     *
      * @return true if help was requested, false otherwise
      */
-    public boolean isHelpRequested(){
+    public boolean isHelpRequested() {
         return cmd.hasOption("h");
     }
 
     /**
      * Checks if version information was requested.
+     *
      * @return true if version information was requested, false otherwise
      */
     public boolean isVersionRequested() {
@@ -50,7 +54,17 @@ public class CommandLineService {
     }
 
     /**
+     * Checks if debug mode is enabled.
+     *
+     * @return true if debug mode is enabled, false otherwise
+     */
+    public boolean isDebugEnabled() {
+        return cmd.hasOption("d");
+    }
+
+    /**
      * Gets the server port number.
+     *
      * @return the server port number, or 443 if not specified or invalid
      */
     public int getServerPort() {
@@ -67,6 +81,7 @@ public class CommandLineService {
 
     /**
      * Prints the help message.
+     *
      * @throws IOException if an I/O error occurs
      */
     public void printHelp() throws IOException {

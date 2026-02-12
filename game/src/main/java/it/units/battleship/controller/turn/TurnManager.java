@@ -244,7 +244,7 @@ public class TurnManager implements GameInteractionFacade {
     /**
      * Transitions to the given state.
      */
-    void transitionTo(@NonNull TurnState newState) {
+    public void transitionTo(@NonNull TurnState newState) {
         Logger.log("TurnManager: " + currentState.getStateName() + " -> " + newState.getStateName());
         currentState.onExit(this);
         currentState = newState;
