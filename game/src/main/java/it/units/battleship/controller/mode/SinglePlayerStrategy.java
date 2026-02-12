@@ -51,11 +51,7 @@ public class SinglePlayerStrategy implements GameModeStrategy {
     @Override
     public void sendShot(Coordinate coordinate) {
         executor.submit(() -> {
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
+            simulatedDelay(500);
 
             boolean hit = aiFleetManager.handleIncomingShot(coordinate);
 
@@ -78,6 +74,14 @@ public class SinglePlayerStrategy implements GameModeStrategy {
             Coordinate aiShot = aiOpponent.calculateNextShot();
             callback.onShotReceived(aiShot);
         });
+    }
+
+    private void simulatedDelay(long millis){
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     @Override
