@@ -1,6 +1,7 @@
 package it.units.battleship.controller.turn.states;
 
 import it.units.battleship.GameState;
+import it.units.battleship.Logger;
 import it.units.battleship.controller.turn.GameContext;
 
 import static it.units.battleship.Defaults.MSG_WAITING_OPPONENT_SETUP;
@@ -42,6 +43,8 @@ public class WaitingSetupState extends BaseGameState {
             stateTransitions.transitionToActiveTurn();
         } else if (state == GameState.WAITING_FOR_OPPONENT) {
             stateTransitions.transitionToWaitingOpponent();
+        }else {
+            Logger.error("Unaspected state received " + state.name());
         }
     }
 }
