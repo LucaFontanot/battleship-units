@@ -53,7 +53,7 @@ class TestSetupState {
         GameViewMediator viewActions = new GameViewMediator(fakeView, fleetManager, opponentGrid);
         NetworkAdapter networkActions = new NetworkAdapter(fakeGameMode);
         GameContext context = new GameContext(viewActions, fakeTransitions, networkActions, fleetManager, opponentGrid);
-        setupState = new SetupState(context);
+        setupState = new SetupState(context, viewActions);
     }
 
     @Test
@@ -113,7 +113,7 @@ class TestSetupState {
         GameViewMediator viewActions = new GameViewMediator(fakeView, fm, opponentGrid);
         NetworkAdapter networkActions = new NetworkAdapter(fakeGameMode);
         GameContext context = new GameContext(viewActions, fakeTransitions, networkActions, fm, opponentGrid);
-        setupState = new SetupState(context);
+        setupState = new SetupState(context, viewActions);
     }
 
     @Test

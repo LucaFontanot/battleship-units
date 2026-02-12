@@ -16,6 +16,7 @@ import it.units.battleship.view.core.BattleshipView;
 import it.units.battleship.Coordinate;
 import it.units.battleship.GameState;
 import it.units.battleship.Logger;
+import it.units.battleship.view.core.game.GameView;
 import lombok.NonNull;
 
 import java.util.List;
@@ -38,10 +39,10 @@ public class GameController implements GameModeStrategy.GameModeCallback, GameIn
 
         Grid opponentGrid = new Grid(fleetManager.getGridRows(), fleetManager.getGridCols());
 
-        ViewActions viewActions = new GameViewMediator(view, fleetManager, opponentGrid);
+        GameViewMediator viewMediator = new GameViewMediator(view, fleetManager, opponentGrid);
         NetworkActions networkActions = new NetworkAdapter(gameMode);
 
-        this.turnManager = new TurnManager(viewActions, networkActions, fleetManager, opponentGrid);
+        this.turnManager = new TurnManager(viewMediator, viewMediator, networkActions, fleetManager, opponentGrid);
 
         view.setOpponentGridListener(new OpponentGridHandler(this));
         view.setPlayerGridListener(new PlayerGridHandler(this));

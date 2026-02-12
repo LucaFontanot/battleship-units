@@ -5,6 +5,7 @@ import it.units.battleship.ShipType;
 import it.units.battleship.Coordinate;
 import it.units.battleship.GameState;
 import it.units.battleship.controller.turn.GameContext;
+import it.units.battleship.controller.turn.contracts.SetupInputProvider;
 import it.units.battleship.model.Ship;
 
 import java.util.LinkedHashSet;
@@ -14,8 +15,11 @@ import java.util.LinkedHashSet;
  */
 public class SetupState extends BaseGameState {
 
-    public SetupState(GameContext ctx) {
+    private final SetupInputProvider setupInput;
+
+    public SetupState(GameContext ctx, SetupInputProvider setupInput) {
         super(ctx);
+        this.setupInput = setupInput;
     }
 
     @Override
@@ -27,8 +31,8 @@ public class SetupState extends BaseGameState {
 
     @Override
     public void handlePlayerGridClick(Coordinate coordinate) {
-        Orientation orientation = view.getSelectedOrientation();
-        ShipType shipType = view.getSelectedShipType();
+        Orientation orientation = setupInput.getSelectedOrientation();
+        ShipType shipType = setupInput.getSelectedShipType();
 
         if (shipType == null) return;
 
@@ -57,8 +61,8 @@ public class SetupState extends BaseGameState {
 
     @Override
     public void handlePlayerGridHover(Coordinate coordinate) {
-        Orientation orientation = view.getSelectedOrientation();
-        ShipType shipType = view.getSelectedShipType();
+        Orientation orientation = setupInput.getSelectedOrientation();
+        ShipType shipType = setupInput.getSelectedShipType();
 
         if (shipType == null) return;
 

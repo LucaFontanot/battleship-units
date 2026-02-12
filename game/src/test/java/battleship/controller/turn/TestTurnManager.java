@@ -41,7 +41,7 @@ class TestTurnManager {
 
         GameViewMediator viewActions = new GameViewMediator(fakeView, fleetManager, opponentGrid);
         NetworkAdapter networkActions = new NetworkAdapter(fakeGameMode);
-        manager = new TurnManager(viewActions, networkActions, fleetManager, opponentGrid);
+        manager = new TurnManager(viewActions, viewActions, networkActions, fleetManager, opponentGrid);
     }
 
     @Test

@@ -3,6 +3,7 @@ package it.units.battleship.controller.turn.adapters;
 import it.units.battleship.Coordinate;
 import it.units.battleship.Orientation;
 import it.units.battleship.ShipType;
+import it.units.battleship.controller.turn.contracts.SetupInputProvider;
 import it.units.battleship.controller.turn.contracts.ViewActions;
 import it.units.battleship.model.FleetManager;
 import it.units.battleship.model.Grid;
@@ -14,7 +15,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
-public class GameViewMediator implements ViewActions {
+public class GameViewMediator implements ViewActions, SetupInputProvider {
 
     private final BattleshipView view;
     private final FleetManager fleetManager;

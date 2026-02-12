@@ -32,9 +32,4 @@ public interface ViewActions {
     void playerErrorSound();
     /** show ship ghost before place it */
     void showPlacementPreview(LinkedHashSet<Coordinate> coordinates, boolean valid, Ship ship);
-
-    /** get which ship is select in UI */
-    ShipType getSelectedShipType();
-    /** get the current rotate orientation */
-    Orientation getSelectedOrientation();
 }

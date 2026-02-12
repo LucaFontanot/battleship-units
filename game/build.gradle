@@ -3,7 +3,7 @@ plugins{
 }
 
 application {
-    mainClass = 'it.units.battleship.Main'
+    mainClass = 'battleship.Main'
 }
 
 dependencies {
