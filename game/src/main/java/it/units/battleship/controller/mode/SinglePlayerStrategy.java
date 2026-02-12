@@ -52,13 +52,7 @@ public class SinglePlayerStrategy implements GameModeStrategy {
     public void sendShot(Coordinate coordinate) {
         executor.submit(() -> {
             simulatedDelay(500);
-
-            boolean hit = aiFleetManager.handleIncomingShot(coordinate);
-
-            String gridSerialized = GridMapper.serialize(aiGrid.getGrid());
-            List<Ship> aiFleet = aiFleetManager.getFleet().stream().filter(Ship::isSunk).collect(Collectors.toUnmodifiableList());
-
-            callback.onGridUpdateReceived(gridSerialized, aiFleet);
+            processPlayerShot(coordinate);
 
             if (aiFleetManager.isGameOver()) {
                 callback.onGameStatusReceived(GameState.GAME_OVER, "You win! All enemy ships destroyed!");
@@ -74,6 +68,15 @@ public class SinglePlayerStrategy implements GameModeStrategy {
             Coordinate aiShot = aiOpponent.calculateNextShot();
             callback.onShotReceived(aiShot);
         });
+    }
+
+    private void processPlayerShot(Coordinate coordinate){
+        boolean hit = aiFleetManager.handleIncomingShot(coordinate);
+
+        String gridSerialized = GridMapper.serialize(aiGrid.getGrid());
+        List<Ship> aiFleet = aiFleetManager.getFleet().stream().filter(Ship::isSunk).collect(Collectors.toUnmodifiableList());
+
+        callback.onGridUpdateReceived(gridSerialized, aiFleet);
     }
 
     private void simulatedDelay(long millis){
