@@ -7,6 +7,7 @@ import it.units.battleship.controller.game.actions.GridInteractionObserver;
 import it.units.battleship.model.Ship;
 import it.units.battleship.view.core.BattleshipView;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -55,7 +56,7 @@ public class FakeView implements BattleshipView {
     @Override
     public Orientation getSelectedOrientation() { return selectedOrientation; }
     @Override
-    public void showPlacementPreview(Set<Coordinate> coordinates, boolean valid, Ship previewShip) {
+    public void showPlacementPreview(LinkedHashSet<Coordinate> coordinates, boolean valid, Ship previewShip) {
         lastPlacementCoords = coordinates;
         lastPlacementValid = valid;
         lastPreviewShip = previewShip;

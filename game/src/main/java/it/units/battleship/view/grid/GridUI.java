@@ -147,14 +147,6 @@ public class GridUI extends JPanel implements CellInteractionListener {
         observer.onGridClick(coordinate);
     }
 
-    public void markSelected(Set<Coordinate> coords) {
-        for (Coordinate c : coords) {
-            if (c.row() >= 0 && c.row() < rows && c.col() >= 0 && c.col() < cols) {
-                cells[c.row()][c.col()].setSelected(true);
-            }
-        }
-    }
-
     public void placeShip(Ship ship) {
         for (Coordinate c : ship.getCoordinates()) {
             if (c.row() < 0 || c.row() >= rows || c.col() < 0 || c.col() >= cols) continue;
@@ -178,14 +170,5 @@ public class GridUI extends JPanel implements CellInteractionListener {
         }
         revalidate();
         repaint();
-    }
-
-
-    public void clearSelected() {
-        for (CellPanel[] row : cells) {
-            for (CellPanel cell : row) {
-                cell.setSelected(false);
-            }
-        }
     }
 }

@@ -95,7 +95,7 @@ public class TestBattleshipFrame {
         Grid grid = new Grid(10, 10);
         Ship ship = Ship.createShip(new Coordinate(0, 0), Orientation.HORIZONTAL_RIGHT,
                 ShipType.DESTROYER, grid);
-        Set<Coordinate> coords = new HashSet<>();
+        LinkedHashSet<Coordinate> coords = new LinkedHashSet<>();
         coords.add(new Coordinate(0, 0));
         coords.add(new Coordinate(0, 1));
 
@@ -108,7 +108,7 @@ public class TestBattleshipFrame {
         Grid grid = new Grid(10, 10);
         Ship ship = Ship.createShip(new Coordinate(0, 0), Orientation.HORIZONTAL_RIGHT,
                 ShipType.DESTROYER, grid);
-        Set<Coordinate> coords = new HashSet<>();
+        LinkedHashSet<Coordinate> coords = new LinkedHashSet<>();
         coords.add(new Coordinate(9, 9));
 
         assertDoesNotThrow(() -> battleshipFrame.showPlacementPreview(coords, false, ship),
