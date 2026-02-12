@@ -2,7 +2,7 @@ package it.units.battleship.view.core.setup;
 
 import it.units.battleship.controller.game.actions.GridInteractionObserver;
 import it.units.battleship.model.Ship;
-import it.units.battleship.utils.DimensionsUtils;
+import it.units.battleship.view.utils.DimensionsUtils;
 import it.units.battleship.view.grid.GridUI;
 import it.units.battleship.Coordinate;
 import it.units.battleship.Logger;

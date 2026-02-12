@@ -1,7 +1,5 @@
 # Battleship Game
 
-[Screenshot principale del gioco]
-
 Battleship is a classic two-player strategy game where players take turns guessing the locations of each other's ships on a grid. The objective is to sink all of the opponent's ships before they sink yours.
 
 This modern implementation features a full client-server architecture with also single player capabilities.

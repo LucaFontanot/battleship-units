@@ -1,6 +1,7 @@
 package it.units.battleship.controller.mode;
 
 import it.units.battleship.controller.game.actions.NetworkActionsReceiver;
+import it.units.battleship.controller.game.network.AbstractPlayerCommunication;
 import it.units.battleship.controller.game.network.NetworkClient;
 import it.units.battleship.controller.game.network.NetworkEventsHandler;
 import it.units.battleship.model.Grid;
@@ -17,38 +18,38 @@ import java.util.List;
  */
 public class OnlineMultiplayerStrategy implements GameModeStrategy {
 
-    private final NetworkClient networkClient;
+    private final AbstractPlayerCommunication network;
 
-    public OnlineMultiplayerStrategy(NetworkClient networkClient) {
-        this.networkClient = networkClient;
+    public OnlineMultiplayerStrategy(AbstractPlayerCommunication network) {
+        this.network = network;
     }
 
     @Override
     public void initialize(GameModeCallback callback) {
         NetworkActionsReceiver inputActions = new OnlineMultiplayerInputHandler(callback);
-        networkClient.addCommunicationEventsListener(new NetworkEventsHandler(inputActions));
+        network.addCommunicationEventsListener(new NetworkEventsHandler(inputActions));
 
         Logger.log("OnlineMultiplayerStrategy initialized");
     }
 
     @Override
     public void sendShot(Coordinate coordinate) {
-        networkClient.sendShotRequest(coordinate);
+        network.sendShotRequest(coordinate);
     }
 
     @Override
     public void sendGridUpdate(Grid grid, List<Ship> fleet, boolean shotOutcome) {
-        networkClient.sendGridUpdate(grid, fleet, shotOutcome);
+        network.sendGridUpdate(grid, fleet, shotOutcome);
     }
 
     @Override
     public void sendGameOver(String message) {
-        networkClient.sendGameStatus(GameState.GAME_OVER, message);
+        network.sendGameStatus(GameState.GAME_OVER, message);
     }
 
     @Override
     public void notifySetupComplete() {
-        networkClient.sendGameStatus(GameState.WAITING_SETUP, "Ready to play");
+        network.sendGameStatus(GameState.WAITING_SETUP, "Ready to play");
     }
 
     @Override

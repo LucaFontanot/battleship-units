@@ -1,4 +1,4 @@
-package it.units.battleship.utils;
+package it.units.battleship.view.utils;
 
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLightLaf;

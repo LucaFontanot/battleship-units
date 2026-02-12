@@ -13,6 +13,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
+import static it.units.battleship.Defaults.*;
+
 /**
  * Represents the single-player strategy for the game.
  * Handles interactions between the player and an AI opponent.
@@ -34,7 +36,7 @@ public class SinglePlayerStrategy implements GameModeStrategy {
     public void initialize(GameModeCallback callback) {
         this.callback = callback;
 
-        this.aiGrid = new Grid(10, 10);
+        this.aiGrid = new Grid(GRID_ROWS, GRID_COLS);
         this.aiFleetManager = new FleetManager(aiGrid, requiredFleetConfiguration);
         this.aiOpponent = new SimpleAIOpponent(aiGrid, aiFleetManager);
 
@@ -48,33 +50,35 @@ public class SinglePlayerStrategy implements GameModeStrategy {
     @Override
     public void sendShot(Coordinate coordinate) {
         executor.submit(() -> {
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-
-            boolean hit = aiFleetManager.handleIncomingShot(coordinate);
-
-            String gridSerialized = GridMapper.serialize(aiGrid.getGrid());
-            List<Ship> aiFleet = aiFleetManager.getFleet().stream().filter(Ship::isSunk).collect(Collectors.toUnmodifiableList());
-
-            callback.onGridUpdateReceived(gridSerialized, aiFleet);
+            simulatedDelay(DELAY_MS);
+            processPlayerShot(coordinate);
 
             if (aiFleetManager.isGameOver()) {
                 callback.onGameStatusReceived(GameState.GAME_OVER, "You win! All enemy ships destroyed!");
                 return;
             }
 
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-
+            simulatedDelay(DELAY_MS);
             Coordinate aiShot = aiOpponent.calculateNextShot();
             callback.onShotReceived(aiShot);
         });
+    }
+
+    private void processPlayerShot(Coordinate coordinate){
+        boolean hit = aiFleetManager.handleIncomingShot(coordinate);
+
+        String gridSerialized = GridMapper.serialize(aiGrid.getGrid());
+        List<Ship> aiFleet = aiFleetManager.getFleet().stream().filter(Ship::isSunk).collect(Collectors.toUnmodifiableList());
+
+        callback.onGridUpdateReceived(gridSerialized, aiFleet);
+    }
+
+    private void simulatedDelay(long millis){
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     @Override

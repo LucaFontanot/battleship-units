@@ -1,29 +1,63 @@
 package battleship.controller.turn.states;
 
-import it.units.battleship.controller.turn.TurnManager;
+import battleship.testutil.FakeGameMode;
+import battleship.testutil.FakeView;
 import it.units.battleship.CellState;
 import it.units.battleship.Coordinate;
 import it.units.battleship.GameState;
+import it.units.battleship.ShipType;
+import it.units.battleship.controller.turn.GameContext;
+import it.units.battleship.controller.turn.adapters.GameViewMediator;
+import it.units.battleship.controller.turn.adapters.NetworkAdapter;
+import it.units.battleship.controller.turn.contracts.StateTransitions;
 import it.units.battleship.controller.turn.states.ActiveTurnState;
+import it.units.battleship.model.FleetManager;
+import it.units.battleship.model.Grid;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 class TestActiveTurnState {
 
-    @Mock
-    private TurnManager mockTurnManager;
+    private static class FakeTransitions implements StateTransitions {
+        boolean transitionedToActiveTurn;
+        boolean transitionedToWaitingOpponent;
+        boolean transitionedToWaitingSetup;
+        boolean transitionedToGameOver;
 
+        @Override
+        public void transitionToActiveTurn() { transitionedToActiveTurn = true; }
+        @Override
+        public void transitionToWaitingOpponent() { transitionedToWaitingOpponent = true; }
+        @Override
+        public void transitionToWaitingSetup() { transitionedToWaitingSetup = true; }
+        @Override
+        public void transitionToGameOver(boolean won, String message) { transitionedToGameOver = true; }
+    }
+
+    private FakeView fakeView;
+    private FakeGameMode fakeGameMode;
+    private FakeTransitions fakeTransitions;
+    private FleetManager fleetManager;
+    private Grid opponentGrid;
     private ActiveTurnState activeTurnState;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-        activeTurnState = new ActiveTurnState();
+        fakeView = new FakeView();
+        fakeGameMode = new FakeGameMode();
+        fakeTransitions = new FakeTransitions();
+        Grid playerGrid = new Grid(10, 10);
+        opponentGrid = new Grid(10, 10);
+        fleetManager = new FleetManager(playerGrid, Map.of(ShipType.DESTROYER, 1));
+
+        GameViewMediator viewActions = new GameViewMediator(fakeView, fleetManager, opponentGrid);
+        NetworkAdapter networkActions = new NetworkAdapter(fakeGameMode);
+        GameContext context = new GameContext(viewActions, fakeTransitions, networkActions, fleetManager, opponentGrid);
+        activeTurnState = new ActiveTurnState(context);
     }
 
     @Test
@@ -43,44 +77,41 @@ class TestActiveTurnState {
 
     @Test
     void testOnEnterSetsPlayerTurnTrue() {
-        activeTurnState.onEnter(mockTurnManager);
+        activeTurnState.onEnter();
 
-        verify(mockTurnManager).setPlayerTurn(true);
-        verify(mockTurnManager).refreshUI();
+        assertTrue(fakeView.playerTurn);
+        assertNotNull(fakeView.lastPlacedCounts);
     }
 
     @Test
     void testHandleOpponentGridClickSendsShotAndTransitions() {
         Coordinate coord = new Coordinate(0, 0);
-        when(mockTurnManager.getOpponentCellState(coord)).thenReturn(CellState.EMPTY);
+        // opponentGrid is empty by default
 
-        activeTurnState.handleOpponentGridClick(mockTurnManager, coord);
+        activeTurnState.handleOpponentGridClick(coord);
 
-        verify(mockTurnManager).executeShot(coord);
-        verify(mockTurnManager).transitionToWaitingOpponent();
+        assertEquals(coord, fakeGameMode.lastShotSent);
+        assertTrue(fakeTransitions.transitionedToWaitingOpponent);
     }
 
     @Test
     void testHandleOpponentGridClickWhenAlreadyShotBlocksShot() {
         Coordinate coord = new Coordinate(1, 1);
-        when(mockTurnManager.getOpponentCellState(coord)).thenReturn(CellState.HIT);
+        opponentGrid.changeState(coord, CellState.HIT);
 
-        activeTurnState.handleOpponentGridClick(mockTurnManager, coord);
+        activeTurnState.handleOpponentGridClick(coord);
 
-        // Should not send shot
-        verify(mockTurnManager, never()).executeShot(any());
-        // Should not transition
-        verify(mockTurnManager, never()).transitionToWaitingOpponent();
-        // Show error message
-        verify(mockTurnManager).notifyUser(contains("already shot"));
+        assertNull(fakeGameMode.lastShotSent);
+        assertFalse(fakeTransitions.transitionedToWaitingOpponent);
+        assertTrue(fakeView.lastSystemMessage.contains("already shot"));
     }
 
     @Test
     void testHandleOpponentGridHoverShowsShotPreview() {
         Coordinate coord = new Coordinate(3, 5);
 
-        activeTurnState.handleOpponentGridHover(mockTurnManager, coord);
+        activeTurnState.handleOpponentGridHover(coord);
 
-        verify(mockTurnManager).renderShotPreview(coord);
+        assertEquals(coord, fakeView.lastShotPreview);
     }
 }
