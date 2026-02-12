@@ -54,8 +54,7 @@ public class SetupState extends BaseGameState {
             }
         } catch (IllegalArgumentException ex) {
             view.playerErrorSound();
-            LinkedHashSet<Coordinate> coords = shipType.getShipCoordinates(coordinate, orientation);
-            view.showPlacementPreview(coords, false, null);
+            showInvalidPlacement(coordinate, orientation, shipType);
         }
     }
 
@@ -71,9 +70,13 @@ public class SetupState extends BaseGameState {
             boolean valid = fleetManager.canPlaceShip(ship);
             view.showPlacementPreview(ship.getCoordinates(), valid, ship);
         } catch (IllegalArgumentException ex) {
-            LinkedHashSet<Coordinate> coords = shipType.getShipCoordinates(coordinate, orientation);
-            view.showPlacementPreview(coords, false, null);
+            showInvalidPlacement(coordinate, orientation, shipType);
         }
+    }
+
+    private void showInvalidPlacement(Coordinate coordinate, Orientation orientation, ShipType shipType){
+        LinkedHashSet<Coordinate> coords = shipType.getShipCoordinates(coordinate, orientation);
+        view.showPlacementPreview(coords, false, null);
     }
 
     @Override
