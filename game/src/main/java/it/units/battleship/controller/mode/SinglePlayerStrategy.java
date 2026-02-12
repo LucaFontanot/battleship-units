@@ -13,8 +13,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
-import static it.units.battleship.Defaults.GRID_COLS;
-import static it.units.battleship.Defaults.GRID_ROWS;
+import static it.units.battleship.Defaults.*;
 
 /**
  * Represents the single-player strategy for the game.
@@ -51,7 +50,7 @@ public class SinglePlayerStrategy implements GameModeStrategy {
     @Override
     public void sendShot(Coordinate coordinate) {
         executor.submit(() -> {
-            simulatedDelay(500);
+            simulatedDelay(DELAY_MS);
             processPlayerShot(coordinate);
 
             if (aiFleetManager.isGameOver()) {
@@ -59,12 +58,7 @@ public class SinglePlayerStrategy implements GameModeStrategy {
                 return;
             }
 
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-
+            simulatedDelay(DELAY_MS);
             Coordinate aiShot = aiOpponent.calculateNextShot();
             callback.onShotReceived(aiShot);
         });
