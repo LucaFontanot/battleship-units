@@ -1,5 +1,14 @@
 # Battleship Game
 
+![Top Language](https://img.shields.io/github/languages/top/LucaFontanot/battleship-units)
+![Checks](https://img.shields.io/github/check-runs/LucaFontanot/battleship-units/master)
+![Github All Releases](https://img.shields.io/github/downloads/LucaFontanot/battleship-units/total.svg)
+![Github Release Version](https://img.shields.io/github/package-json/v/LucaFontanot/battleship-units)
+![GitHub Release Date](https://img.shields.io/github/release-date/LucaFontanot/battleship-units)
+![GitHub License](https://img.shields.io/github/license/LucaFontanot/battleship-units)
+
+---
+
 Battleship is a classic two-player strategy game where players take turns guessing the locations of each other's ships on a grid. The objective is to sink all of the opponent's ships before they sink yours.
 
 This modern implementation features a full client-server architecture with also single player capabilities.
