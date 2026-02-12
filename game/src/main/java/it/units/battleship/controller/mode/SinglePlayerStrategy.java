@@ -13,6 +13,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
+import static it.units.battleship.Defaults.GRID_COLS;
+import static it.units.battleship.Defaults.GRID_ROWS;
+
 /**
  * Represents the single-player strategy for the game.
  * Handles interactions between the player and an AI opponent.
@@ -34,7 +37,7 @@ public class SinglePlayerStrategy implements GameModeStrategy {
     public void initialize(GameModeCallback callback) {
         this.callback = callback;
 
-        this.aiGrid = new Grid(10, 10);
+        this.aiGrid = new Grid(GRID_ROWS, GRID_COLS);
         this.aiFleetManager = new FleetManager(aiGrid, requiredFleetConfiguration);
         this.aiOpponent = new SimpleAIOpponent(aiGrid, aiFleetManager);
 
