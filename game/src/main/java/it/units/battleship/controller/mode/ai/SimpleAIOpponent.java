@@ -117,7 +117,7 @@ public class SimpleAIOpponent implements AIOpponent {
     }
 
     private boolean isValidCoordinate(Coordinate coord) {
-        return coord.row() >= 0 && coord.row() < 10
-                && coord.col() >= 0 && coord.col() < 10;
+        return coord.row() >= 0 && coord.row() < grid.getRow()
+                && coord.col() >= 0 && coord.col() < grid.getCol();
     }
 }
