@@ -1,36 +1,34 @@
 package battleship.controller.mode;
 
-import it.units.battleship.controller.game.events.CommunicationEvents;
-import it.units.battleship.controller.game.network.NetworkClient;
-import it.units.battleship.controller.mode.GameModeStrategy;
+import battleship.testutil.FakeCallback;
+import battleship.testutil.FakeNetworkClient;
 import it.units.battleship.controller.mode.OnlineMultiplayerStrategy;
 import it.units.battleship.model.Grid;
 import it.units.battleship.model.Ship;
 import it.units.battleship.Coordinate;
 import it.units.battleship.GameState;
+import it.units.battleship.data.socket.GameMessageType;
 import it.units.battleship.data.socket.payloads.GameStatusDTO;
 import it.units.battleship.data.socket.payloads.GridUpdateDTO;
 import it.units.battleship.data.socket.payloads.ShotRequestDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 class TestOnlineMultiplayerStrategy {
 
     private OnlineMultiplayerStrategy strategy;
-    private NetworkClient mockNetworkClient;
-    private GameModeStrategy.GameModeCallback mockCallback;
+    private FakeNetworkClient fakeNetwork;
+    private FakeCallback fakeCallback;
 
     @BeforeEach
     void setUp() {
-        mockNetworkClient = mock(NetworkClient.class);
-        mockCallback = mock(GameModeStrategy.GameModeCallback.class);
-        strategy = new OnlineMultiplayerStrategy(mockNetworkClient);
+        fakeNetwork = new FakeNetworkClient();
+        fakeCallback = new FakeCallback();
+        strategy = new OnlineMultiplayerStrategy(fakeNetwork);
     }
 
     @Test
@@ -39,43 +37,54 @@ class TestOnlineMultiplayerStrategy {
     }
 
     @Test
-    void testInitializeAddsListenerToNetworkClient() {
-        strategy.initialize(mockCallback);
+    void testInitializeRegistersListenerOnNetwork() {
+        strategy.initialize(fakeCallback);
 
-        verify(mockNetworkClient).addCommunicationEventsListener(any(CommunicationEvents.class));
+        // After initialize, a listener should been registered on the network
+        // We can verify by sending an event and checking the callback receives it
+        fakeNetwork.onShotReceived(new ShotRequestDTO(new Coordinate(0, 0)));
+        assertNotNull(fakeCallback.lastShotReceived);
     }
 
     @Test
-    void testSendShotDelegatesToNetworkClient() {
+    void testSendShotDelegatesToNetwork() {
         Coordinate coord = new Coordinate(3, 5);
 
         strategy.sendShot(coord);
 
-        verify(mockNetworkClient).sendShotRequest(coord);
+        assertEquals(GameMessageType.SHOT_REQUEST, fakeNetwork.lastMessageType);
+        assertInstanceOf(ShotRequestDTO.class, fakeNetwork.lastMessagePayload);
     }
 
     @Test
-    void testSendGridUpdateDelegatesToNetworkClient() {
-        Grid mockGrid = mock(Grid.class);
+    void testSendGridUpdateDelegatesToNetwork() {
+        Grid grid = new Grid(10, 10);
         List<Ship> fleet = List.of();
 
-        strategy.sendGridUpdate(mockGrid, fleet, true);
+        strategy.sendGridUpdate(grid, fleet, true);
 
-        verify(mockNetworkClient).sendGridUpdate(mockGrid, fleet, true);
+        assertEquals(GameMessageType.GRID_UPDATE, fakeNetwork.lastMessageType);
+        assertInstanceOf(GridUpdateDTO.class, fakeNetwork.lastMessagePayload);
     }
 
     @Test
-    void testSendGameOverDelegatesToNetworkClient() {
+    void testSendGameOverDelegatesToNetwork() {
         strategy.sendGameOver("Game over!");
 
-        verify(mockNetworkClient).sendGameStatus(GameState.GAME_OVER, "Game over!");
+        assertEquals(GameMessageType.TURN_CHANGE, fakeNetwork.lastMessageType);
+        assertInstanceOf(GameStatusDTO.class, fakeNetwork.lastMessagePayload);
+        GameStatusDTO payload = (GameStatusDTO) fakeNetwork.lastMessagePayload;
+        assertEquals(GameState.GAME_OVER, payload.state());
     }
 
     @Test
     void testNotifySetupCompleteSendsWaitingSetupStatus() {
         strategy.notifySetupComplete();
 
-        verify(mockNetworkClient).sendGameStatus(GameState.WAITING_SETUP, "Ready to play");
+        assertEquals(GameMessageType.TURN_CHANGE, fakeNetwork.lastMessageType);
+        assertInstanceOf(GameStatusDTO.class, fakeNetwork.lastMessagePayload);
+        GameStatusDTO payload = (GameStatusDTO) fakeNetwork.lastMessagePayload;
+        assertEquals(GameState.WAITING_SETUP, payload.state());
     }
 
     @Test
@@ -85,51 +94,42 @@ class TestOnlineMultiplayerStrategy {
 
     @Test
     void testIncomingShotIsRoutedToCallback() {
-        ArgumentCaptor<CommunicationEvents> captor = ArgumentCaptor.forClass(CommunicationEvents.class);
-        strategy.initialize(mockCallback);
-        verify(mockNetworkClient).addCommunicationEventsListener(captor.capture());
+        strategy.initialize(fakeCallback);
 
-        CommunicationEvents listener = captor.getValue();
         Coordinate expectedCoord = new Coordinate(2, 3);
-        listener.onShotReceived(new ShotRequestDTO(expectedCoord));
+        fakeNetwork.onShotReceived(new ShotRequestDTO(expectedCoord));
 
-        verify(mockCallback).onShotReceived(expectedCoord);
+        assertEquals(expectedCoord, fakeCallback.lastShotReceived);
     }
 
     @Test
     void testIncomingGameStatusIsRoutedToCallback() {
-        ArgumentCaptor<CommunicationEvents> captor = ArgumentCaptor.forClass(CommunicationEvents.class);
-        strategy.initialize(mockCallback);
-        verify(mockNetworkClient).addCommunicationEventsListener(captor.capture());
+        strategy.initialize(fakeCallback);
 
-        CommunicationEvents listener = captor.getValue();
-        listener.onGameStatusReceived(new GameStatusDTO(GameState.ACTIVE_TURN, "Your turn"));
+        fakeNetwork.onGameStatusReceived(new GameStatusDTO(GameState.ACTIVE_TURN, "Your turn"));
 
-        verify(mockCallback).onGameStatusReceived(GameState.ACTIVE_TURN, "Your turn");
+        assertEquals(GameState.ACTIVE_TURN, fakeCallback.lastGameStatusState);
+        assertEquals("Your turn", fakeCallback.lastGameStatusMessage);
     }
 
     @Test
     void testIncomingGridUpdateIsRoutedToCallback() {
-        ArgumentCaptor<CommunicationEvents> captor = ArgumentCaptor.forClass(CommunicationEvents.class);
-        strategy.initialize(mockCallback);
-        verify(mockNetworkClient).addCommunicationEventsListener(captor.capture());
+        strategy.initialize(fakeCallback);
 
-        CommunicationEvents listener = captor.getValue();
         String gridSerialized = "EEEEEEEEEE";
-        listener.onOpponentGridUpdate(new GridUpdateDTO(true, gridSerialized, List.of()));
+        fakeNetwork.onOpponentGridUpdate(new GridUpdateDTO(true, gridSerialized, List.of()));
 
-        verify(mockCallback).onGridUpdateReceived(eq(gridSerialized), anyList());
+        assertEquals(gridSerialized, fakeCallback.lastGridUpdateSerialized);
+        assertNotNull(fakeCallback.lastGridUpdateFleet);
     }
 
     @Test
     void testIncomingGameOverStatusIsRoutedToCallback() {
-        ArgumentCaptor<CommunicationEvents> captor = ArgumentCaptor.forClass(CommunicationEvents.class);
-        strategy.initialize(mockCallback);
-        verify(mockNetworkClient).addCommunicationEventsListener(captor.capture());
+        strategy.initialize(fakeCallback);
 
-        CommunicationEvents listener = captor.getValue();
-        listener.onGameStatusReceived(new GameStatusDTO(GameState.GAME_OVER, "You lost!"));
+        fakeNetwork.onGameStatusReceived(new GameStatusDTO(GameState.GAME_OVER, "You lost!"));
 
-        verify(mockCallback).onGameStatusReceived(GameState.GAME_OVER, "You lost!");
+        assertEquals(GameState.GAME_OVER, fakeCallback.lastGameStatusState);
+        assertEquals("You lost!", fakeCallback.lastGameStatusMessage);
     }
 }

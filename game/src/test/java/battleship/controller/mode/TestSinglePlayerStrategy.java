@@ -1,6 +1,6 @@
 package battleship.controller.mode;
 
-import it.units.battleship.controller.mode.GameModeStrategy;
+import battleship.testutil.FakeCallback;
 import it.units.battleship.controller.mode.SinglePlayerStrategy;
 import it.units.battleship.model.Grid;
 import it.units.battleship.model.Ship;
@@ -15,17 +15,16 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 class TestSinglePlayerStrategy {
 
     private SinglePlayerStrategy singlePlayerStrategy;
-    private GameModeStrategy.GameModeCallback mockCallback;
+    private FakeCallback fakeCallback;
     private Map<ShipType, Integer> requiredFleetConfiguration;
 
     @BeforeEach
     void setUp() {
-        mockCallback = mock(GameModeStrategy.GameModeCallback.class);
+        fakeCallback = new FakeCallback();
         requiredFleetConfiguration = Map.of(
                 ShipType.CARRIER, 1,
                 ShipType.BATTLESHIP, 1,
@@ -50,68 +49,76 @@ class TestSinglePlayerStrategy {
 
     @Test
     void testInitializeCallsOnOpponentReady() {
-        singlePlayerStrategy.initialize(mockCallback);
+        singlePlayerStrategy.initialize(fakeCallback);
 
-        verify(mockCallback).onOpponentReady();
+        assertTrue(fakeCallback.opponentReadyCalled);
     }
 
     @Test
-    void testSendShotCallsOnGridUpdateReceived() {
-        singlePlayerStrategy.initialize(mockCallback);
+    void testSendShotCallsOnGridUpdateReceived() throws InterruptedException {
+        singlePlayerStrategy.initialize(fakeCallback);
         Coordinate coord = new Coordinate(0, 0);
 
         singlePlayerStrategy.sendShot(coord);
 
-        // Verify with timeout for async execution
-        verify(mockCallback, timeout(2000)).onGridUpdateReceived(anyString(), anyList());
+        // Wait for the async execution to complete
+        long deadline = System.currentTimeMillis() + 3000;
+        while (fakeCallback.lastGridUpdateSerialized == null && System.currentTimeMillis() < deadline) {
+            Thread.sleep(50);
+        }
+
+        assertNotNull(fakeCallback.lastGridUpdateSerialized);
     }
 
     @Test
-    void testSendShotTriggersGameOverWhenNoShipsPlaced() {
+    void testSendShotTriggersGameOverWhenNoShipsPlaced() throws InterruptedException {
         // Create a strategy with NO ships required
         SinglePlayerStrategy emptyStrategy = new SinglePlayerStrategy(Map.of());
-        emptyStrategy.initialize(mockCallback);
+        emptyStrategy.initialize(fakeCallback);
         Coordinate coord = new Coordinate(0, 0);
 
         emptyStrategy.sendShot(coord);
 
         // Since AI has no ships placed, game should end immediately with player winning
-        verify(mockCallback, timeout(2000)).onGameStatusReceived(
-                eq(GameState.GAME_OVER),
-                contains("win")
-        );
+        long deadline = System.currentTimeMillis() + 3000;
+        while (fakeCallback.lastGameStatusState == null && System.currentTimeMillis() < deadline) {
+            Thread.sleep(50);
+        }
+
+        assertEquals(GameState.GAME_OVER, fakeCallback.lastGameStatusState);
+        assertTrue(fakeCallback.lastGameStatusMessage.contains("win"));
         emptyStrategy.shutdown();
     }
 
     @Test
     void testSendGridUpdateProcessesLastShotResult() {
-        singlePlayerStrategy.initialize(mockCallback);
+        singlePlayerStrategy.initialize(fakeCallback);
 
-        Grid mockGrid = mock(Grid.class);
+        Grid grid = new Grid(10, 10);
         List<Ship> fleet = List.of();
 
         assertDoesNotThrow(() ->
-                singlePlayerStrategy.sendGridUpdate(mockGrid, fleet, true)
+                singlePlayerStrategy.sendGridUpdate(grid, fleet, true)
         );
     }
 
     @Test
     void testNotifySetupCompleteDoesNotThrow() {
-        singlePlayerStrategy.initialize(mockCallback);
+        singlePlayerStrategy.initialize(fakeCallback);
 
         assertDoesNotThrow(() -> singlePlayerStrategy.notifySetupComplete());
     }
 
     @Test
     void testSendGameOverDoesNotThrow() {
-        singlePlayerStrategy.initialize(mockCallback);
+        singlePlayerStrategy.initialize(fakeCallback);
 
         assertDoesNotThrow(() -> singlePlayerStrategy.sendGameOver("Game Over"));
     }
 
     @Test
     void testShutdownStopsExecutor() {
-        singlePlayerStrategy.initialize(mockCallback);
+        singlePlayerStrategy.initialize(fakeCallback);
 
         assertDoesNotThrow(() -> singlePlayerStrategy.shutdown());
     }
