@@ -23,8 +23,6 @@ import java.util.List;
 
 /**
  * Main glue class that keeps the model, view and networking layer talking.
- * Implements {@link GameActions} so that turn states can call back into the controller
- * for model updates, view refreshes, network communication and state transitions.
  */
 public class GameController implements GameModeStrategy.GameModeCallback, GameInteractionFacade{
 
