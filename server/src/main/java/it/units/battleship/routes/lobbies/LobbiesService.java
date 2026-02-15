@@ -86,7 +86,7 @@ public class LobbiesService implements Runnable {
     public void run() {
         for (String lobbyID : lobbies.keySet()) {
             if (!LobbySocketClient.connectedLobbies.containsKey(lobbyID)) {
-                if (lobbies.get(lobbyID).getPlayerOneCtx() == null || lobbies.get(lobbyID).getPlayerTwoCtx() == null) {
+                if (lobbies.get(lobbyID).getPlayerOneCtx() == null && lobbies.get(lobbyID).getPlayerTwoCtx() == null) {
                     lobbies.remove(lobbyID);
                 } else if (!(lobbies.get(lobbyID).getPlayerOneCtx().isConnected() || lobbies.get(lobbyID).getPlayerTwoCtx().isConnected())) {
                     lobbies.remove(lobbyID);

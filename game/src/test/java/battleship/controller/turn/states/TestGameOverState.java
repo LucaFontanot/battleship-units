@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
+import static it.units.battleship.Defaults.MSG_VICTORY;
 import static org.junit.jupiter.api.Assertions.*;
 
 class TestGameOverState {
@@ -103,7 +104,7 @@ class TestGameOverState {
 
         assertFalse(fakeView.playerTurn);
         assertEquals(message, fakeView.lastEndGameMessage);
-        assertEquals(message, fakeGameMode.lastGameOverMessage);
+        assertEquals(MSG_VICTORY, fakeGameMode.lastGameOverMessage);
         assertNotNull(fakeView.lastPlacedCounts);
     }
 }
