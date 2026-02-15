@@ -64,6 +64,7 @@ public class LobbiesController extends AbstractRoute<LobbiesService> {
             if (client != null) {
                 client.onClose(ctx);
             }
+            websocketClients.remove(ctx);
         });
         config.onBinaryMessage(ctx -> {
             LobbySocketClient client = websocketClients.get(ctx);
@@ -76,6 +77,7 @@ public class LobbiesController extends AbstractRoute<LobbiesService> {
             if (client != null) {
                 client.onError(ctx);
             }
+            websocketClients.remove(ctx);
         });
         config.onMessage(ctx -> {
             LobbySocketClient client = websocketClients.get(ctx);

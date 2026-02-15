@@ -20,6 +20,7 @@ public class LobbySocketClient implements WebSocketConnection {
     final WebServerApp app;
     final WsContext ctx;
     final AtomicBoolean isAuthenticated = new AtomicBoolean(false);
+    final AtomicBoolean isConnected = new AtomicBoolean(true);
 
     Lobby lobby;
     LobbiesService.PlayerType playerType;
@@ -28,6 +29,10 @@ public class LobbySocketClient implements WebSocketConnection {
         Logger.log("[LobbySocketClient] New WebSocket connection initialized: " + ctx.sessionId());
         this.app = app;
         this.ctx = ctx;
+    }
+
+    public boolean isConnected() {
+        return isConnected.get();
     }
 
     /**
@@ -198,6 +203,7 @@ public class LobbySocketClient implements WebSocketConnection {
     }
 
     void disposeLobby() {
+        isConnected.set(false);
         if (lobby != null && isAuthenticated.get()) {
             if (playerType.equals(LobbiesService.PlayerType.PLAYER_ONE)) {
                 lobby.setPlayerOneCtx(null);
