@@ -4,6 +4,8 @@ import it.units.battleship.GameState;
 import it.units.battleship.controller.turn.GameContext;
 import lombok.Getter;
 
+import static it.units.battleship.Defaults.MSG_VICTORY;
+
 /**
  * Represents the state of the game when it has ended, either in victory or defeat.
  */
@@ -26,7 +28,7 @@ public class GameOverState extends BaseGameState {
         view.showEndGame(message);
 
         if (!won) {
-            network.sendGameOver(message);
+            network.sendGameOver(MSG_VICTORY);
         }
     }
 
